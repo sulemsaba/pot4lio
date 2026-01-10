@@ -1,24 +1,32 @@
+<!-- src/App.vue -->
 <template>
   <div id="app" :data-theme="theme">
-    <ChatSidebar 
-      :theme="theme" 
+    <!-- Sidebar -->
+    <ChatSidebar
+      :theme="theme"
       @toggle-theme="toggleTheme"
       @select-section="handleSectionSelect"
     />
+
+    <!-- Main chat area -->
     <div class="main-content">
-      <ChatContainer 
+      <ChatContainer
         :messages="messages"
         :is-typing="isTyping"
-        @send-message="sendMessage"
-      />
+        ref="chatContainer"
+      >
+        <!-- Input Area slot -->
+        <InputArea @send-message="sendMessage" />
+      </ChatContainer>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import ChatSidebar from './components/ChatSidebar.vue';
 import ChatContainer from './components/ChatContainer.vue';
+import InputArea from './components/InputArea.vue';
 import { portfolioData, getBotResponse } from './data/portfolio-data.js';
 
 const theme = ref('dark');
@@ -30,83 +38,81 @@ const toggleTheme = () => {
   localStorage.setItem('portfolio-theme', theme.value);
 };
 
+// Handle sidebar section selection
 const handleSectionSelect = (sectionId) => {
   const section = portfolioData.sections.find(s => s.id === sectionId);
-  if (section) {
-    // Add user message
-    const userMessage = {
-      id: Date.now(),
-      text: `Tell me about ${section.title.toLowerCase()}`,
-      sender: 'user',
-      timestamp: new Date()
-    };
-    messages.value.push(userMessage);
-    
-    // Add bot response after delay
-    setTimeout(() => {
-      addBotResponse(section.content);
-    }, 300);
-  }
+  if (!section) return;
+
+  addUserMessage(`Tell me about ${section.title.toLowerCase()}`);
+  simulateBotResponse(section.content);
 };
 
-const sendMessage = (messageText) => {
-  if (!messageText.trim()) return;
-  
-  // Add user message
-  const userMessage = {
+// Add user message
+const addUserMessage = (text) => {
+  messages.value.push({
     id: Date.now(),
-    text: messageText,
     sender: 'user',
-    timestamp: new Date()
-  };
-  messages.value.push(userMessage);
-  
-  // Show typing indicator
+    text,
+    timestamp: new Date(),
+  });
+  scrollToBottom();
+};
+
+// Simulate bot response
+const simulateBotResponse = (text) => {
   isTyping.value = true;
-  
-  // Simulate bot thinking delay
   setTimeout(() => {
-    const botResponse = getBotResponse(messageText);
-    addBotResponse(botResponse);
+    messages.value.push({
+      id: Date.now() + 1,
+      sender: 'bot',
+      text,
+      timestamp: new Date(),
+    });
     isTyping.value = false;
-  }, 800 + Math.random() * 800); // Random delay for realism
+    scrollToBottom();
+    saveMessages();
+  }, 800 + Math.random() * 800); // random delay
 };
 
-const addBotResponse = (text) => {
-  const botMessage = {
-    id: Date.now() + 1,
-    text: text,
-    sender: 'bot',
-    timestamp: new Date()
-  };
-  messages.value.push(botMessage);
-  
-  // Save to localStorage
-  saveMessages();
+// Handle input area sending message
+const sendMessage = (text) => {
+  if (!text.trim()) return;
+  addUserMessage(text);
+
+  // Bot thinking
+  isTyping.value = true;
+  setTimeout(() => {
+    const botText = getBotResponse(text);
+    simulateBotResponse(botText);
+  }, 600 + Math.random() * 600);
 };
 
+// Scroll helper
+const chatContainer = ref(null);
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatContainer.value?.$refs?.messagesContainer) {
+      const el = chatContainer.value.$refs.messagesContainer;
+      el.scrollTop = el.scrollHeight;
+    }
+  });
+};
+
+// Persist messages & theme
 const saveMessages = () => {
-  if (messages.value.length > 0) {
-    const messagesToSave = messages.value.slice(-50); // Save last 50 messages
-    localStorage.setItem('portfolio-chat-history', JSON.stringify(messagesToSave));
-  }
+  localStorage.setItem('portfolio-chat-history', JSON.stringify(messages.value.slice(-50)));
 };
 
 const loadMessages = () => {
   const saved = localStorage.getItem('portfolio-chat-history');
-  if (saved) {
-    messages.value = JSON.parse(saved);
-  } else {
-    // Initial greeting
-    setTimeout(() => {
-      addBotResponse(portfolioData.greetings[0]);
-    }, 500);
-  }
-  
-  // Load theme preference
+  if (saved) messages.value = JSON.parse(saved);
+
   const savedTheme = localStorage.getItem('portfolio-theme');
-  if (savedTheme) {
-    theme.value = savedTheme;
+  if (savedTheme) theme.value = savedTheme;
+
+  // Initial greeting if no messages
+  if (messages.value.length === 0) {
+    simulateBotResponse(portfolioData.greetings[0]);
   }
 };
 
@@ -127,8 +133,8 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-secondary);
   overflow: hidden;
+  background-color: var(--bg-secondary);
 }
 
 @media (max-width: 768px) {
@@ -137,7 +143,7 @@ onMounted(() => {
   }
   
   .main-content {
-    height: calc(100vh - 60px); /* Leave space for mobile sidebar */
+    height: calc(100vh - 60px); /* adjust if sidebar height changes */
   }
 }
 </style>

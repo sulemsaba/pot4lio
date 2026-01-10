@@ -1,195 +1,95 @@
+<!-- src/components/MessageBubble.vue -->
 <template>
-  <div 
-    class="message" 
-    :class="[message.sender, { 'has-avatar': showAvatar }]"
-    :aria-label="`${message.sender === 'user' ? 'You' : 'Assistant'} message`"
-  >
-    <div class="message-avatar" v-if="showAvatar">
-      <div class="avatar-initial">
-        {{ message.sender === 'user' ? 'Y' : 'A' }}
-      </div>
-    </div>
-    
+  <div :class="['message-bubble', role]" :aria-label="role + ' message'">
     <div class="message-content">
-      <div class="message-text" v-html="formattedText"></div>
-      <div class="message-time">
-        {{ formattedTime }}
-      </div>
+      <p v-html="content"></p>
+      <span class="timestamp">{{ formattedTime }}</span>
     </div>
+    <button v-if="role==='user'" class="delete-btn" @click="$emit('delete')">
+      &times;
+    </button>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps({
-  message: {
-    type: Object,
-    required: true
-  },
-  showAvatar: {
-    type: Boolean,
-    default: true
-  }
-});
+  role: { type: String, required: true },
+  content: { type: String, required: true },
+  timestamp: { type: Date, required: true },
+  isStreaming: { type: Boolean, default: false }
+})
 
 const formattedTime = computed(() => {
-  const date = new Date(props.message.timestamp);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-});
-
-const formattedText = computed(() => {
-  // Simple markdown-like formatting
-  let text = props.message.text;
-  
-  // Bold: **text**
-  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
-  // Headers: ### text
-  text = text.replace(/^### (.*$)/gm, '<h3 class="message-header">$1</h3>');
-  text = text.replace(/^## (.*$)/gm, '<h3 class="message-header">$1</h3>');
-  text = text.replace(/^# (.*$)/gm, '<h2 class="message-header">$1</h2>');
-  
-  // Links: [text](url)
-  text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener" class="message-link">$1</a>');
-  
-  // Lists: - item
-  text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
-  text = text.replace(/(<li>.*<\/li>)/s, '<ul class="message-list">$1</ul>');
-  
-  // New lines to <br>
-  text = text.replace(/\n/g, '<br>');
-  
-  return text;
-});
+  const h = props.timestamp.getHours().toString().padStart(2,'0')
+  const m = props.timestamp.getMinutes().toString().padStart(2,'0')
+  return `${h}:${m}`
+})
 </script>
 
 <style scoped>
-.message {
+.message-bubble {
   display: flex;
-  gap: 1rem;
-  padding: 1.25rem;
-  border-radius: 0.5rem;
-  animation: fadeIn 0.3s ease;
-  max-width: 85%;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 75%;
+  position: relative;
 }
 
-.message.user {
-  background-color: var(--user-message);
-  color: white;
-  margin-left: auto;
-  border-bottom-right-radius: 0.25rem;
-}
-
-.message.bot {
-  background-color: var(--bg-tertiary);
-  border-bottom-left-radius: 0.25rem;
-}
-
-.message.has-avatar {
-  padding-top: 0.75rem;
-}
-
-.message-avatar {
-  flex-shrink: 0;
-}
-
-.avatar-initial {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.875rem;
-}
-
-.user .avatar-initial {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.bot .avatar-initial {
-  background-color: var(--accent-color);
-  color: white;
-}
-
-.message-content {
-  flex: 1;
-  min-width: 0; /* Prevent overflow */
-}
-
-.message-text {
-  line-height: 1.5;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.message-text :deep(.message-header) {
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.message-text :deep(.message-header):first-child {
-  margin-top: 0;
-}
-
-.message-text :deep(.message-link) {
-  color: inherit;
-  text-decoration: underline;
-  opacity: 0.9;
-}
-
-.user .message-text :deep(.message-link) {
-  color: white;
-}
-
-.message-text :deep(.message-list) {
-  margin-left: 1.5rem;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.message-text :deep(li) {
-  margin-bottom: 0.25rem;
-}
-
-.message-time {
-  font-size: 0.75rem;
-  opacity: 0.7;
-  margin-top: 0.5rem;
-  display: flex;
+.message-bubble.user {
+  align-self: flex-end;
   justify-content: flex-end;
 }
 
-.user .message-time {
-  color: rgba(255, 255, 255, 0.8);
+.message-bubble.assistant {
+  align-self: flex-start;
+  justify-content: flex-start;
 }
 
-.bot .message-time {
-  color: var(--text-secondary);
+.message-content {
+  background: rgba(68,70,84,0.5);
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  color: var(--text-primary, #ececf1);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.message-bubble.user .message-content {
+  background: var(--user-message, #10a37f);
+  color: white;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .message {
-    max-width: 95%;
-    padding: 1rem;
-    gap: 0.75rem;
-  }
-  
-  .avatar-initial {
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
-  }
+.timestamp {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(236,236,241,0.5);
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+/* Delete button */
+.delete-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: red;
+}
+
+/* Streaming animation (optional) */
+.message-bubble.assistant p::after {
+  content: attr(data-stream);
 }
 </style>

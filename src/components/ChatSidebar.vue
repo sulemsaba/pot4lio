@@ -1,318 +1,145 @@
 <template>
-  <aside class="sidebar" :class="{ 'sidebar-mobile': isMobile }">
-    <div class="sidebar-header">
-      <div class="user-info">
-        <div class="avatar">[Y]</div>
-        <div>
-          <h2>{{ portfolioData.name }}</h2>
-          <p class="user-title">{{ portfolioData.title }}</p>
-        </div>
-      </div>
-      <ThemeToggle :theme="theme" @toggle-theme="$emit('toggle-theme')" />
+  <aside class="sidebar" :class="{ expanded: isExpanded }">
+    <!-- Profile / Logo -->
+    <div class="sidebar-top">
+      <img src="" alt="Profile" class="profile-pic" />
+      <h1 v-if="isExpanded" class="sidebar-title">Portfolio GPT</h1>
+      <button class="expand-btn" @click="isExpanded = !isExpanded">
+        <MoreHorizontal />
+      </button>
     </div>
-    
-    <div class="sidebar-content">
-      <p class="sidebar-bio">{{ portfolioData.bio }}</p>
-      
-      <div class="section-nav">
-        <h3 class="section-title">Quick Links</h3>
-        <ul class="nav-list">
-          <li 
-            v-for="section in portfolioData.sections" 
-            :key="section.id"
-            @click="$emit('select-section', section.id)"
-            class="nav-item"
-            :aria-label="`Navigate to ${section.title}`"
-          >
-            <span class="nav-icon">›</span>
-            {{ section.title }}
-          </li>
-        </ul>
-      </div>
-      
-      <div class="contact-info">
-        <h3 class="section-title">Contact Info</h3>
-        <p>[your.email@example.com]</p>
-        <div class="social-links">
-          <a href="#" class="social-link" aria-label="GitHub">GitHub</a>
-          <a href="#" class="social-link" aria-label="LinkedIn">LinkedIn</a>
-          <a href="#" class="social-link" aria-label="Twitter">Twitter</a>
-        </div>
-      </div>
-      
-      <div class="chat-info">
-        <p class="chat-tip">
-          <strong>Tip:</strong> Try asking about my skills, projects, or experience.
-        </p>
-        <button 
-          class="clear-chat-btn" 
-          @click="$emit('clear-chat')"
-          aria-label="Clear chat history"
-        >
-          Clear Chat
-        </button>
-      </div>
+
+    <!-- Sections -->
+    <div class="sidebar-sections">
+      <SidebarSection
+        v-for="section in sections"
+        :key="section.id"
+        :icon="section.icon"
+        :label="section.label"
+        :expanded="isExpanded"
+        @click="section.action"
+      />
     </div>
-    
-    <div class="sidebar-footer">
-      <p>© {{ new Date().getFullYear() }} {{ portfolioData.name }}</p>
+
+    <!-- Top actions -->
+    <div class="sidebar-actions">
+      <SidebarSection
+        v-for="action in actions"
+        :key="action.id"
+        :icon="action.icon"
+        :label="action.label"
+        :expanded="isExpanded"
+        @click="action.action"
+      />
     </div>
+
+    <!-- Dropdown Menu -->
+    <SidebarDropdownMenu
+      :expanded="isExpanded"
+      @select="handleMenuAction"
+    />
   </aside>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { portfolioData } from '../data/portfolio-data.js';
-import ThemeToggle from './ThemeToggle.vue';
+import { ref } from 'vue';
+import SidebarSection from './SidebarSection.vue';
+import SidebarDropdownMenu from './SidebarDropdownMenu.vue';
+import { Home, Search, FileText, Image, Users, Share2, MoreHorizontal } from 'lucide-vue-next';
 
-defineProps({
-  theme: {
-    type: String,
-    default: 'dark'
-  }
-});
+// Collapsible sidebar
+const isExpanded = ref(false);
 
-defineEmits(['toggle-theme', 'select-section', 'clear-chat']);
+// Sections for main navigation
+const sections = [
+  { id: 'chat', label: 'Chat', icon: Home, action: () => console.log('Chat clicked') },
+  { id: 'new-chat', label: 'New Chat', icon: FileText, action: () => console.log('New Chat') },
+  { id: 'search', label: 'Search', icon: Search, action: () => console.log('Search') },
+  { id: 'create-image', label: 'Create Image', icon: Image, action: () => console.log('Create Image') }
+];
 
-const isMobile = ref(false);
+// Top action buttons
+const actions = [
+  { id: 'share', label: 'Share', icon: Share2, action: () => console.log('Share clicked') },
+  { id: 'team', label: 'Team', icon: Users, action: () => console.log('Add People clicked') }
+];
 
-const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768;
+// Dropdown menu handler
+const handleMenuAction = (action) => {
+  console.log('Menu Action:', action);
 };
-
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);
-});
 </script>
 
 <style scoped>
 .sidebar {
-  width: var(--sidebar-width);
-  background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-  overflow-y: auto;
+  width: 60px;
+  background-color: var(--bg-primary);
   height: 100vh;
+  padding: 0.5rem;
+  transition: width 0.3s;
+}
+
+.sidebar.expanded {
+  width: 200px;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
   position: relative;
-  z-index: 10;
 }
 
-.sidebar-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  background-color: var(--accent-color);
+.profile-pic {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.sidebar-title {
+  font-size: 0.875rem;
   font-weight: bold;
-  color: white;
-  flex-shrink: 0;
 }
 
-.user-info h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.user-title {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
-}
-
-.sidebar-content {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.sidebar-bio {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 2rem;
-}
-
-.section-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-}
-
-.nav-list {
-  list-style: none;
-  margin-bottom: 2rem;
-}
-
-.nav-item {
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.nav-item:hover {
-  background-color: var(--bg-tertiary);
-}
-
-.nav-icon {
-  margin-right: 0.75rem;
-  color: var(--accent-color);
-}
-
-.contact-info {
-  margin-bottom: 2rem;
-}
-
-.contact-info p {
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-}
-
-.social-links {
-  display: flex;
-  gap: 1rem;
-}
-
-.social-link {
-  color: var(--accent-color);
-  text-decoration: none;
-  font-size: 0.875rem;
-  transition: opacity 0.2s;
-}
-
-.social-link:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
-
-.chat-info {
-  padding: 1rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 0.5rem;
-  margin-top: auto;
-}
-
-.chat-tip {
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  color: var(--text-secondary);
-}
-
-.clear-chat-btn {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background-color: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+.expand-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: transparent;
+  border: none;
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: background-color 0.2s;
 }
 
-.clear-chat-btn:hover {
-  background-color: var(--bg-secondary);
+.sidebar-sections,
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  gap: 0.25rem;
 }
 
-.sidebar-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-color);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-align: center;
-}
-
-/* Mobile Styles */
+/* Responsive */
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    height: 60px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
-    overflow: visible;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
   }
-  
-  .sidebar-header {
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: none;
+
+  .sidebar.expanded {
+    width: 100%;
   }
-  
-  .user-info {
-    margin-bottom: 0;
-  }
-  
-  .avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.875rem;
-  }
-  
-  .user-info h2 {
-    font-size: 1rem;
-  }
-  
-  .user-title {
-    display: none;
-  }
-  
-  .sidebar-content,
-  .sidebar-footer {
-    display: none;
-  }
-  
-  .sidebar-mobile .sidebar-content {
-    display: block;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background-color: var(--bg-primary);
-    height: calc(100vh - 60px);
-    z-index: 100;
-    padding: 1.5rem;
-    overflow-y: auto;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sidebar-mobile .sidebar-footer {
-    display: block;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--bg-primary);
+
+  .sidebar-top,
+  .sidebar-sections,
+  .sidebar-actions {
+    flex-direction: row;
+    gap: 0.5rem;
   }
 }
 </style>
