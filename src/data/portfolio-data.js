@@ -1,131 +1,55 @@
-// src/data/portfolio-data.js
-import { User, Code, Briefcase, Mail, HelpCircle } from 'lucide-vue-next';
-
+// Update with your real information
 export const portfolioData = {
-  name: '[Your Name]',
-  title: '[Your Title]',
-  bio: 'Passionate developer specializing in [Your Specialties].',
+  name: 'Suleiman',
+  title: 'Full Stack Developer',
+  bio: 'Passionate developer specializing in Vue.js, React, and modern web technologies.',
 
   sections: [
     {
       id: 'about',
       title: 'About Me',
       icon: User,
-      keywords: ['about', 'who are you', 'bio', 'background', 'introduction'],
-      content: `I'm a passionate developer with expertise in modern web technologies. I enjoy creating intuitive user experiences and solving complex problems with clean, efficient code. My background includes [Your Background Details].`
+      keywords: ['about', 'who are you', 'bio', 'background'],
+      content: `I'm a passionate Full Stack Developer with 3+ years of experience building web applications. I specialize in Vue.js, React, and Node.js, and love creating beautiful, performant user experiences.`
     },
     {
       id: 'skills',
       title: 'Skills',
       icon: Code,
-      keywords: ['skills', 'technologies', 'tools', 'stack', 'what do you know'],
-      content: `**Frontend:** Vue.js, React, JavaScript, TypeScript, HTML5, CSS3\n**Backend:** Node.js, Python, Express\n**Databases:** MongoDB, PostgreSQL\n**Tools:** Git, Docker, AWS, Figma\n**Other:** Responsive Design, UI/UX, Agile/Scrum`
+      keywords: ['skills', 'technologies', 'stack', 'what do you know'],
+      content: `**Frontend:** Vue.js, React, JavaScript/TypeScript, HTML5/CSS3, Tailwind CSS
+**Backend:** Node.js, Express, Python, REST APIs
+**Databases:** MongoDB, PostgreSQL, Firebase
+**Tools:** Git, Docker, AWS, CI/CD, Figma
+**Other:** Agile/Scrum, UI/UX Design, Responsive Design`
     },
     {
       id: 'projects',
       title: 'Projects',
       icon: Code,
-      keywords: ['projects', 'portfolio', 'work', 'showcase', 'what have you built'],
-      content: `### **Project 1: [Project Name]**
-      - Description: [Brief project description]
-      - Technologies: Vue.js, Node.js, MongoDB
-      - Features: [Key features]
-      - Link: [Live demo or GitHub URL]
+      keywords: ['projects', 'portfolio', 'work', 'showcase'],
+      content: `### **E-Commerce Platform** (Vue.js, Node.js, MongoDB)
+      - Full-featured e-commerce platform with admin dashboard
+      - Features: User auth, product management, payment integration
+      - [Live Demo](https://demo.example.com) | [GitHub](https://github.com/yourusername/ecommerce)
       
-      ### **Project 2: [Project Name]**
-      - Description: [Brief project description]
-      - Technologies: React, Express, PostgreSQL
-      - Features: [Key features]
-      - Link: [Live demo or GitHub URL]
+      ### **Task Management App** (React, Firebase)
+      - Real-time collaborative task management with drag & drop
+      - Features: Team collaboration, notifications, file uploads
+      - [Live Demo](https://taskapp.example.com) | [GitHub](https://github.com/yourusername/taskapp)
       
-      ### **Project 3: [Project Name]**
-      - Description: [Brief project description]
-      - Technologies: [Technologies used]
-      - Features: [Key features]
-      - Link: [Live demo or GitHub URL]`
+      ### **Weather Dashboard** (Vue.js, OpenWeather API)
+      - Beautiful weather dashboard with 5-day forecast
+      - Features: Location search, interactive charts, PWA
+      - [Live Demo](https://weather.example.com) | [GitHub](https://github.com/yourusername/weather)`
     },
-    {
-      id: 'experience',
-      title: 'Experience',
-      icon: Briefcase,
-      keywords: ['experience', 'work history', 'jobs', 'career', 'employment'],
-      content: `### **Senior Developer** at [Company Name] (2020-Present)
-      - Led development of customer-facing applications using Vue.js
-      - Implemented CI/CD pipelines reducing deployment time by 40%
-      - Mentored 3 junior developers on best practices
-      
-      ### **Frontend Developer** at [Company Name] (2018-2020)
-      - Developed responsive web applications using React and TypeScript
-      - Collaborated with UX designers to implement user-centric features
-      - Optimized application performance improving load times by 30%`
-    },
-    {
-      id: 'contact',
-      title: 'Contact',
-      icon: Mail,
-      keywords: ['contact', 'email', 'get in touch', 'hire', 'connect', 'social'],
-      content: `Feel free to reach out for collaborations, opportunities, or just to chat!
-      
-      **Email:** [your.email@example.com]
-      **LinkedIn:** [linkedin.com/in/yourprofile]
-      **GitHub:** [github.com/yourusername]
-      **Twitter:** [twitter.com/yourhandle]
-      
-      I typically respond within 24 hours.`
-    },
-    {
-      id: 'help',
-      title: 'Help',
-      icon: HelpCircle,
-      keywords: ['help', 'commands', 'what can you do', 'options', 'menu'],
-      content: `I can tell you about:
-      - **About me**: My background and interests
-      - **Skills**: Technologies and tools I work with
-      - **Projects**: My portfolio projects with details
-      - **Experience**: My professional work history
-      - **Contact**: How to get in touch with me
-      
-      Just ask about any of these topics, or type "help" anytime!`
-    }
+    // ... rest of your sections
   ],
 
   greetings: [
-    "Hello! I'm [Your Name]'s portfolio assistant. How can I help you today?",
-    "Hi there! Ask me about my skills, projects, experience, or contact information.",
-    "Welcome to my interactive portfolio! What would you like to know about me?"
+    "Hi! I'm Suleiman, a Full Stack Developer. Ask me about my projects, skills, or experience!",
+    "Hello! Welcome to my portfolio. Feel free to ask me anything about my work or background.",
+    "Hey there! I'm Suleiman. I build web applications and love solving complex problems with code."
   ],
-
-  defaultResponses: [
-    "I'm not sure about that. Try asking about my skills, projects, or experience!",
-    "Could you rephrase that? I can tell you about my background, skills, projects, or contact info.",
-    "I'm here to help you learn about my portfolio. Try asking about specific sections like 'projects' or 'experience'."
-  ]
-};
-
-// Bot response logic
-export const getBotResponse = (userMessage) => {
-  const message = userMessage.toLowerCase().trim();
-  const { sections, defaultResponses, greetings } = portfolioData;
-
-  // Greetings
-  if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-    return greetings[Math.floor(Math.random() * greetings.length)];
-  }
-
-  // Help
-  if (message.includes('help')) {
-    return sections.find(s => s.id === 'help').content;
-  }
-
-  // Section keywords
-  for (const section of sections) {
-    for (const keyword of section.keywords) {
-      if (message.includes(keyword)) {
-        return section.content;
-      }
-    }
-  }
-
-  // Default response
-  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  // ...
 };
