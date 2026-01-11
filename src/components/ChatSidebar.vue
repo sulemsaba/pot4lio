@@ -1,114 +1,159 @@
-<!-- Update the sidebar-top section -->
 <template>
-  <aside class="sidebar" :class="{ expanded: isExpanded }">
-    <!-- Profile / Logo -->
+  <aside class="chat-sidebar">
+    <!-- Top Brand / Persona Switcher -->
     <div class="sidebar-top">
-      <div class="profile-section">
-        <img src="" alt="Profile" class="profile-pic" />
-        <div v-if="isExpanded" class="profile-info">
-          <h1 class="sidebar-title">Suleiman</h1>
-          <p class="sidebar-subtitle">Full Stack Developer</p>
-        </div>
-      </div>
-      <button class="expand-btn" @click="isExpanded = !isExpanded">
-        <MoreHorizontal />
+      <h1 class="brand">Suleiman Msaba</h1>
+      <select v-model="selectedPersona" class="persona-selector">
+        <option v-for="p in personas" :key="p" :value="p">{{ p }}</option>
+      </select>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav">
+      <button
+        v-for="item in navItems"
+        :key="item.label"
+        :class="['nav-button', { active: activeItem === item.label }]"
+        @click="selectItem(item.label)"
+      >
+        <item.icon class="icon" />
+        <span>{{ item.label }}</span>
       </button>
-    </div>
+    </nav>
 
-    <!-- Navigation Sections -->
-    <div class="sidebar-sections">
-      <SidebarSection
-        v-for="section in sections"
-        :key="section.id"
-        :icon="section.icon"
-        :label="section.label"
-        :expanded="isExpanded"
-        @click="$emit('select-section', section.id)"
-      />
-    </div>
-
-    <!-- Social Links -->
-    <div v-if="isExpanded" class="social-links">
-      <a href="https://github.com/yourusername" target="_blank" class="social-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-        </svg>
-        GitHub
-      </a>
-      <a href="https://linkedin.com/in/yourprofile" target="_blank" class="social-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-        </svg>
-        LinkedIn
-      </a>
-    </div>
-
-    <!-- Theme Toggle -->
-    <div class="theme-toggle-section">
-      <ThemeToggle :theme="theme" @toggle-theme="$emit('toggle-theme')" />
+    <!-- Bottom Settings / Theme -->
+    <div class="sidebar-bottom">
+      <ThemeToggle />
     </div>
   </aside>
 </template>
 
-<script setup>
-// Add ThemeToggle import
-import ThemeToggle from './ThemeToggle.vue';
-// Rest of your imports...
+<script>
+import { ref } from 'vue'
+import { Home, FileText, Code, Mail } from 'lucide-vue-next'
+import ThemeToggle from './ThemeToggle.vue'
 
-defineEmits(['select-section', 'toggle-theme']);
+export default {
+  components: { ThemeToggle },
+  setup() {
+    const activeItem = ref('Chat')
+    const selectedPersona = ref('Default')
+    const personas = ['Default', 'Creative', 'Executive', 'Nerd']
+
+    const navItems = [
+      { label: 'Home', icon: Home },
+      { label: 'Chat', icon: FileText },
+      { label: 'Sidecar', icon: Code },
+      { label: 'Contact', icon: Mail },
+    ]
+
+    const selectItem = (label) => {
+      activeItem.value = label
+    }
+
+    return { activeItem, selectItem, navItems, personas, selectedPersona }
+  },
+}
 </script>
 
 <style scoped>
-/* Add these styles */
-.profile-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.profile-pic {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-color);
-}
-
-.profile-info {
+.chat-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  background: rgba(33, 33, 33, 0.8); /* glass effect */
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
-.sidebar-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 0.125rem;
-}
-
-.social-links {
-  margin-top: auto;
-  padding: 1rem;
+.sidebar-top {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 16px;
 }
 
-.social-link {
+.brand {
+  font-family: 'Söhne', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.persona-selector {
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.nav-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: all 0.2s;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.social-link:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+.nav-button:hover,
+.nav-button.active {
+  background: rgba(16, 163, 127, 0.2); /* OpenAI Green accent */
+  color: #ffffff;
 }
 
-.theme-toggle-section {
-  padding: 1rem;
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar-bottom {
+  margin-bottom: 16px;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .chat-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+  }
+
+  .nav-button {
+    flex-direction: column;
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  .sidebar-bottom {
+    display: none;
+  }
 }
 </style>

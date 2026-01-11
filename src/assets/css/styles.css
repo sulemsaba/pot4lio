@@ -1,6 +1,6 @@
 /* ================================
    Gradient UI Design System
-   (ChatGPT-style personal portfolio)
+   (Responsive ChatGPT-style UI)
    ================================ */
 
 :root {
@@ -16,6 +16,7 @@
 
   --radius-lg: 20px;
   --radius-md: 14px;
+  --radius-sm: 10px;
 
   --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
@@ -31,6 +32,7 @@ body {
   color: var(--text-primary);
   font-family: Inter, system-ui, sans-serif;
   line-height: 1.6;
+  font-size: 15px;
 }
 
 /* Glass panel */
@@ -45,11 +47,13 @@ body {
 
 /* Chat bubbles */
 .bubble {
+  width: fit-content;
   max-width: 720px;
   padding: 14px 18px;
   border-radius: var(--radius-md);
   background: var(--surface);
   border: 1px solid var(--border-subtle);
+  word-wrap: break-word;
 }
 
 /* Assistant bubble */
@@ -87,5 +91,41 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ================================
+   Responsive adjustments
+   ================================ */
+
+/* Tablets and below */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .bubble {
+    max-width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+  }
+
+  .glass {
+    border-radius: 16px;
+  }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+  body {
+    font-size: 13.5px;
+  }
+
+  .bubble {
+    padding: 10px 12px;
+  }
+
+  .floating-input {
+    padding: 10px 14px;
   }
 }

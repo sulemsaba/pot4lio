@@ -1,95 +1,62 @@
-<!-- src/components/MessageBubble.vue -->
 <template>
-  <div :class="['message-bubble', role]" :aria-label="role + ' message'">
-    <div class="message-content">
-      <p v-html="content"></p>
-      <span class="timestamp">{{ formattedTime }}</span>
-    </div>
-    <button v-if="role==='user'" class="delete-btn" @click="$emit('delete')">
-      &times;
-    </button>
+  <div
+    :class="['message-bubble', fromUser ? 'user' : 'ai']"
+  >
+    <p>{{ text }}</p>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
-const props = defineProps({
-  role: { type: String, required: true },
-  content: { type: String, required: true },
-  timestamp: { type: Date, required: true },
-  isStreaming: { type: Boolean, default: false }
-})
-
-const formattedTime = computed(() => {
-  const h = props.timestamp.getHours().toString().padStart(2,'0')
-  const m = props.timestamp.getMinutes().toString().padStart(2,'0')
-  return `${h}:${m}`
+defineProps({
+  text: String,
+  fromUser: Boolean
 })
 </script>
 
 <style scoped>
 .message-bubble {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
   max-width: 75%;
-  position: relative;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+  border-radius: 16px;
+  transition: background 0.3s, transform 0.2s;
 }
 
-.message-bubble.user {
-  align-self: flex-end;
-  justify-content: flex-end;
-}
-
-.message-bubble.assistant {
+/* AI Bubble */
+.message-bubble.ai {
+  background: linear-gradient(135deg, #0d0d0d, #212121);
+  color: #fff;
   align-self: flex-start;
-  justify-content: flex-start;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
 }
 
-.message-content {
-  background: rgba(68,70,84,0.5);
-  padding: 0.5rem 0.75rem;
-  border-radius: 12px;
-  color: var(--text-primary, #ececf1);
-  font-size: 0.875rem;
-  line-height: 1.4;
-  word-wrap: break-word;
-  position: relative;
+/* User Bubble */
+.message-bubble.user {
+  background: rgba(16, 163, 127, 0.1);
+  color: #10a37f;
+  align-self: flex-end;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
 }
 
-.message-bubble.user .message-content {
-  background: var(--user-message, #10a37f);
-  color: white;
+/* Bubble hover effect */
+.message-bubble:hover {
+  transform: scale(1.02);
 }
 
-.timestamp {
-  display: block;
-  font-size: 0.65rem;
-  color: rgba(236,236,241,0.5);
-  margin-top: 0.25rem;
-  text-align: right;
-}
-
-/* Delete button */
-.delete-btn {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  border: none;
-  background: transparent;
-  color: rgba(255,255,255,0.6);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.delete-btn:hover {
-  color: red;
-}
-
-/* Streaming animation (optional) */
-.message-bubble.assistant p::after {
-  content: attr(data-stream);
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  .message-bubble {
+    max-width: 90%;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
 }
 </style>
