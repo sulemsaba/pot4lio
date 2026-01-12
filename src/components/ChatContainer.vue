@@ -1,204 +1,251 @@
 <template>
-  <main class="chat-container">
-    <!-- Chat Header -->
-    <header class="chat-header">
-      <div class="chat-title">Chat</div>
-      <div class="status-orb" :class="reasoningLevel"></div>
-    </header>
+  <div class="chat-container">
+    <!-- Messages Area -->
+    <div class="chat-messages" ref="messagesContainer">
+      <!-- Welcome Screen -->
+      <div v-if="messages.length === 0" class="welcome-screen">
+        <div class="welcome-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h1 class="welcome-title">How can I help you?</h1>
+        <p class="welcome-subtitle">Ask about projects, skills, experience, or contact info</p>
+        
+        <div class="suggestion-grid">
+          <button 
+            v-for="suggestion in suggestions" 
+            :key="suggestion.id"
+            class="suggestion-btn"
+            @click="handleSuggestion(suggestion)"
+          >
+            <component :is="suggestion.icon" class="suggestion-icon" />
+            <span>{{ suggestion.title }}</span>
+          </button>
+        </div>
+      </div>
 
-    <!-- Chat Messages -->
-    <section class="chat-messages">
-      <MessageBubble
-        v-for="(msg, index) in messages"
-        :key="index"
-        :message="msg"
-        :is-user="msg.isUser"
-      />
+      <!-- Messages -->
+      <div v-else class="messages-list">
+        <MessageBubble
+          v-for="msg in messages"
+          :key="msg.id"
+          :message="msg"
+          :is-user="msg.isUser"
+        />
+        
+        <!-- Typing Indicator -->
+        <div v-if="isTyping" class="typing-indicator">
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+      
       <div ref="scrollAnchor"></div>
-    </section>
+    </div>
 
     <!-- Input Area -->
     <InputArea
-      v-model="currentMessage"
-      @send="sendMessage"
-      placeholder="Type your message..."
+      :is-typing="isTyping"
+      @send="handleSend"
     />
-
-    <!-- Thinking Tray (optional, collapsible) -->
-    <transition name="fade">
-      <div v-if="isThinking" class="thinking-tray">
-        <p>Thinking...</p>
-        <div class="progress-bar">
-          <div class="progress" :style="{ width: reasoningProgress + '%' }"></div>
-        </div>
-      </div>
-    </transition>
-  </main>
+  </div>
 </template>
 
-<script>
-import { ref, reactive, nextTick } from 'vue'
+<script setup>
+import { ref, watch, nextTick, onMounted } from 'vue'
+import { Briefcase, Code, User, Mail } from 'lucide-vue-next'
 import MessageBubble from './MessageBubble.vue'
 import InputArea from './InputArea.vue'
 
-export default {
-  components: { MessageBubble, InputArea },
-  setup() {
-    const messages = reactive([
-      { isUser: false, text: 'Hello! I am your portfolio assistant.' },
-    ])
-    const currentMessage = ref('')
-    const isThinking = ref(false)
-    const reasoningLevel = ref('low') // none, low, medium, high, xhigh
-    const reasoningProgress = ref(0)
-    const scrollAnchor = ref(null)
-
-    const scrollToBottom = () => {
-      nextTick(() => {
-        scrollAnchor.value?.scrollIntoView({ behavior: 'smooth' })
-      })
-    }
-
-    const sendMessage = () => {
-      if (!currentMessage.value.trim()) return
-      messages.push({ isUser: true, text: currentMessage.value })
-      currentMessage.value = ''
-      scrollToBottom()
-
-      // Simulate AI response
-      isThinking.value = true
-      reasoningLevel.value = 'medium'
-      reasoningProgress.value = 0
-      let progressInterval = setInterval(() => {
-        reasoningProgress.value += 5
-        if (reasoningProgress.value >= 100) {
-          clearInterval(progressInterval)
-          messages.push({
-            isUser: false,
-            text: 'Here is the AI response to your message!',
-          })
-          isThinking.value = false
-          reasoningLevel.value = 'none'
-          scrollToBottom()
-        }
-      }, 50)
-    }
-
-    return {
-      messages,
-      currentMessage,
-      sendMessage,
-      isThinking,
-      reasoningLevel,
-      reasoningProgress,
-      scrollAnchor,
-    }
+const props = defineProps({
+  messages: {
+    type: Array,
+    default: () => []
   },
+  isTyping: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['send-message'])
+
+const messagesContainer = ref(null)
+const scrollAnchor = ref(null)
+
+const suggestions = [
+  { id: 'projects', icon: Briefcase, title: 'View projects', query: 'Tell me about your projects' },
+  { id: 'skills', icon: Code, title: 'Technical skills', query: 'What technologies do you use?' },
+  { id: 'about', icon: User, title: 'About me', query: 'Tell me about yourself' },
+  { id: 'contact', icon: Mail, title: 'Contact', query: 'How can I contact you?' }
+]
+
+const scrollToBottom = () => {
+  nextTick(() => {
+    scrollAnchor.value?.scrollIntoView({ behavior: 'smooth' })
+  })
 }
+
+const handleSend = (messageData) => {
+  emit('send-message', messageData)
+}
+
+const handleSuggestion = (suggestion) => {
+  emit('send-message', { text: suggestion.query })
+}
+
+watch(() => props.messages.length, scrollToBottom)
+watch(() => props.isTyping, (typing) => { if (typing) scrollToBottom() })
+
+onMounted(scrollToBottom)
 </script>
 
 <style scoped>
 .chat-container {
-  margin-left: 280px; /* Sidebar width */
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #050505; /* Dark mode background */
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  overflow: hidden;
+  height: 100%;
+  background: var(--bg-primary);
 }
 
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  backdrop-filter: blur(12px);
-  background: rgba(33, 33, 33, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.chat-title {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.status-orb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: green;
-  animation: pulse 2s infinite;
-}
-
-.status-orb.none { background: gray; }
-.status-orb.low { background: #10a37f; }
-.status-orb.medium { background: #10a37f; animation: pulse 2s infinite; }
-.status-orb.high { background: #0f7a5f; animation: pulse 1.5s infinite; }
-.status-orb.xhigh { background: #0c5a3f; animation: pulse 1s infinite; }
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
-}
-
+/* Messages Area */
 .chat-messages {
   flex: 1;
-  padding: 16px;
   overflow-y: auto;
+  padding: 24px 16px;
+}
+
+/* Welcome Screen */
+.welcome-screen {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  scrollbar-width: thin;
-}
-
-.thinking-tray {
-  position: absolute;
-  bottom: 72px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  padding: 12px 16px;
-  border-radius: 16px;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
   text-align: center;
-  font-size: 0.9rem;
-  z-index: 500;
+  padding: 40px 20px;
 }
 
-.progress-bar {
+.welcome-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--brand-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.welcome-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.welcome-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-width: 400px;
   width: 100%;
+}
+
+.suggestion-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.suggestion-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--brand-primary);
+}
+
+.suggestion-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+/* Messages List */
+.messages-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  padding: 16px 0;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 6px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  margin-top: 6px;
+  background: var(--text-tertiary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
 }
 
-.progress {
-  height: 100%;
-  background: #10a37f;
-  border-radius: 6px;
-  transition: width 0.1s linear;
+.typing-dots span:nth-child(1) { animation-delay: 0s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
+/* Scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
 }
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .chat-container {
-    margin-left: 0;
+  .suggestion-grid {
+    grid-template-columns: 1fr;
   }
-
-  .thinking-tray {
-    width: 95%;
-    bottom: 100px;
+  
+  .welcome-title {
+    font-size: 20px;
   }
 }
 </style>

@@ -1,59 +1,55 @@
 <template>
-  <button class="theme-toggle" @click="toggleTheme" :aria-label="'Toggle theme'">
-    <LucideMoon v-if="isDark" class="icon"/>
+  <button 
+    class="theme-toggle" 
+    @click="$emit('toggle-theme')" 
+    :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+    :title="theme === 'dark' ? 'Light mode' : 'Dark mode'"
+  >
+    <LucideMoon v-if="theme === 'dark'" class="icon"/>
     <LucideSun v-else class="icon"/>
   </button>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
 import { Moon as LucideMoon, Sun as LucideSun } from 'lucide-vue-next'
 
-const isDark = ref(true)
-
-onMounted(() => {
-  const storedTheme = localStorage.getItem('theme')
-  if (storedTheme) {
-    isDark.value = storedTheme === 'dark'
-    document.documentElement.classList.toggle('dark', isDark.value)
-  } else {
-    document.documentElement.classList.add('dark')
+defineProps({
+  theme: {
+    type: String,
+    default: 'dark'
   }
 })
 
-function toggleTheme() {
-  isDark.value = !isDark.value
-  document.documentElement.classList.toggle('dark', isDark.value)
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-}
+defineEmits(['toggle-theme'])
 </script>
 
 <style scoped>
 .theme-toggle {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 6px 10px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .theme-toggle:hover {
-  background: rgba(16, 163, 127, 0.2);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--brand-primary);
 }
 
-.theme-toggle:focus {
-  outline: 2px solid #10A37F;
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--brand-primary);
   outline-offset: 2px;
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2;
+  width: 16px;
+  height: 16px;
 }
 </style>
