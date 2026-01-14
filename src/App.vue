@@ -8,7 +8,10 @@
     :data-theme="theme"
   >
     <!-- Desktop Navigation Bar -->
-    <NavigationBar @research-click="handleResearchClick" />
+    <NavigationBar 
+      @research-click="handleResearchClick" 
+      @product-click="handleProductClick"
+    />
 
     <!-- Mobile Header (hidden on desktop) -->
     <header class="mobile-header">
@@ -202,6 +205,11 @@ const handleSendMessage = async (messageData) => {
 const handleResearchClick = () => {
   // Handle research button click from navbar
   console.log('Research clicked')
+}
+
+const handleProductClick = () => {
+  // Toggle sidecar panel when Product is clicked
+  sidecarOpen.value = !sidecarOpen.value
 }
 
 const generateResponse = async (query) => {

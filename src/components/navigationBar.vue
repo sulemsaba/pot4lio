@@ -17,7 +17,7 @@
           </svg>
           Research
         </button>
-        <a href="#" class="nav-link">Product</a>
+        <button class="nav-link" @click="handleProductClick">Product</button>
 
         <div class="dropdown" :class="{ open: dropdownOpen }" @click.stop>
           <button class="nav-link dropdown-trigger" @click="toggleDropdown">
@@ -94,7 +94,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import SidebarDropdownMenu from './SidebarDropdownMenu.vue'
 
-const emit = defineEmits(['research-click'])
+const emit = defineEmits(['research-click', 'product-click'])
 
 const navOpen = ref(false)
 const dropdownOpen = ref(false)
@@ -126,6 +126,10 @@ const handleResearchClick = () => {
 
 const closeResearchPanel = () => {
   showResearchPanel.value = false
+}
+
+const handleProductClick = () => {
+  emit('product-click')
 }
 
 const handleClickOutside = (event) => {
