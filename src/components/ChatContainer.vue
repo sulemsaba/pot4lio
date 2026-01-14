@@ -1,32 +1,9 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" :class="{ centered: isCentered }">
     <!-- Messages Area -->
-    <div class="chat-messages" ref="messagesContainer">
-      <!-- Welcome Screen -->
-      <div v-if="messages.length === 0" class="welcome-screen">
-        <div class="welcome-icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </div>
-        <h1 class="welcome-title">How can I help you?</h1>
-        <p class="welcome-subtitle">Ask about projects, skills, experience, or contact info</p>
-        
-        <div class="suggestion-grid">
-          <button 
-            v-for="suggestion in suggestions" 
-            :key="suggestion.id"
-            class="suggestion-btn"
-            @click="handleSuggestion(suggestion)"
-          >
-            <component :is="suggestion.icon" class="suggestion-icon" />
-            <span>{{ suggestion.title }}</span>
-          </button>
-        </div>
-      </div>
-
+    <div class="chat-messages" ref="messagesContainer" :class="{ hidden: isCentered && messages.length === 0 }">
       <!-- Messages -->
-      <div v-else class="messages-list">
+      <div class="messages-list">
         <MessageBubble
           v-for="msg in messages"
           :key="msg.id"
@@ -50,7 +27,9 @@
     <!-- Input Area -->
     <InputArea
       :is-typing="isTyping"
+      :is-centered="isCentered"
       @send="handleSend"
+      @footer-action="handleFooterAction"
     />
   </div>
 </template>
@@ -67,6 +46,10 @@ const props = defineProps({
     default: () => []
   },
   isTyping: {
+    type: Boolean,
+    default: false
+  },
+  isCentered: {
     type: Boolean,
     default: false
   }
@@ -98,6 +81,21 @@ const handleSuggestion = (suggestion) => {
   emit('send-message', { text: suggestion.query })
 }
 
+const handleFooterAction = (action) => {
+  // Map footer actions to queries
+  const actionQueries = {
+    'Projects': 'Tell me about your projects',
+    'About': 'Tell me about yourself',
+    'Contact': 'How can I contact you?',
+    'Contacts': 'How can I contact you?',
+    'Skills': 'What technologies do you use?',
+    'Experience': 'Tell me about your experience'
+  }
+  
+  const query = actionQueries[action] || `Tell me about ${action}`
+  emit('send-message', { text: query })
+}
+
 watch(() => props.messages.length, scrollToBottom)
 watch(() => props.isTyping, (typing) => { if (typing) scrollToBottom() })
 
@@ -110,6 +108,12 @@ onMounted(scrollToBottom)
   flex-direction: column;
   height: 100%;
   background: var(--bg-primary);
+  transition: all 0.4s ease;
+}
+
+/* Centered mode (initial state like ChatGPT) */
+.chat-container.centered {
+  justify-content: center;
 }
 
 /* Messages Area */
@@ -117,83 +121,16 @@ onMounted(scrollToBottom)
   flex: 1;
   overflow-y: auto;
   padding: 24px 16px;
+  transition: all 0.4s ease;
 }
 
-/* Welcome Screen */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.welcome-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--brand-primary);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  margin-bottom: 20px;
-}
-
-.welcome-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.welcome-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 32px;
-}
-
-.suggestion-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  max-width: 400px;
-  width: 100%;
-}
-
-.suggestion-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  text-align: left;
-}
-
-.suggestion-btn:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-  border-color: var(--brand-primary);
-}
-
-.suggestion-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--brand-primary);
-  flex-shrink: 0;
+.chat-messages.hidden {
+  display: none;
 }
 
 /* Messages List */
 .messages-list {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
@@ -240,12 +177,8 @@ onMounted(scrollToBottom)
 
 /* Responsive */
 @media (max-width: 768px) {
-  .suggestion-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .welcome-title {
-    font-size: 20px;
+  .chat-messages {
+    padding: 16px 12px;
   }
 }
 </style>

@@ -1,84 +1,68 @@
 <template>
-  <div id="thread-bottom-container">
-    <div class="bg-token-bg-primary">
-      <!-- Input Container -->
-      <div class="wcDTda_prosemirror-parent">
-        <div
-          ref="textareaRef"
-          id="prompt-textarea"
-          contenteditable="true"
-          :placeholder="placeholder"
-          @input="handleInput"
-          @keydown="handleKeydown"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          class="prompt-textarea"
-          :class="{ 'has-text': hasText }"
-          spellcheck="true"
-        ></div>
-      </div>
+  <div id="thread-bottom-container" :class="{ centered: isCentered }">
+    <div class="composer-wrapper">
+      <div class="bg-token-bg-primary">
+        <!-- Input Container -->
+        <div class="wcDTda_prosemirror-parent">
+          <div
+            ref="textareaRef"
+            id="prompt-textarea"
+            contenteditable="true"
+            :placeholder="placeholder"
+            @input="handleInput"
+            @keydown="handleKeydown"
+            @focus="handleFocus"
+            @blur="handleBlur"
+            class="prompt-textarea"
+            :class="{ 'has-text': hasText }"
+            spellcheck="true"
+          ></div>
+        </div>
 
-      <!-- Send Button -->
-      <div class="send-container">
-        <button
-          id="sendBtn"
-          class="send-btn"
-          :class="{ active: canSend }"
-          @click="sendMessage"
-          :disabled="!canSend"
-          aria-label="Send message"
-          title="Send message"
-        >
-          <svg viewBox="0 0 24 24" fill="none" class="send-icon">
-            <path d="M5 12L19 12M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
+        <!-- Send Button -->
+        <div class="send-container">
+          <button
+            id="sendBtn"
+            class="send-btn"
+            :class="{ active: canSend }"
+            @click="sendMessage"
+            :disabled="!canSend"
+            aria-label="Send message"
+            title="Send message"
+          >
+            <svg viewBox="0 0 24 24" fill="none" class="send-icon">
+              <path d="M5 12L19 12M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
 
-      <!-- Footer actions -->
-      <div data-testid="composer-footer-actions">
-        <button class="footer-btn" @click="handleFooterClick('Projects')" aria-label="Projects">
-          <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span class="footer-text">Projects</span>
-        </button>
-        
-        <button class="footer-btn" @click="handleFooterClick('About')" aria-label="About">
-          <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <span class="footer-text">About</span>
-        </button>
-        
-        <button class="footer-btn" @click="handleFooterClick('Contact')" aria-label="Contact">
-          <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-          </svg>
-          <span class="footer-text">Contact</span>
-        </button>
-        
-        <button class="footer-btn" @click="handleFooterClick('Skills')" aria-label="Skills">
-          <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12h.01"></path>
-            <path d="M15 12h.01"></path>
-            <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"></path>
-            <path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"></path>
-          </svg>
-          <span class="footer-text">Skills</span>
-        </button>
-        
-        <button class="footer-btn" @click="handleFooterClick('Experience')" aria-label="Experience">
-          <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="7" width="20" height="14" rx="2"></rect>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-          </svg>
-          <span class="footer-text">Experience</span>
-        </button>
+        <!-- Footer actions -->
+        <div data-testid="composer-footer-actions" class="footer-actions">
+          <button class="footer-btn" @click="handleFooterClick('Projects')" aria-label="Projects">
+            <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M3 3h7l2 2h9v14H3V3z"></path>
+              <path d="M3 9h18"></path>
+            </svg>
+            <span class="footer-text">Projects</span>
+          </button>
+          
+          <button class="footer-btn" @click="handleFooterClick('About')" aria-label="About">
+            <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span class="footer-text">About</span>
+          </button>
+          
+          <button class="footer-btn" @click="handleFooterClick('Contact')" aria-label="Contact">
+            <svg class="footer-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <span class="footer-text">Contacts</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -93,6 +77,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: "Ask anything..."
+  },
+  isCentered: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -167,33 +155,73 @@ onMounted(() => {
 
 <style scoped>
 /* =========================
+   CSS VARIABLES
+========================= */
+#thread-bottom-container {
+  --composer-bg: #ffffff;
+  --composer-border: #e5e7eb;
+  --composer-text: #0f172a;
+  --composer-placeholder: #9ca3af;
+  --composer-hover: #f3f4f6;
+  --composer-button-bg: #000000;
+  --composer-button-text: #ffffff;
+  --composer-gradient-start: #fafafa;
+}
+
+/* Dark theme support */
+[data-theme="dark"] #thread-bottom-container {
+  --composer-bg: #2d2d2d;
+  --composer-border: rgba(255, 255, 255, 0.1);
+  --composer-text: #ffffff;
+  --composer-placeholder: #6b7280;
+  --composer-hover: rgba(255, 255, 255, 0.08);
+  --composer-button-bg: #ffffff;
+  --composer-button-text: #000000;
+  --composer-gradient-start: #212121;
+}
+
+/* =========================
    BASE LAYOUT
 ========================= */
 #thread-bottom-container {
   position: sticky;
   bottom: 0;
-  z-index: 10;
+  z-index: 20;
   padding: 12px;
-  background: linear-gradient(to top, #f9f9f9 70%, transparent);
+  background: linear-gradient(to top, var(--composer-gradient-start) 70%, transparent);
+  transition: all 0.4s ease;
+}
+
+/* Centered mode for initial state */
+#thread-bottom-container.centered {
+  position: absolute;
+  bottom: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(50%);
+  background: transparent;
+}
+
+.composer-wrapper {
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 /* =========================
    COMPOSER GRID CONTAINER
 ========================= */
 .bg-token-bg-primary {
-  max-width: 760px;
-  margin: 0 auto;
-  background: #fff;
+  background: var(--composer-bg);
   border-radius: 28px;
   padding: 10px 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   grid-template-areas:
-    "header header header"
-    "leading primary trailing"
-    ". footer .";
+    "primary trailing"
+    "footer footer";
   gap: 8px;
+  border: 1px solid var(--composer-border);
 }
 
 /* =========================
@@ -217,21 +245,21 @@ onMounted(() => {
   padding: 8px;
   white-space: pre-wrap;
   resize: none;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: transparent;
-  color: #000;
+  color: var(--composer-text);
   width: 100%;
 }
 
 #prompt-textarea:empty::before {
   content: attr(placeholder);
-  color: #aaa;
+  color: var(--composer-placeholder);
   pointer-events: none;
 }
 
 #prompt-textarea[contenteditable="true"]:empty::before {
   content: attr(placeholder);
-  color: #aaa;
+  color: var(--composer-placeholder);
 }
 
 #prompt-textarea:focus {
@@ -247,18 +275,18 @@ onMounted(() => {
 }
 
 #prompt-textarea::-webkit-scrollbar-thumb {
-  background: #ddd;
+  background: var(--composer-border);
   border-radius: 3px;
 }
 
 #prompt-textarea::-webkit-scrollbar-thumb:hover {
-  background: #ccc;
+  background: var(--composer-placeholder);
 }
 
 /* =========================
    FOOTER BUTTONS WITH ICONS
 ========================= */
-[data-testid="composer-footer-actions"] {
+.footer-actions {
   grid-area: footer;
   display: flex;
   gap: 6px;
@@ -267,21 +295,21 @@ onMounted(() => {
   scrollbar-width: none;
 }
 
-[data-testid="composer-footer-actions"]::-webkit-scrollbar {
+.footer-actions::-webkit-scrollbar {
   display: none;
 }
 
 .footer-btn {
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid var(--composer-border);
+  background: var(--composer-bg);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
-  color: #333;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--composer-text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -289,12 +317,11 @@ onMounted(() => {
 }
 
 .footer-btn:hover {
-  background: #f2f2f2;
+  background: var(--composer-hover);
   transform: translateY(-1px);
 }
 
 .footer-btn:active {
-  background: #e8e8e8;
   transform: translateY(0);
 }
 
@@ -319,14 +346,13 @@ onMounted(() => {
 .send-container {
   grid-area: trailing;
   display: flex;
-  align-items: center;
-  padding-left: 8px;
+  align-items: flex-end;
 }
 
 .send-btn {
   border: none;
-  background: #000;
-  color: white;
+  background: var(--composer-button-bg);
+  color: var(--composer-button-text);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -411,7 +437,7 @@ onMounted(() => {
   }
   
   /* Adjust gap for icon-only buttons */
-  [data-testid="composer-footer-actions"] {
+  .footer-actions {
     gap: 4px;
   }
 }
@@ -436,7 +462,7 @@ onMounted(() => {
 
 /* Extra small screens (very small phones) */
 @media (max-width: 480px) {
-  [data-testid="composer-footer-actions"] {
+  .footer-actions {
     gap: 3px;
   }
   
@@ -459,46 +485,6 @@ onMounted(() => {
   .send-icon {
     width: 14px;
     height: 14px;
-  }
-}
-
-/* =========================
-   DARK MODE SUPPORT
-========================= */
-@media (prefers-color-scheme: dark) {
-  #thread-bottom-container {
-    background: linear-gradient(to top, #1a1a1a 70%, transparent);
-  }
-  
-  .bg-token-bg-primary {
-    background: #2d2d2d;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  }
-  
-  #prompt-textarea {
-    color: #fff;
-  }
-  
-  #prompt-textarea:empty::before {
-    color: #888;
-  }
-  
-  .footer-btn {
-    background: #3d3d3d;
-    border-color: #444;
-    color: #fff;
-  }
-  
-  .footer-btn:hover {
-    background: #4a4a4a;
-  }
-  
-  .send-btn {
-    background: #fff;
-  }
-  
-  .send-icon {
-    stroke: #000;
   }
 }
 
@@ -531,8 +517,7 @@ onMounted(() => {
   }
 }
 
-/* 
-=========================
+/* =========================
    UTILITY CLASSES
 ========================= */
 .prompt-textarea.has-text + .send-container .send-btn {
