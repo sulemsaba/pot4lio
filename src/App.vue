@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
-import NavigationBar from './components/navigationBar.vue'
+import NavigationBar from './components/NavigationBar.vue'
 import ChatSidebar from './components/ChatSidebar.vue'
 import ChatContainer from './components/ChatContainer.vue'
 import SidecarPanel from './components/SidecarPanel.vue'
