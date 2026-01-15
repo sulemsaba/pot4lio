@@ -21,7 +21,7 @@
     <!-- Brand Section -->
     <div class="brand-section" v-if="!isCollapsed">
       <div class="brand-name">Suleiman Msaba</div>
-      <div class="brand-title">Full Stack Developer</div>
+      <div class="brand-title">Software engineer</div>
     </div>
     <div class="brand-collapsed" v-else>
       <span class="brand-initials">SM</span>
