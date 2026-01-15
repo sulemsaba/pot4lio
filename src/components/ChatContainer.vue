@@ -9,6 +9,7 @@
           :key="msg.id"
           :message="msg"
           :is-user="msg.isUser"
+          @delete="handleDeleteMessage" <!-- ADD THIS -->
         />
         
         <!-- Typing Indicator -->
@@ -55,7 +56,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['send-message'])
+const emit = defineEmits(['send', 'delete-message']) 
 
 const messagesContainer = ref(null)
 const scrollAnchor = ref(null)
@@ -74,11 +75,16 @@ const scrollToBottom = () => {
 }
 
 const handleSend = (messageData) => {
-  emit('send-message', messageData)
+  emit('send', messageData.text) <!-- UPDATE THIS -->
 }
 
 const handleSuggestion = (suggestion) => {
-  emit('send-message', { text: suggestion.query })
+  emit('send', suggestion.query) <!-- UPDATE THIS -->
+}
+
+// ADD THIS FUNCTION
+const handleDeleteMessage = (messageId) => {
+  emit('delete-message', messageId)
 }
 
 const handleFooterAction = (action) => {
@@ -93,7 +99,7 @@ const handleFooterAction = (action) => {
   }
   
   const query = actionQueries[action] || `Tell me about ${action}`
-  emit('send-message', { text: query })
+  emit('send', query) <!-- UPDATE THIS -->
 }
 
 watch(() => props.messages.length, scrollToBottom)
