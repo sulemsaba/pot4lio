@@ -21,58 +21,25 @@
         @click="toggleMobileSidebar"
         aria-label="Toggle menu"
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 12h18M3 6h18M3 18h18" />
-        </svg>
+        <span class="hamburger-icon" :class="{ 'is-active': mobileSidebarOpen }">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
       </button>
 
-      <span class="mobile-brand">Suleiman Msaba</span>
+      <a href="#" class="mobile-brand">
+        <span class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </span>
+        <span class="brand-text">Suleiman</span>
+      </a>
 
-      <button
-        class="mobile-theme-btn"
-        @click="toggleTheme"
-        aria-label="Toggle theme"
-      >
-        <svg
-          v-if="theme === 'dark'"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg
-          v-else
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
+      <ThemeToggle :theme="theme" @toggle-theme="toggleTheme" />
     </header>
 
     <!-- ===================== MOBILE OVERLAY ===================== -->
@@ -124,6 +91,7 @@ import NavigationBar from './components/NavigationBar.vue'
 import ChatSidebar from './components/ChatSidebar.vue'
 import ChatContainer from './components/ChatContainer.vue'
 import SidecarPanel from './components/SidecarPanel.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
 
 import {
   projects,
@@ -413,7 +381,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-/* Your original style remains unchanged - just keeping it here for completeness */
+/* ================================
+   App Shell Variables
+   ================================ */
 :root {
   --bg-primary: #0a0a0a;
   --bg-secondary: #1a1a1a;
@@ -430,6 +400,7 @@ onBeforeUnmount(() => {
   --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3);
   --shadow-large: 0 10px 25px rgba(0, 0, 0, 0.4);
+  --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
 }
 
 [data-theme="light"] {
@@ -450,8 +421,205 @@ onBeforeUnmount(() => {
   --shadow-large: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Rest of your original style remains the same... */
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; width:100%; overflow:hidden; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif; }
-/* ...and so on - keeping your original style intact */
+/* ================================
+   Base Reset
+   ================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { 
+  height: 100%; 
+  width: 100%; 
+  overflow: hidden; 
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* ================================
+   App Shell Layout
+   ================================ */
+#app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease;
+}
+
+/* ================================
+   Mobile Header
+   ================================ */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(var(--bg-primary-rgb, 10, 10, 10), 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 1000;
+}
+
+[data-theme="light"] .mobile-header {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.mobile-menu-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--surface-hover);
+}
+
+/* Hamburger Icon */
+.hamburger-icon {
+  width: 20px;
+  height: 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.hamburger-icon.is-active span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger-icon.is-active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-icon.is-active span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile Brand */
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.mobile-brand .brand-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-gradient);
+  border-radius: 6px;
+  color: white;
+}
+
+.mobile-brand .brand-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mobile-brand .brand-text {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================
+   Mobile Overlay
+   ================================ */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+}
+
+/* ================================
+   Chat Main Area
+   ================================ */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 64px; /* Account for navbar */
+  transition: padding 0.3s ease;
+}
+
+.chat-main.centered {
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .chat-main {
+    padding-top: 60px; /* Mobile header height */
+  }
+}
+
+/* ================================
+   Navbar Header (Desktop)
+   ================================ */
+.navbar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* ================================
+   Sidecar Panel Adjustments
+   ================================ */
+#app-shell.sidecar-open .chat-main {
+  margin-right: 400px;
+}
+
+@media (max-width: 1024px) {
+  #app-shell.sidecar-open .chat-main {
+    margin-right: 0;
+  }
+}
+
+/* ================================
+   Reduced Motion
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
