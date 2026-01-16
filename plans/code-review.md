@@ -5,7 +5,7 @@ This is a Vue 3 portfolio website styled like ChatGPT with a chat-based interfac
 
 ---
 
-## 🔴 Critical Bugs
+##  Critical Bugs
 
 ### 1. **XSS Vulnerability in MessageBubble.vue**
 **File:** [`src/components/MessageBubble.vue`](src/components/MessageBubble.vue:10)
@@ -29,7 +29,7 @@ const formattedContent = computed(() => {
 })
 ```
 
----
+--
 
 ### 2. **Reactive `isMobile` Computed Property Bug**
 **File:** [`src/App.vue`](src/App.vue:116)
