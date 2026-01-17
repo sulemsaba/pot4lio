@@ -1,7 +1,12 @@
 <template>
   <div
     id="app-shell"
-    :class="{ 'chat-started': chatStarted, 'sidecar-open': sidecarOpen }"
+    :class="{ 
+      'chat-started': chatStarted, 
+      'sidecar-open': sidecarOpen,
+      'is-mobile': isMobile,
+      'sidebar-collapsed': sidebarCollapsed
+    }"
     :data-theme="theme"
     :style="appShellStyle"
   >
@@ -17,7 +22,11 @@
 
     <!-- ===================== MOBILE HEADER ===================== -->
     <header v-if="isMobile" class="mobile-header">
-      <button class="mobile-menu-btn" @click="toggleMobileSidebar" aria-label="Toggle menu">
+      <button
+        class="mobile-menu-btn"
+        @click="toggleMobileSidebar"
+        aria-label="Toggle menu"
+      >
         <svg
           width="20"
           height="20"
@@ -33,36 +42,41 @@
       </button>
 
       <div class="mobile-title">
-        <span class="logo">Portfolio</span>
+        <span class="logo">PortfolioGPT</span>
       </div>
 
-      <ThemeToggle :theme="theme" @toggle-theme="toggleTheme" class="mobile-theme-btn" />
+      <button
+        class="mobile-theme-btn"
+        @click="toggleTheme"
+        aria-label="Toggle theme"
+      >
+        <ThemeToggle :theme="theme" />
+      </button>
     </header>
 
-    <!-- ===================== MOBILE SIDEBAR ===================== -->
+    <!-- ===================== LEFT SIDEBAR ===================== -->
     <ChatSidebar
-      v-if="isMobile"
-      :is-open="mobileSidebarOpen"
-      @close="closeMobileSidebar"
-      @nav-select="handleNavSelect"
       :theme="theme"
+      :class="{ 'mobile-open': isMobile && mobileSidebarOpen }"
+      @nav-select="handleNavSelect"
+      @toggle-theme="toggleTheme"
+      @toggle-collapse="handleSidebarCollapse"
     />
 
-    <!-- Mobile overlay -->
-    <div v-if="isMobile && mobileSidebarOpen" class="mobile-overlay" @click="closeMobileSidebar"></div>
-
     <!-- ===================== MAIN CHAT AREA ===================== -->
-    <main class="main-content" role="main">
+    <main class="main-content">
       <ChatContainer
         ref="chatContainer"
         :messages="messages"
         :is-typing="isTyping"
+        :is-centered="!chatStarted"
         @send-message="handleSendMessage"
       />
     </main>
 
-    <!-- ===================== SIDECAR PANEL ===================== -->
+    <!-- ===================== SIDE PANEL (SIDE CAR) ===================== -->
     <SidecarPanel
+      v-if="sidecarOpen"
       :is-open="sidecarOpen"
       :current-persona="currentPersona"
       @close="closeSidecar"
@@ -70,15 +84,22 @@
       @contact-sent="handleContactSent"
       @width-change="handleSidecarWidthChange"
     />
+
+    <!-- ===================== MOBILE OVERLAY ===================== -->
+    <div
+      v-if="isMobile && mobileSidebarOpen"
+      class="mobile-overlay"
+      @click="closeMobileSidebar"
+    ></div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import NavigationBar from './components/NavigationBar.vue'
-import ChatSidebar from './components/ChatSidebar.vue'
 import ChatContainer from './components/ChatContainer.vue'
+import ChatSidebar from './components/ChatSidebar.vue'
+import NavigationBar from './components/NavigationBar.vue'
 import SidecarPanel from './components/SidecarPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 
@@ -94,30 +115,55 @@ import portfolioData, {
 } from './data/portfolio-data.js'
 
 /**
- * Layout & UI state
+ * Layout state
  */
 const theme = ref('dark')
+const sidecarOpen = ref(false)
+const mobileSidebarOpen = ref(false)
 const currentPersona = ref('default')
 
-const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
-const isMobile = computed(() => windowWidth.value <= 768)
+// Left sidebar (ChatGPT-style)
+const sidebarCollapsed = ref(false)
+const SIDEBAR_WIDTH = 200
+const SIDEBAR_COLLAPSED_WIDTH = 56
+const DESKTOP_NAVBAR_HEIGHT = 64
 
-const mobileSidebarOpen = ref(false)
-const sidecarOpen = ref(false)
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const isMobile = computed(() => windowWidth.value < 768)
+
+// Sidecar sizing: keep main content aligned with sidecar width (including resize)
 const sidecarWidth = ref(0)
+const DEFAULT_SIDECAR_WIDTH = 420
+
+const appShellStyle = computed(() => {
+  const widthPx = sidecarOpen.value ? `${Math.max(0, sidecarWidth.value)}px` : '0px'
+  const sidebarPx = isMobile.value
+    ? '0px'
+    : `${sidebarCollapsed.value ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH}px`
+  const desktopTopOffsetPx = isMobile.value ? '0px' : `${DESKTOP_NAVBAR_HEIGHT}px`
+  return {
+    '--sidecar-width': widthPx,
+    '--sidebar-width': sidebarPx,
+    '--desktop-top-offset': desktopTopOffsetPx
+  }
+})
 
 /**
  * Chat state
  */
-const chatContainer = ref(null)
 const messages = ref([])
 const isTyping = ref(false)
-
 const chatStarted = computed(() => messages.value.length > 0)
 
-const appShellStyle = computed(() => ({
-  '--sidecar-width': sidecarOpen.value ? `${sidecarWidth.value}px` : '0px'
-}))
+const chatContainer = ref(null)
+
+function createMessage({ isUser, text }) {
+  return {
+    id: crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    isUser,
+    text
+  }
+}
 
 /**
  * Theme
@@ -133,7 +179,7 @@ function toggleTheme() {
 }
 
 /**
- * Navigation / Sidebars
+ * Mobile sidebar
  */
 function toggleMobileSidebar() {
   mobileSidebarOpen.value = !mobileSidebarOpen.value
@@ -143,31 +189,72 @@ function closeMobileSidebar() {
   mobileSidebarOpen.value = false
 }
 
-function handleNavSelect(key) {
-  // Keep this extensible: you can map nav items to actions later.
-  closeMobileSidebar()
-
-  if (key === 'projects' || key === 'skills' || key === 'timeline' || key === 'contact' || key === 'cv') {
-    sidecarOpen.value = true
-  }
+function handleSidebarCollapse(collapsed) {
+  sidebarCollapsed.value = Boolean(collapsed)
 }
 
+function handleNavSelect(item) {
+  // Supports multiple shapes:
+  // - ChatSidebar emits: { id, section }
+  // - Legacy objects: { label, query, persona }
+  // - Strings (label)
+
+  const id = item && typeof item === 'object' ? item.id : null
+  const label = typeof item === 'string' ? item : item?.label
+  const query = typeof item === 'string' ? null : item?.query
+
+  if (item?.persona) currentPersona.value = item.persona
+
+  if (isMobile.value) closeMobileSidebar()
+
+  // ChatSidebar path
+  if (id) {
+    const mappedById = {
+      projects: 'Tell me about your projects',
+      skills: 'What technologies do you use?',
+      about: 'Tell me about yourself',
+      contact: 'How can I contact you?',
+      resume: 'Where can I download your CV?'
+    }
+    const text = mappedById[id]
+    if (text) handleSendMessage({ text })
+    return
+  }
+
+  // Legacy path
+  if (query) {
+    handleSendMessage({ text: query })
+    return
+  }
+
+  if (!label) return
+
+  const mapped = {
+    Projects: 'Tell me about your projects',
+    Skills: 'What technologies do you use?',
+    Experience: 'Tell me about your experience',
+    About: 'Tell me about yourself',
+    Contact: 'How can I contact you?',
+    CV: 'Where can I download your CV?'
+  }
+
+  handleSendMessage({ text: mapped[label] || `Tell me about ${label}` })
+}
+
+/**
+ * Sidecar
+ */
 function handleResearchClick() {
-  // “Research” in your navbar can map to an “About/Skills/Projects” help response.
-  messages.value.push(
-    createMessage({
-      isUser: false,
-      text: buildHelpResponse()
-    })
-  )
+  // In this UI, “Research” functions as a context panel toggle.
+  toggleSidecar()
 }
 
 function toggleSidecar() {
   sidecarOpen.value = !sidecarOpen.value
+
   if (sidecarOpen.value) {
-    // Default width (or last saved by SidecarPanel)
-    const savedWidth = Number(localStorage.getItem('sidecar-width'))
-    sidecarWidth.value = Number.isFinite(savedWidth) && savedWidth > 0 ? savedWidth : 420
+    const savedWidth = parseInt(localStorage.getItem('sidecar-width') || '', 10)
+    sidecarWidth.value = Number.isFinite(savedWidth) ? savedWidth : DEFAULT_SIDECAR_WIDTH
   } else {
     sidecarWidth.value = 0
   }
@@ -179,152 +266,153 @@ function closeSidecar() {
 }
 
 function handleSidecarWidthChange(newWidth) {
-  if (typeof newWidth === 'number' && Number.isFinite(newWidth)) {
-    sidecarWidth.value = newWidth
-  }
+  const width = Number(newWidth)
+  if (!Number.isFinite(width)) return
+  sidecarWidth.value = Math.max(0, Math.min(800, width))
 }
 
-/**
- * Chat message helpers
- */
-function createMessage({ isUser, text }) {
-  return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    isUser: !!isUser,
-    text: String(text || '')
-  }
+function handleProjectView(project) {
+  if (!project?.name) return
+  const text = formatProjectDetails(project)
+  messages.value.push(createMessage({ isUser: false, text }))
+}
+
+function handleContactSent(payload) {
+  const name = payload?.name ? `, ${payload.name}` : ''
+  messages.value.push(
+    createMessage({
+      isUser: false,
+      text: `Thanks${name}. Your message has been received. If you prefer email, reach me at **${contactInfo.email}**.`
+    })
+  )
 }
 
 /**
  * Chat send
  */
 async function handleSendMessage(payload) {
-  const userText = (payload?.text || '').trim()
-  if (!userText) return
+  const text = (payload?.text || '').trim()
+  if (!text) return
 
-  messages.value.push(createMessage({ isUser: true, text: userText }))
-
+  messages.value.push(createMessage({ isUser: true, text }))
   isTyping.value = true
 
   try {
-    const response = await generateResponse(userText)
+    const response = await generateResponse(text)
     messages.value.push(createMessage({ isUser: false, text: response }))
+  } catch (err) {
+    console.error(err)
+    messages.value.push(
+      createMessage({
+        isUser: false,
+        text: "Sorry — something went wrong while generating a response. Please try again."
+      })
+    )
   } finally {
     isTyping.value = false
-    // ChatContainer already scrolls internally; this is a safe no-op if not exposed.
-    chatContainer.value?.scrollToBottom?.()
   }
 }
 
 /**
- * Events from SidecarPanel
- */
-function handleProjectView(project) {
-  // Optional: when user clicks a project in SidecarPanel, mirror to chat
-  if (!project?.name) return
-  messages.value.push(
-    createMessage({
-      isUser: false,
-      text: formatSingleProject(project)
-    })
-  )
-}
-
-function handleContactSent(contactPayload) {
-  // Optional: reflect contact submission to chat (useful for demo)
-  messages.value.push(
-    createMessage({
-      isUser: false,
-      text: 'Thanks — your message has been captured. I will respond as soon as possible.'
-    })
-  )
-}
-
-/**
- * Chat “AI” response generator (uses your portfolio-data.js shape)
+ * Portfolio-aware response generator
  */
 async function generateResponse(query) {
-  const q = query.toLowerCase()
+  const q = String(query || '').toLowerCase()
 
-  // Quick intent routing
-  if (q.includes('project')) return formatProjects(projects)
-  if (q.includes('skill') || q.includes('technology') || q.includes('stack') || q.includes('tech')) return formatSkills(skills)
-  if (q.includes('experience') || q.includes('timeline') || q.includes('work') || q.includes('career')) return formatTimeline(timeline)
+  if (q.includes('project') || q.includes('portfolio') || q.includes('work')) return formatProjectsSummary(projects)
+  if (q.includes('skill') || q.includes('technology') || q.includes('stack') || q.includes('tech')) return formatSkillsSummary(skills)
+  if (q.includes('experience') || q.includes('timeline') || q.includes('career') || q.includes('work history')) return formatTimelineSummary(timeline)
+  if (q.includes('about') || q.includes('who are you') || q.includes('yourself') || q.includes('bio')) return formatBio(bio)
+  if (q.includes('cert') || q.includes('achievement') || q.includes('award')) return formatAchievements(achievements)
+  if (q.includes('cv') || q.includes('resume')) return `You can download my CV here: **${cvLink}**.`
   if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('reach')) return formatContact(contactInfo)
-  if (q.includes('about') || q.includes('bio') || q.includes('who are you') || q.includes('who are u')) return formatBio(bio)
-  if (q.includes('cv') || q.includes('resume')) return `You can download my CV here: ${cvLink}`
-  if (q.includes('cert') || q.includes('achievement')) return formatAchievements(achievements)
-  if (q.includes('faq')) return formatFAQ(faq)
-  if (q.includes('help')) return buildHelpResponse()
+  if (q.includes('faq') || q.includes('freelance') || q.includes('available') || q.includes('process')) return formatFAQ(faq)
 
-  // Default: helpful overview
-  return buildHelpResponse()
-}
-
-function buildHelpResponse() {
   return (
-    "Here’s what I can share:\n\n" +
-    "• **Projects** — what I built and the tech stack\n" +
+    "I can help you with:\n\n" +
+    "• **Projects** — portfolio work and case studies\n" +
     "• **Skills** — technologies and proficiency\n" +
-    "• **Experience** — timeline of roles and highlights\n" +
-    "• **Contact** — email, location, availability\n" +
-    "• **CV** — download link\n\n" +
+    "• **Experience** — timeline and highlights\n" +
+    "• **About** — background and focus\n" +
+    "• **Contact** — how to reach me\n\n" +
     "Try: *Tell me about your projects* or *What technologies do you use?*"
   )
 }
 
-function formatProjects(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'No projects are listed yet.'
+/**
+ * Formatting helpers (Markdown)
+ */
+function formatProjectsSummary(list) {
+  if (!Array.isArray(list) || list.length === 0) return 'Projects are not available yet.'
 
-  const lines = list.map((p) => {
-    const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : ''
-    const feats = Array.isArray(p.features) && p.features.length
-      ? `\n  - Key features: ${p.features.slice(0, 4).join('; ')}${p.features.length > 4 ? '; …' : ''}`
-      : ''
-    const meta = [p.year ? `(${p.year})` : null, p.status ? `— ${p.status}` : null].filter(Boolean).join(' ')
-    return `- **${p.name}** ${meta}\n  - ${p.description}\n  - Tech: ${stack}${feats}`
+  const lines = list.map((p, idx) => {
+    const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : '—'
+    const status = p.status ? p.status.toUpperCase() : '—'
+    const year = p.year ? `${p.year}` : ''
+
+    return (
+      `${idx + 1}. **${p.name}** ${year ? `(${year})` : ''}\n` +
+      `   - Status: **${status}**\n` +
+      `   - Stack: ${stack}\n` +
+      `   - ${p.description || ''}`
+    )
   })
 
-  return `Here are my projects:\n\n${lines.join('\n')}\n\nIf you want, say: *Tell me more about project-2* (or the project name).`
+  return `Here are a few of my key projects:\n\n${lines.join('\n\n')}\n\nIf you want, tell me which project to open and I will summarize the features and technical decisions.`
 }
 
-function formatSingleProject(p) {
-  const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : ''
-  const feats = Array.isArray(p.features) ? p.features.map((f) => `- ${f}`).join('\n') : ''
+function formatProjectDetails(p) {
+  const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : '—'
+  const features = Array.isArray(p.features) ? p.features.map(f => `- ${f}`).join('\n') : ''
   const link = p.link && p.link !== '#' ? `\n\nLink: ${p.link}` : ''
-  return `**${p.name}**\n\n${p.description}\n\nTech stack: ${stack}\n\nFeatures:\n${feats}${link}`
+
+  return (
+    `**${p.name}**\n\n` +
+    `${p.description || ''}\n\n` +
+    `**Tech stack:** ${stack}\n` +
+    (features ? `\n**Key features:**\n${features}` : '') +
+    link
+  )
 }
 
-function formatSkills(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'Skills are not listed yet.'
+function formatSkillsSummary(categories) {
+  if (!Array.isArray(categories) || categories.length === 0) return 'Skills are not available yet.'
 
-  const lines = list.map((group) => {
-    const items = Array.isArray(group.items) ? group.items : []
-    const skillsLine = items.map((s) => `${s.name}${s.level ? ` (${s.level})` : ''}`).join(', ')
-    return `- **${group.category}**: ${skillsLine}`
-  })
+  const lines = categories
+    .map(cat => {
+      const items = Array.isArray(cat.items) ? cat.items : []
+      const skillsLine = items.map(i => `${i.name} (${i.level})`).join(', ')
+      return `**${cat.category}:** ${skillsLine || '—'}`
+    })
+    .filter(Boolean)
 
-  return `Here is my current skill set:\n\n${lines.join('\n')}`
+  return `Here is my skills overview:\n\n${lines.join('\n')}\n\nIf you are hiring for a specific role, share the job description and I will map my skills to it.`
 }
 
-function formatTimeline(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'Timeline entries are not listed yet.'
+function formatTimelineSummary(items) {
+  if (!Array.isArray(items) || items.length === 0) return 'Experience information is not available yet.'
 
-  const lines = list.map((e) => {
-    const highlights = Array.isArray(e.highlights) && e.highlights.length
-      ? `\n  - Highlights: ${e.highlights.slice(0, 3).join('; ')}`
-      : ''
-    return `- **${e.year}** — ${e.role} @ ${e.company} (${e.duration})\n  - ${e.description}${highlights}`
+  const lines = items.map((e) => {
+    const year = e.year ? `**${e.year}**` : ''
+    const role = e.role ? ` — ${e.role}` : ''
+    const company = e.company ? ` @ ${e.company}` : ''
+    const duration = e.duration ? ` (${e.duration})` : ''
+    const highlights = Array.isArray(e.highlights) ? e.highlights.map(h => `   - ${h}`).join('\n') : ''
+
+    return (
+      `${year}${role}${company}${duration}\n` +
+      `${e.description || ''}` +
+      (highlights ? `\n${highlights}` : '')
+    )
   })
 
-  return `Here is my professional timeline:\n\n${lines.join('\n')}`
+  return `Here is my timeline:\n\n${lines.join('\n\n')}`
 }
 
 function formatBio(b) {
   if (!b) return 'Bio is not available yet.'
-  const short = b.short ? `${b.short}\n\n` : ''
-  const tagline = b.tagline ? `\n\nTagline: *${b.tagline}*` : ''
-  return `${short}${b.long || ''}${tagline}`.trim()
+  const tagline = b.tagline ? `\n\n_${b.tagline}_` : ''
+  return `${b.long || b.short || ''}${tagline}`
 }
 
 function formatAchievements(list) {
@@ -372,10 +460,19 @@ function handleWindowResize() {
 onMounted(() => {
   loadTheme()
 
-  // Set sidecar width baseline
+  if (typeof window !== 'undefined') {
+    handleWindowResize()
+  }
+
+  try {
+    const savedCollapsed = localStorage.getItem('sidebar-collapsed')
+    if (savedCollapsed !== null) sidebarCollapsed.value = JSON.parse(savedCollapsed)
+  } catch {
+    // Ignore malformed localStorage
+  }
+
   sidecarWidth.value = 0
 
-  // Greeting message
   messages.value.push(
     createMessage({
       isUser: false,
@@ -401,11 +498,22 @@ onUnmounted(() => {
   color: var(--text-primary);
 }
 
-/* Desktop layout: main content shifts when sidecar opens */
 .main-content {
   flex: 1;
   min-height: 0;
-  transition: margin-right 0.3s ease;
+  transition: margin-right 0.3s ease, margin-left 0.2s ease, padding-top 0.2s ease;
+}
+
+/* Desktop: reserve space for the fixed left sidebar and top navbar */
+#app-shell:not(.is-mobile) .main-content {
+  margin-left: var(--sidebar-width, 200px);
+  padding-top: var(--desktop-top-offset, 64px);
+}
+
+/* Desktop: push the sidebar below the fixed navbar */
+#app-shell:not(.is-mobile) :deep(.chat-sidebar) {
+  top: var(--desktop-top-offset, 64px) !important;
+  height: calc(100vh - var(--desktop-top-offset, 64px)) !important;
 }
 
 #app-shell.sidecar-open .main-content {
