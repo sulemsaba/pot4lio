@@ -3,8 +3,9 @@
     id="app-shell"
     :class="{ 'chat-started': chatStarted, 'sidecar-open': sidecarOpen }"
     :data-theme="theme"
+    :style="shellStyle"
   >
-    <!-- ===================== DESKTOP NAVBAR ===================== -->
+    <!-- ===================== DESKTOP TOP NAVBAR ===================== -->
     <NavigationBar
       v-if="!isMobile"
       class="navbar-header"
@@ -14,6 +15,15 @@
       :theme="theme"
     />
 
+    <!-- ===================== DESKTOP LEFT SIDEBAR (ChatGPT-style) ===================== -->
+    <ChatSidebar
+      v-if="!isMobile"
+      :theme="theme"
+      @nav-select="handleNavSelect"
+      @toggle-theme="toggleTheme"
+      @toggle-collapse="handleSidebarCollapse"
+    />
+
     <!-- ===================== MOBILE HEADER ===================== -->
     <header v-if="isMobile" class="mobile-header">
       <button
@@ -21,99 +31,116 @@
         @click="toggleMobileSidebar"
         aria-label="Toggle menu"
       >
-        <span class="hamburger-icon" :class="{ 'is-active': mobileSidebarOpen }">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
       </button>
 
-      <a href="#" class="mobile-brand">
-        <span class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-            <polyline points="2 17 12 22 22 17"/>
-            <polyline points="2 12 12 17 22 12"/>
+      <a class="mobile-brand" href="#" aria-label="Home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3 7h7l-5.5 4 2.5 7-7-4.5L5 20l2.5-7L2 9h7l3-7z" />
           </svg>
         </span>
-        <span class="brand-text">Suleiman</span>
+        <span class="brand-text">Portfolio ChatGPT</span>
       </a>
 
-      <ThemeToggle :theme="theme" @toggle-theme="toggleTheme" />
+      <ThemeToggle :theme="theme" @toggle="toggleTheme" />
     </header>
 
-    <!-- ===================== MOBILE OVERLAY ===================== -->
+    <!-- ===================== MOBILE SIDEBAR OVERLAY ===================== -->
     <div
-      v-if="mobileSidebarOpen && isMobile"
+      v-if="isMobile && mobileSidebarOpen"
       class="mobile-overlay"
       @click="closeMobileSidebar"
+      aria-hidden="true"
     />
 
-    <!-- ===================== LEFT SIDEBAR (MOBILE) ===================== -->
     <ChatSidebar
       v-if="isMobile"
       :theme="theme"
       :class="{ 'mobile-open': mobileSidebarOpen }"
-      @toggle-theme="toggleTheme"
+      @close="closeMobileSidebar"
       @nav-select="handleNavSelect"
+      @toggle-theme="toggleTheme"
+      @toggle-collapse="handleSidebarCollapse"
     />
 
-    <!-- ===================== MAIN CHAT ===================== -->
-    <main
-      class="chat-main"
-      :class="{ centered: !chatStarted }"
-    >
+    <!-- ===================== MAIN CHAT AREA ===================== -->
+    <main class="chat-main" :class="{ centered: !chatStarted }">
       <ChatContainer
         ref="chatContainer"
         :messages="messages"
         :is-typing="isTyping"
-        :is-centered="!chatStarted"
+        :chat-started="chatStarted"
         @send-message="handleSendMessage"
+        @footer-action="handleNavSelect"
       />
     </main>
 
-    <!-- ===================== RIGHT SIDECAR ===================== -->
+    <!-- ===================== SIDE PANEL ===================== -->
     <SidecarPanel
-      v-if="sidecarOpen"
       :is-open="sidecarOpen"
       :current-persona="currentPersona"
       @close="closeSidecar"
       @project-view="handleProjectView"
       @contact-sent="handleContactSent"
+      @width-change="handleSidecarWidthChange"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
+import { ref, shallowRef, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
-import NavigationBar from './components/NavigationBar.vue'
-import ChatSidebar from './components/ChatSidebar.vue'
 import ChatContainer from './components/ChatContainer.vue'
+import ChatSidebar from './components/ChatSidebar.vue'
+import NavigationBar from './components/NavigationBar.vue'
 import SidecarPanel from './components/SidecarPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 
-import {
-  projects,
-  skills,
-  timeline,
-  contactInfo,
-  cvLink
-} from './data/portfolio-data.js'
+import { projects, skills, timeline, contactInfo, cvLink } from './data/portfolio-data.js'
 
-// ── State ────────────────────────────────────────────────────────────────
+// ── Reactive viewport (fixes non-reactive isMobile bug) ───────────────────
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const isMobile = computed(() => windowWidth.value < 769)
+
+// ── App State ────────────────────────────────────────────────────────────
 const theme = ref('dark')
+const chatStarted = ref(false)
 const mobileSidebarOpen = ref(false)
 const sidecarOpen = ref(false)
-const currentPersona = ref('developer')
+const currentPersona = ref('default')
 
-const messages = ref([])
 const isTyping = ref(false)
-const chatStarted = ref(false)
+const messages = shallowRef([]) // recruiter-friendly perf: avoids deep reactivity cost
 const chatContainer = ref(null)
 
-// ── Computed ─────────────────────────────────────────────────────────────
-const isMobile = computed(() => window.innerWidth < 769)
+// Desktop sidebar state (so layout stays correct when collapsed)
+const sidebarCollapsed = ref(false)
+
+// Sidecar width state (matches SidecarPanel and fixes hardcoded 400px overlap)
+const sidecarWidth = ref(420)
+
+// ── Layout style vars (no overlap, no magic numbers) ─────────────────────
+const shellStyle = computed(() => {
+  const leftWidth = isMobile.value ? 0 : (sidebarCollapsed.value ? 56 : 200)
+  const rightWidth = (!isMobile.value && sidecarOpen.value) ? sidecarWidth.value : 0
+
+  return {
+    '--left-sidebar-width': `${leftWidth}px`,
+    '--sidecar-width': `${rightWidth}px`
+  }
+})
 
 // ── Theme ────────────────────────────────────────────────────────────────
 const restoreTheme = () => {
@@ -139,10 +166,9 @@ const closeMobileSidebar = () => {
   document.body.style.overflow = ''
 }
 
-const handleResize = () => {
-  if (!isMobile.value && mobileSidebarOpen.value) {
-    closeMobileSidebar()
-  }
+// ── Desktop Sidebar ──────────────────────────────────────────────────────
+const handleSidebarCollapse = (collapsed) => {
+  sidebarCollapsed.value = !!collapsed
 }
 
 // ── Sidecar ──────────────────────────────────────────────────────────────
@@ -152,7 +178,7 @@ const toggleSidecar = () => {
     addMessage({
       id: Date.now(),
       isUser: false,
-      text: "Opened projects panel. Browse my work or contact me directly from here.",
+      text: 'Opened the portfolio panel. You can browse projects, skills, timeline, or contact me from there.',
       timestamp: new Date().toISOString()
     })
   }
@@ -162,9 +188,18 @@ const closeSidecar = () => {
   sidecarOpen.value = false
 }
 
+const handleSidecarWidthChange = (newWidth) => {
+  const n = Number(newWidth)
+  if (Number.isFinite(n) && n >= 280 && n <= 900) {
+    sidecarWidth.value = n
+  }
+}
+
 // ── Messages ─────────────────────────────────────────────────────────────
 const addMessage = (message) => {
-  messages.value.push(message)
+  // shallowRef requires reassign to trigger updates in some patterns; safest:
+  messages.value = [...messages.value, message]
+
   nextTick(() => {
     chatContainer.value?.scrollToBottom?.()
   })
@@ -172,31 +207,24 @@ const addMessage = (message) => {
 
 const getWelcomeMessage = () => {
   const hour = new Date().getHours()
-  let greeting = 'Hello'
-  if (hour < 12) greeting = 'Good morning'
-  else if (hour < 18) greeting = 'Good afternoon'
-  else greeting = 'Good evening'
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
-  return `${greeting}! 👋 I'm Suleiman's portfolio assistant.
+  return `${greeting}. I'm Suleiman's portfolio assistant.
 
-I can help you learn about:
-• **Projects** - My portfolio work
-• **Skills** - Technical expertise
-• **Experience** - Career journey
-• **Contact** - Get in touch
+You can ask about:
+• Projects
+• Skills
+• Experience
+• Contact details
 
-Just ask me anything or use the navigation buttons above!`
+Type a question or use the navigation.`
 }
 
 // ── Chat Logic ───────────────────────────────────────────────────────────
 const handleSendMessage = async (payload) => {
-  if (!chatStarted.value) {
-    chatStarted.value = true
-  }
+  if (!chatStarted.value) chatStarted.value = true
 
-  if (isMobile.value && mobileSidebarOpen.value) {
-    closeMobileSidebar()
-  }
+  if (isMobile.value && mobileSidebarOpen.value) closeMobileSidebar()
 
   addMessage({
     id: Date.now(),
@@ -206,7 +234,6 @@ const handleSendMessage = async (payload) => {
   })
 
   isTyping.value = true
-
   const response = await generateResponse(payload.text)
 
   setTimeout(() => {
@@ -217,93 +244,121 @@ const handleSendMessage = async (payload) => {
       text: response,
       timestamp: new Date().toISOString()
     })
-  }, 700)
+  }, 450)
 }
 
-// ── Simple local response logic (unchanged) ──────────────────────────────
+// ── Local Response Logic (robust to skills structure mismatch) ───────────
 async function generateResponse(query) {
-  const q = query.toLowerCase()
+  const q = String(query || '').toLowerCase()
 
   if (q.includes('hello') || q.includes('hi') || q.includes('hey')) {
-    return "Hello! How can I help you learn about Suleiman's work today?"
+    return "Hello. What would you like to review—projects, skills, experience, or contact details?"
   }
 
   if (q.includes('project')) {
     if (projects && projects.length > 0) {
-      let response = "Here are my projects:\n\n"
+      let response = 'Here are selected projects:\n\n'
       projects.forEach((project, index) => {
         response += `${index + 1}. **${project.name}** — ${project.description}\n`
-        if (project.technologies && project.technologies.length > 0) {
-          response += `   _Tech: ${project.technologies.join(', ')}_\n\n`
-        } else {
-          response += '\n'
-        }
+        if (project.technologies?.length) response += `   _Tech: ${project.technologies.join(', ')}_\n`
+        response += '\n'
       })
-      return response
+      return response.trim()
     }
-    return "I don't have projects listed yet. Please check back soon!"
+    return 'Projects are not available yet.'
   }
 
   if (q.includes('skill')) {
-    if (skills && skills.length > 0) {
-      if (skills[0] && typeof skills[0] === 'object' && skills[0].category) {
-        const categorized = {}
-        skills.forEach(skill => {
-          if (!categorized[skill.category]) categorized[skill.category] = []
-          categorized[skill.category].push(skill.name)
+    if (!skills || skills.length === 0) return 'Skills are not available yet.'
+
+    // Supports:
+    // A) [{ category: 'Frontend', items: [{ name, level }] }]
+    // B) [{ category: 'Frontend', name: 'Vue' }]
+    // C) ['Vue', 'Node']
+    const first = skills[0]
+
+    // A) grouped categories
+    if (first && typeof first === 'object' && Array.isArray(first.items)) {
+      let response = 'My skills by category:\n\n'
+      skills.forEach(cat => {
+        response += `**${cat.category}**:\n`
+        cat.items.forEach(s => {
+          const lvl = s.level ? ` (${s.level})` : ''
+          response += `• ${s.name}${lvl}\n`
         })
-        
-        let response = "My skills by category:\n\n"
-        Object.entries(categorized).forEach(([category, skillList]) => {
-          response += `**${category}**:\n`
-          skillList.forEach(skill => response += `• ${skill}\n`)
-          response += '\n'
-        })
-        return response
-      } else {
-        return `My skills include:\n\n• ${skills.join('\n• ')}`
-      }
+        response += '\n'
+      })
+      return response.trim()
     }
-    return "Skills information is not available yet."
+
+    // B) flat objects with category + name
+    if (first && typeof first === 'object' && first.category && first.name) {
+      const categorized = {}
+      skills.forEach(s => {
+        if (!categorized[s.category]) categorized[s.category] = []
+        categorized[s.category].push(s.level ? `${s.name} (${s.level})` : s.name)
+      })
+
+      let response = 'My skills by category:\n\n'
+      Object.entries(categorized).forEach(([cat, list]) => {
+        response += `**${cat}**:\n`
+        list.forEach(item => (response += `• ${item}\n`))
+        response += '\n'
+      })
+      return response.trim()
+    }
+
+    // C) plain strings
+    if (Array.isArray(skills) && typeof skills[0] === 'string') {
+      return `My skills include:\n\n• ${skills.join('\n• ')}`
+    }
+
+    return 'Skills format is not recognized yet.'
   }
 
   if (q.includes('experience') || q.includes('work')) {
     if (timeline && timeline.length > 0) {
-      let response = "My experience timeline:\n\n"
-      timeline.forEach((exp, index) => {
-        response += `${index + 1}. **${exp.role}** at ${exp.company}\n`
-        response += `   ${exp.duration}\n`
-        response += `   ${exp.description}\n\n`
+      let response = 'Experience timeline:\n\n'
+
+      // Supports common shapes; renders what exists
+      timeline.forEach((t, i) => {
+        const title = t.role || t.title || 'Experience'
+        const org = t.company || t.organization || ''
+        const when = t.duration || t.date || ''
+        const desc = t.description || ''
+        response += `${i + 1}. **${title}**${org ? ` at ${org}` : ''}\n`
+        if (when) response += `   ${when}\n`
+        if (desc) response += `   ${desc}\n`
+        response += '\n'
       })
-      return response
+
+      return response.trim()
     }
-    return "Experience information is not available yet."
+    return 'Experience information is not available yet.'
   }
 
   if (q.includes('contact')) {
-    if (contactInfo) {
-      let response = "You can reach me at:\n\n"
-      response += `📧 **Email**: ${contactInfo.email || 'Not provided'}\n`
-      response += `📞 **Phone**: ${contactInfo.phone || 'Not provided'}\n`
-      if (contactInfo.location) response += `📍 **Location**: ${contactInfo.location}\n`
-      if (contactInfo.linkedin) response += `🔗 **LinkedIn**: ${contactInfo.linkedin}\n`
-      if (contactInfo.github) response += `💻 **GitHub**: ${contactInfo.github}\n`
-      return response
-    }
-    return "Contact information is not available yet."
+    if (!contactInfo) return 'Contact information is not available yet.'
+    let response = 'You can reach me via:\n\n'
+    if (contactInfo.email) response += `Email: ${contactInfo.email}\n`
+    if (contactInfo.phone) response += `Phone: ${contactInfo.phone}\n`
+    if (contactInfo.location) response += `Location: ${contactInfo.location}\n`
+    if (contactInfo.linkedin) response += `LinkedIn: ${contactInfo.linkedin}\n`
+    if (contactInfo.github) response += `GitHub: ${contactInfo.github}\n`
+    return response.trim()
   }
 
   if (q.includes('help')) {
-    return "I can help you with:\n\n• **Projects** - View my portfolio work\n• **Skills** - See my technical expertise\n• **Experience** - Check my career timeline\n• **Contact** - Get in touch with me\n\nJust ask about any of these topics!"
+    return 'Ask about projects, skills, experience, or contact details.'
   }
 
-  return "I can help you with information about projects, skills, experience, or contact details. What would you like to know more about?"
+  return 'Ask about projects, skills, experience, or contact details. What should I show you?'
 }
 
 // ── Navigation & Sidecar Events ──────────────────────────────────────────
 const handleNavSelect = (navData) => {
-  closeMobileSidebar()
-  
+  if (isMobile.value) closeMobileSidebar()
+
   switch (navData.type) {
     case 'projects':
       handleSendMessage({ text: 'Tell me about your projects' })
@@ -326,11 +381,11 @@ const handleNavSelect = (navData) => {
 const handleResearchClick = () => {
   currentPersona.value = 'researcher'
   sidecarOpen.value = true
-  
+
   addMessage({
     id: Date.now(),
     isUser: false,
-    text: "Switched to **Researcher** mode. You can now explore my academic and research projects.",
+    text: 'Switched to Research mode. You can explore academic and research work in the side panel.',
     timestamp: new Date().toISOString()
   })
 }
@@ -339,10 +394,10 @@ const handleProjectView = (project) => {
   addMessage({
     id: Date.now(),
     isUser: false,
-    text: `**${project.name}**\n\n${project.description}\n\n**Technologies**: ${project.technologies?.join(', ') || 'Various technologies'}\n\n**Features**:\n${project.features?.map(f => `• ${f}`).join('\n') || 'Check the project panel for details.'}`,
+    text: `**${project.name}**\n\n${project.description}\n\n**Technologies**: ${project.technologies?.join(', ') || 'Various'}\n`,
     timestamp: new Date().toISOString()
   })
-  
+
   if (isMobile.value) closeSidecar()
 }
 
@@ -350,17 +405,44 @@ const handleContactSent = (data) => {
   addMessage({
     id: Date.now(),
     isUser: false,
-    text: `Thank you ${data.name}! Your message has been sent. I'll get back to you shortly.`,
+    text: `Thank you, ${data.name}. Your message has been sent.`,
     timestamp: new Date().toISOString()
   })
-  
+
   closeSidecar()
 }
+
+// ── Resize handling (reactive isMobile + safe cleanup) ───────────────────
+function debounce(fn, wait = 100) {
+  let t
+  return (...args) => {
+    clearTimeout(t)
+    t = setTimeout(() => fn(...args), wait)
+  }
+}
+
+const onResize = debounce(() => {
+  windowWidth.value = window.innerWidth
+
+  // If we crossed back to desktop, ensure mobile overlay is closed
+  if (!isMobile.value && mobileSidebarOpen.value) closeMobileSidebar()
+}, 100)
 
 // ── Lifecycle ────────────────────────────────────────────────────────────
 onMounted(() => {
   restoreTheme()
-  
+
+  // Restore desktop sidebar state for correct initial layout
+  const savedCollapsed = localStorage.getItem('sidebar-collapsed')
+  if (savedCollapsed === 'true') sidebarCollapsed.value = true
+
+  // Restore sidecar width to match SidecarPanel/localStorage
+  const savedSidecarWidth = localStorage.getItem('sidecar-width')
+  if (savedSidecarWidth) {
+    const n = parseInt(savedSidecarWidth, 10)
+    if (!Number.isNaN(n)) sidecarWidth.value = n
+  }
+
   if (messages.value.length === 0) {
     setTimeout(() => {
       addMessage({
@@ -369,14 +451,15 @@ onMounted(() => {
         text: getWelcomeMessage(),
         timestamp: new Date().toISOString()
       })
-    }, 300)
+    }, 250)
   }
-  
-  window.addEventListener('resize', handleResize)
+
+  window.addEventListener('resize', onResize, { passive: true })
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('resize', onResize)
+  document.body.style.overflow = ''
 })
 </script>
 
@@ -401,6 +484,10 @@ onBeforeUnmount(() => {
   --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3);
   --shadow-large: 0 10px 25px rgba(0, 0, 0, 0.4);
   --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+
+  /* Layout vars (controlled by App.vue computed style) */
+  --left-sidebar-width: 0px;
+  --sidecar-width: 0px;
 }
 
 [data-theme="light"] {
@@ -425,10 +512,10 @@ onBeforeUnmount(() => {
    Base Reset
    ================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { 
-  height: 100%; 
-  width: 100%; 
-  overflow: hidden; 
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
@@ -457,16 +544,14 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  background: rgba(var(--bg-primary-rgb, 10, 10, 10), 0.85);
+  background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 1000;
 }
 
-[data-theme="light"] .mobile-header {
-  background: rgba(255, 255, 255, 0.85);
-}
+[data-theme="light"] .mobile-header { background: rgba(255, 255, 255, 0.85); }
 
 .mobile-menu-btn {
   width: 40px;
@@ -480,45 +565,8 @@ html, body {
   cursor: pointer;
   transition: background 0.2s ease;
 }
+.mobile-menu-btn:hover { background: var(--surface-hover); }
 
-.mobile-menu-btn:hover {
-  background: var(--surface-hover);
-}
-
-/* Hamburger Icon */
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.hamburger-icon span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: var(--text-primary);
-  border-radius: 2px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-}
-
-.hamburger-icon.is-active span:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
-}
-
-.hamburger-icon.is-active span:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.hamburger-icon.is-active span:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-/* Mobile Brand */
 .mobile-brand {
   display: flex;
   align-items: center;
@@ -540,10 +588,7 @@ html, body {
   color: white;
 }
 
-.mobile-brand .brand-icon svg {
-  width: 16px;
-  height: 16px;
-}
+.mobile-brand .brand-icon svg { width: 16px; height: 16px; }
 
 .mobile-brand .brand-text {
   background: var(--brand-gradient);
@@ -564,15 +609,33 @@ html, body {
 }
 
 /* ================================
-   Chat Main Area
+   Desktop Navbar
+   ================================ */
+.navbar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 950;
+}
+
+/* ================================
+   Main Chat Area
    ================================ */
 .chat-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-top: 64px; /* Account for navbar */
-  transition: padding 0.3s ease;
+
+  /* account for fixed top navbar on desktop */
+  padding-top: 64px;
+
+  /* critical: no overlap with sidebars */
+  margin-left: var(--left-sidebar-width);
+  margin-right: var(--sidecar-width);
+
+  transition: margin 0.2s ease, padding 0.2s ease;
 }
 
 .chat-main.centered {
@@ -582,30 +645,8 @@ html, body {
 
 @media (max-width: 768px) {
   .chat-main {
-    padding-top: 60px; /* Mobile header height */
-  }
-}
-
-/* ================================
-   Navbar Header (Desktop)
-   ================================ */
-.navbar-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-/* ================================
-   Sidecar Panel Adjustments
-   ================================ */
-#app-shell.sidecar-open .chat-main {
-  margin-right: 400px;
-}
-
-@media (max-width: 1024px) {
-  #app-shell.sidecar-open .chat-main {
+    padding-top: 60px;
+    margin-left: 0;
     margin-right: 0;
   }
 }

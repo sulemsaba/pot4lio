@@ -483,7 +483,7 @@ import {
   Globe
 } from 'lucide-vue-next'
 
-const emit = defineEmits(['close', 'project-view', 'contact-sent'])
+const emit = defineEmits(['close', 'project-view', 'contact-sent', 'width-change'])
 
 const props = defineProps({
   isOpen: {
@@ -668,6 +668,9 @@ const isFormValid = computed(() => {
          contact.value.email.includes('@')
 })
 
+// Effective width used by parent to reserve space
+const effectiveWidth = computed(() => (isCollapsed.value ? 60 : panelWidth.value))
+
 // Methods
 const startResize = (e) => {
   isResizing.value = true
@@ -699,6 +702,7 @@ const toggleResize = () => {
 
 const togglePanel = () => {
   isCollapsed.value = !isCollapsed.value
+  emit('width-change', effectiveWidth.value)
 }
 
 const closePanel = () => {
@@ -762,6 +766,10 @@ onMounted(() => {
   if (savedWidth) {
     panelWidth.value = parseInt(savedWidth, 10)
   }
+
+
+  // Tell parent the initial width
+  emit('width-change', effectiveWidth.value)
 })
 
 onUnmounted(() => {
@@ -774,6 +782,11 @@ onUnmounted(() => {
 // Watch for width changes to save
 watch(panelWidth, (newWidth) => {
   localStorage.setItem('sidecar-width', newWidth.toString())
+  if (!isCollapsed.value) emit('width-change', newWidth)
+})
+
+watch(isCollapsed, () => {
+  emit('width-change', effectiveWidth.value)
 })
 </script>
 

@@ -4,8 +4,8 @@
     <div class="content-wrapper">
       <!-- Message Body -->
       <div :class="['message-body', isUser ? 'user-message' : 'ai-message']">
-        <div 
-          v-if="!isUser" 
+        <div
+          v-if="!isUser"
           class="message-content"
           v-html="formattedContent"
         ></div>
@@ -15,18 +15,34 @@
       </div>
 
       <!-- Copy Button (AI messages only) -->
-      <button 
+      <button
         v-if="!isUser"
-        class="copy-btn" 
+        class="copy-btn"
         @click="copyMessage"
         :title="copied ? 'Copied!' : 'Copy'"
       >
-        <svg v-if="!copied" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        <svg
+          v-if="!copied"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
         </svg>
-        <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="20 6 9 17 4 12"/>
+        <svg
+          v-else
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="20 6 9 17 4 12" />
         </svg>
       </button>
     </div>
@@ -36,6 +52,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   message: {
@@ -50,22 +67,32 @@ const props = defineProps({
 
 const copied = ref(false)
 
+// Configure Marked once (not on every computed run).
+marked.setOptions({
+  breaks: true,
+  gfm: true
+})
+
 const formattedContent = computed(() => {
-  if (!props.message.text) return ''
-  
-  marked.setOptions({
-    breaks: true,
-    gfm: true
+  const text = props.message?.text ?? ''
+  if (!text) return ''
+
+  const rawHtml = marked.parse(text)
+
+  // Sanitize rendered HTML to prevent XSS (e.g., <script>, onerror=, javascript: URLs).
+  // Keep the default safe configuration, while enabling standard HTML output.
+  return DOMPurify.sanitize(rawHtml, {
+    USE_PROFILES: { html: true }
   })
-  
-  return marked.parse(props.message.text)
 })
 
 const copyMessage = async () => {
   try {
-    await navigator.clipboard.writeText(props.message.text)
+    await navigator.clipboard.writeText(props.message?.text ?? '')
     copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
   } catch (err) {
     console.error('Failed to copy:', err)
   }
@@ -84,8 +111,14 @@ const copyMessage = async () => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .content-wrapper {
@@ -198,12 +231,12 @@ const copyMessage = async () => {
   .message-row {
     padding: 8px 0;
   }
-  
+
   .content-wrapper,
   .user-row .content-wrapper {
     max-width: 90%;
   }
-  
+
   .copy-btn {
     opacity: 1;
     position: static;

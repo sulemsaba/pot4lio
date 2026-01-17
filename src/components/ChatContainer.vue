@@ -3,7 +3,7 @@
     <!-- Messages Area -->
     <div class="chat-messages" ref="messagesContainer" :class="{ hidden: isCentered && messages.length === 0 }">
       <!-- Messages -->
-      <div class="messages-list">
+      <div class="messages-list" role="log" aria-live="polite" aria-label="Chat messages">
         <MessageBubble
           v-for="msg in messages"
           :key="msg.id"
@@ -24,6 +24,26 @@
       <div ref="scrollAnchor"></div>
     </div>
 
+    <!-- Starter Suggestions (initial centered state) -->
+    <div v-if="isCentered && messages.length === 0" class="starter" aria-label="Suggested prompts">
+      <div class="starter-grid" role="list">
+        <button
+          v-for="s in suggestions"
+          :key="s.id"
+          type="button"
+          class="starter-card"
+          role="listitem"
+          @click="handleSuggestion(s)"
+        >
+          <component :is="s.icon" class="starter-icon" aria-hidden="true" />
+          <div class="starter-copy">
+            <div class="starter-title">{{ s.title }}</div>
+            <div class="starter-sub">{{ s.query }}</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
     <!-- Input Area -->
     <InputArea
       :is-typing="isTyping"
@@ -35,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, watch, nextTick, onMounted, defineExpose } from 'vue'
 import { Briefcase, Code, User, Mail } from 'lucide-vue-next'
 import MessageBubble from './MessageBubble.vue'
 import InputArea from './InputArea.vue'
@@ -72,6 +92,8 @@ const scrollToBottom = () => {
     scrollAnchor.value?.scrollIntoView({ behavior: 'smooth' })
   })
 }
+
+defineExpose({ scrollToBottom })
 
 const handleSend = (messageData) => {
   emit('send-message', messageData)
@@ -134,6 +156,74 @@ onMounted(scrollToBottom)
   margin: 0 auto;
 }
 
+/* Starter Suggestions */
+.starter {
+  width: 100%;
+  padding: 0 16px 18px;
+}
+
+.starter-grid {
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.starter-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.starter-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+}
+
+.starter-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.starter-icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+}
+
+.starter-copy {
+  min-width: 0;
+}
+
+.starter-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.starter-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 /* Typing Indicator */
 .typing-indicator {
   padding: 16px 0;
@@ -179,6 +269,14 @@ onMounted(scrollToBottom)
 @media (max-width: 768px) {
   .chat-messages {
     padding: 16px 12px;
+  }
+
+  .starter {
+    padding: 0 12px 14px;
+  }
+
+  .starter-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

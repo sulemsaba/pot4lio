@@ -81,13 +81,16 @@ const props = defineProps({
   isCentered: {
     type: Boolean,
     default: false
+  },
+  isTyping: {
+    type: Boolean,
+    default: false
   }
 })
 
 const textareaRef = ref(null)
 const hasText = ref(false)
-const canSend = computed(() => hasText.value && !isTyping.value)
-const isTyping = ref(false)
+const canSend = computed(() => hasText.value && !props.isTyping)
 
 const handleInput = (e) => {
   const text = e.target.innerText.trim()
