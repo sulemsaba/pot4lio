@@ -354,8 +354,5 @@ const suggestions = [...]
 
 ---
 
-## Next Steps
-Would you to:
-1. Switch to Code mode and implement these fixes?
-2. Focus on specific issues first?
-3. Provide more detailed solutions for any particular issue?
+done this wait to edit another thing
+
