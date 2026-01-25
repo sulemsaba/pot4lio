@@ -14,3 +14,4 @@ An interactive personal portfolio built with Vue.js, mimicking the ChatGPT inter
 
 For real AI integration, add OpenAI API calls in `App.vue`'s `getResponse` function.
 enjoy the file 
+hdh
