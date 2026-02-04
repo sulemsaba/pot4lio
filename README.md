@@ -8,7 +8,7 @@ An interactive personal portfolio built with Vue.js, mimicking the ChatGPT inter
 3. Build for production: `npm run build`
 
 ## Customization
-- Edit `src/data/portfolio-data.js` with your info.
+- Edit `src/data/portfolio-data.js` with your OWN info.
 - Add your favicon to `public/favicon.ico`.
 - Deploy to Netlify, Vercel, or GitHub Pages.
 
