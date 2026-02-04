@@ -16,3 +16,4 @@ For real AI integration, add OpenAI API calls in `App.vue`'s `getResponse` funct
 enjoy the file 
 
  Also this file is as of 2025 dec
+ there might be changes in current UI
