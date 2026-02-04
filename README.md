@@ -12,7 +12,7 @@ An interactive personal portfolio built with Vue.js, mimicking the ChatGPT inter
 - Add your favicon to `public/favicon.ico`.
 - Deploy to Netlify, Vercel, or GitHub Pages.
 
-For real AI integration, add OpenAI API calls in `App.vue`'s `getResponse` function.
+For real AI integration, add OpenAI API calls in `App.vue`'s `getResponse` function you may buy apis if you may like .
 enjoy the file 
 
  Also this file is as of 2025 dec
