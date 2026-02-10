@@ -1,4 +1,4 @@
-# Portfolio ChatGPT Mimic by Sule Msaba
+# Portfolio ChatGPT Mimic 
 
 An interactive personal portfolio built with Vue.js, mimicking the ChatGPT interface. Users "chat" to explore sections like about, projects, skills, and contact.
 
