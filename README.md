@@ -1,19 +1,30 @@
-# Portfolio ChatGPT Mimic 
+# Suleiman Msaba
 
-An interactive personal portfolio built with Vue.js, mimicking the ChatGPT interface. Users "chat" to explore sections like about, projects, skills, and contact.
+Personal portfolio: websites, Android apps and business systems, built in Dar es Salaam. English and Kiswahili.
 
-## Make Setup step by step
-1. Install dependencies: `npm install`
-2. Run dev server: `npm run dev`
-3. Build for production: `npm run build`
+Built with Vue 3 and Vite. The finished site is plain static files, so it can be hosted for free.
 
-## Customization
-- Edit `src/data/portfolio-data.js` with your OWN info.
-- Add your favicon to `public/favicon.ico`.
-- Deploy to Netlify, Vercel, or GitHub Pages.
+## Run it locally
 
-For real AI integration, add OpenAI API calls in `App.vue`'s `getResponse` function you may buy apis if you may like .
-enjoy the file 
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production files in dist/
+npm run preview  # check the production build
+```
 
- Also this file is as of 2025 dec
- there might be changes in current UI
+## Edit the content
+
+Everything the site says is in `src/content.js`, in English (`en`) and Kiswahili (`sw`):
+
+- `profile.links`: email, WhatsApp, GitHub, LinkedIn and CV. Empty links are hidden.
+- `projects`: name, type, status, summary, link and images. Images live in `public/work/`.
+- `experience`: organization, role and dates.
+
+Visitors can switch language with EN / SW, or you can share a link that opens in Kiswahili: `?lang=sw`.
+
+## Publish for free
+
+**GitHub Pages (already set up).** In the repository on GitHub, open *Settings → Pages* and set *Source* to *GitHub Actions*. Every push to `main` then publishes the site to `https://sulemsaba.github.io/pot4lio/`.
+
+**Netlify, Vercel or Cloudflare Pages.** Import the repository, use the build command `npm run build` and the output folder `dist`. Set the environment variable `SITE_URL` to the final address (for example `https://suleiman.netlify.app`) so link previews on WhatsApp and LinkedIn show the right image.
