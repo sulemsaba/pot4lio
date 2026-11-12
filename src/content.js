@@ -6,74 +6,358 @@ export const profile = {
   name: 'Suleiman Msaba',
   city: 'Dar es Salaam',
   timeZone: 'Africa/Dar_es_Salaam',
+  photo: 'suleiman.webp', // square photo in /public
   links: {
     email: 'suleimanmsaba1@gmail.com',
     whatsapp: '255768944291', // international format, digits only
     github: 'https://github.com/sulemsaba',
     linkedin: '', // e.g. 'https://www.linkedin.com/in/your-handle'
     cv: 'suleiman-msaba-cv.pdf', // file in /public
+    cvPreview: 'cv-preview.webp', // picture of the first page, in /public
   },
 }
 
+// In any text below, **words like this** are shown a shade stronger.
 export const copy = {
   en: {
-    role: 'Banking · Business · Software',
-    statement: 'I build websites, Android apps and business systems in Dar es Salaam.',
-    intro:
-      'I studied Banking and Financial Services at the University of Dar es Salaam. At Exxonim Company Limited I work across software development and business operations: building websites, apps and internal systems, and supporting budgets, accounting, reporting and audit.',
-    now: 'Studying Computer Science at University of the People. Open to new roles and freelance projects.',
-    getInTouch: 'Get in touch',
-    downloadCv: 'Download CV',
-    work: 'Work',
-    privateWork: 'Other websites, business systems and client applications are private or confidential, so they are not listed here.',
-    experience: 'Experience',
-    skills: 'Skills',
-    education: 'Education',
-    certificates: 'Certificates',
-    contact: 'Contact',
-    contactLine: 'Have a role or a project in mind? I would like to hear about it.',
-    email: 'Email',
-    whatsapp: 'WhatsApp',
-    github: 'GitHub',
-    linkedin: 'LinkedIn',
-    cv: 'CV (PDF)',
-    visit: 'Visit',
-    localTime: 'Local time in Dar es Salaam',
+    nav: { home: 'Home', about: 'About', work: 'Work', cv: 'CV', contact: 'Contact' },
+    navLabel: 'Pages',
     language: 'Language',
+    themeToDark: 'Switch to the dark theme',
+    themeToLight: 'Switch to the light theme',
     skip: 'Skip to content',
     opensNewTab: 'opens in a new tab',
-  },
-  sw: {
-    role: 'Benki · Biashara · Programu',
-    statement: 'Ninatengeneza tovuti, programu za Android na mifumo ya biashara, jijini Dar es Salaam.',
-    intro:
-      'Nilisoma Benki na Huduma za Fedha katika Chuo Kikuu cha Dar es Salaam. Katika Exxonim Company Limited ninafanya kazi ya uundaji wa programu na uendeshaji wa biashara: kujenga tovuti, programu na mifumo ya ndani, na kusaidia bajeti, uhasibu, ripoti na ukaguzi.',
-    now: 'Ninasoma Sayansi ya Kompyuta katika University of the People. Niko tayari kwa ajira mpya na miradi binafsi.',
-    getInTouch: 'Wasiliana nami',
-    downloadCv: 'Pakua CV',
-    work: 'Kazi',
-    privateWork: 'Tovuti nyingine, mifumo ya biashara na programu za wateja ni za siri au binafsi, kwa hiyo hazijaorodheshwa hapa.',
-    experience: 'Uzoefu',
-    skills: 'Ujuzi',
-    education: 'Elimu',
-    certificates: 'Vyeti',
-    contact: 'Mawasiliano',
-    contactLine: 'Una nafasi ya kazi au mradi? Ningependa kusikia kutoka kwako.',
-    email: 'Barua pepe',
-    whatsapp: 'WhatsApp',
+    photoAlt: 'Suleiman Msaba smiling, with palm trees and a blue sky behind him',
+
+    // Home
+    headBuilds: 'builds',
+    builds: ['websites', 'Android apps', 'business systems'],
+    buildsAll: 'websites, Android apps and business systems',
+    headWin: 'that help your business win.',
+    sticker: 'Hi, I’m Suleiman',
+    reasons: [
+      '**Software and money, in one person.** I studied banking and finance, so budgets, books and reports make sense to me.',
+      '**Real work, live today:** three websites, and two Android apps on Google Play.',
+      '**From idea to launch:** the screens, the code, the database and the release.',
+      '**In Kiswahili and English,** for customers who speak either.',
+      '**Open to new roles and freelance projects.**',
+    ],
+    heroCta: 'Tell me what you need',
+    heroWork: 'See the work',
+    heroCv: 'Hiring? Read my CV',
+    workTitle: '**Built to help your business win.** Here is what each project does for the people who use it.',
+    needsTitle: '**What does your business need?** Pick one.',
+    needsLabel: 'What your business needs',
+    needsOr: 'or email me',
+    needs: [
+      {
+        id: 'website',
+        label: 'A website',
+        pitch: '**Get found online,** and make the next step obvious.',
+        points: ['Your services up front, with one clear first step.', 'Call or WhatsApp in one tap.', 'In English, Kiswahili or both.'],
+        proof: 'Like Exxonim Consult, LEVO, JOTOFA Group and Drax Raw.',
+        proofLink: '#/work/exxonim-consult',
+        cta: 'Ask me about a website',
+        message: 'Hi Suleiman, I need a website for my business.',
+      },
+      {
+        id: 'app',
+        label: 'An Android app',
+        pitch: '**Put your service in your customers’ pockets.**',
+        points: ['Built with Flutter and published on Google Play.', 'Made to work well on slow networks.', 'In English and Kiswahili.'],
+        proof: 'Like LigiPlay and MangiPlus.',
+        proofLink: '#/work/ligiplay',
+        cta: 'Ask me about an app',
+        message: 'Hi Suleiman, I need an Android app.',
+      },
+      {
+        id: 'system',
+        label: 'A business system',
+        pitch: '**Records, reports and workflows,** in one place.',
+        points: ['A proper database, with the APIs behind it.', 'Clear reports for decisions.', 'Built by someone who also does budgets and accounting.'],
+        proof: 'Like the internal systems I build at Exxonim Company Limited.',
+        proofLink: '#/about',
+        cta: 'Ask me about a system',
+        message: 'Hi Suleiman, I need a system for my business.',
+      },
+      {
+        id: 'numbers',
+        label: 'Help with the numbers',
+        pitch: '**Budgets, records and reports,** in order.',
+        points: ['Budgets and expenditure tracking.', 'Accounting records and reporting.', 'Internal audit support.'],
+        proof: 'From a banking and finance graduate who does this at Exxonim.',
+        proofLink: '#/about',
+        cta: 'Ask me about your numbers',
+        message: 'Hi Suleiman, I need help with budgets and reporting.',
+      },
+    ],
+    winsTitle: 'What it does for you',
+    likeThis: 'Want one like this?',
+    demoTitle: 'Try it: confirm a result',
+    demoBadge: 'Demo',
+    demoRead: 'sent a screenshot. LigiPlay read the score:',
+    demoAsk: 'is that right?',
+    demoConfirm: 'Yes, confirm',
+    demoDone: 'Confirmed by both players. The table updated itself.',
+    demoNext: 'Next match',
+    demoAgain: 'Start again',
+    demoPlayer: 'Player',
+    demoPlayed: 'Played',
+    demoPoints: 'Points',
+    ctaTitle: '**Have a role or a project in mind?** Let’s talk.',
+    orEmail: 'Or email me at',
+    periods: { dawn: 'Early morning', morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening', night: 'Night' },
+    swahiliTime: 'Swahili time',
+    skyTitle: 'Now in Dar es Salaam',
+    wordTitle: 'A word of Kiswahili',
+    wordFlip: 'Tap to see what it means',
+    wordNext: 'Tap for another word',
+    wordMeaning: 'Meaning',
+    cvTitle: 'My CV',
+    cvMeta: 'One page, in English',
+    readCv: 'Read my CV',
+    githubLine: 'My code, including this website.',
+    githubButton: 'View GitHub',
+
+    // About
+    aboutPageTitle: '**Suleiman**, in short.',
+    story: [
+      {
+        label: 'What I studied',
+        text: '**Banking and Financial Services** at the **University of Dar es Salaam**, from 2022 to 2025. Along the way I interned at **Tanzania Commercial Bank**, at the front office and the teller desk.',
+      },
+      {
+        label: 'What I do now',
+        text: 'At **Exxonim Company Limited** I build **websites, Android apps and internal systems**. I also work on the business side: budgets, accounting records, reporting and audit support.',
+      },
+      {
+        label: 'What I’m learning',
+        text: '**Computer Science** at **University of the People**, online, until 2027.',
+      },
+      {
+        label: 'What I’m looking for',
+        text: 'A new role or a freelance project in **software, finance or business operations**.',
+      },
+      {
+        label: 'Outside work',
+        text: 'I love **charity and helping people**.',
+      },
+    ],
+    experience: 'Experience',
+    education: 'Education',
+    skills: 'Skills',
+    certificates: 'Certificates',
+
+    // Work
+    privateWork: 'Other websites, business systems and client applications are private or confidential, so they are not listed here.',
+    visit: 'Visit',
+
+    // CV
+    cvPageTitle: '**My CV**, to read here or download.',
+    downloadPdf: 'Download PDF',
+    print: 'Print',
+    cvLanguageNote: '',
+
+    // Contact
+    contactTitle: '**Say hello**, in English or Kiswahili.',
+    chatChannel: 'on WhatsApp',
+    chatGreeting: 'Have a role or a project in mind? Write to me here and the message opens in WhatsApp.',
+    chatLabel: 'Your message',
+    chatPlaceholder: 'Write a message',
+    chatSend: 'Send on WhatsApp',
+    chatSent: 'Opened in WhatsApp',
+    composeTitle: 'Email',
+    composeTo: 'To',
+    composeSubject: 'Subject',
+    composeSubjectPlaceholder: 'What is it about?',
+    composeMessage: 'Message',
+    composeMessagePlaceholder: 'Write your message',
+    composeSend: 'Open in my email app',
+    phoneLabel: 'Phone',
+    copy: 'Copy',
+    copied: 'Copied',
     github: 'GitHub',
     linkedin: 'LinkedIn',
-    cv: 'CV (PDF)',
-    visit: 'Tembelea',
-    localTime: 'Saa za Dar es Salaam',
+  },
+  sw: {
+    nav: { home: 'Mwanzo', about: 'Kunihusu', work: 'Kazi', cv: 'CV', contact: 'Wasiliana' },
+    navLabel: 'Kurasa',
     language: 'Lugha',
+    themeToDark: 'Badili kwenda mandhari meusi',
+    themeToLight: 'Badili kwenda mandhari meupe',
     skip: 'Ruka hadi maudhui',
     opensNewTab: 'inafunguka kwenye kichupo kipya',
+    photoAlt: 'Suleiman Msaba akitabasamu, nyuma yake mitende na anga la buluu',
+
+    // Home
+    headBuilds: 'anatengeneza',
+    builds: ['tovuti', 'programu za Android', 'mifumo ya biashara'],
+    buildsAll: 'tovuti, programu za Android na mifumo ya biashara',
+    headWin: 'ili biashara yako ishinde.',
+    sticker: 'Habari, mimi ni Suleiman',
+    reasons: [
+      '**Teknolojia na fedha, kwa mtu mmoja.** Nilisoma benki na fedha, kwa hiyo bajeti, vitabu vya hesabu na ripoti ninavielewa.',
+      '**Kazi halisi, iliyo hewani leo:** tovuti tatu, na programu mbili za Android zilizo Google Play.',
+      '**Kutoka wazo hadi uzinduzi:** skrini, msimbo, hifadhidata na kuichapisha.',
+      '**Kwa Kiswahili na Kiingereza,** kwa wateja wanaozungumza lugha yoyote kati ya hizo.',
+      '**Niko tayari kwa ajira mpya na miradi binafsi.**',
+    ],
+    heroCta: 'Niambie unachohitaji',
+    heroWork: 'Tazama kazi',
+    heroCv: 'Unaajiri? Soma CV yangu',
+    workTitle: '**Imejengwa kusaidia biashara yako kushinda.** Hiki ndicho kila mradi unawafanyia wanaoutumia.',
+    needsTitle: '**Biashara yako inahitaji nini?** Chagua kimoja.',
+    needsLabel: 'Biashara yako inahitaji nini',
+    needsOr: 'au niandikie barua pepe',
+    needs: [
+      {
+        id: 'website',
+        label: 'Tovuti',
+        pitch: '**Patikana mtandaoni,** na fanya hatua inayofuata iwe wazi.',
+        points: ['Huduma zako mbele, na hatua moja ya kwanza iliyo wazi.', 'Piga simu au WhatsApp kwa kubofya mara moja.', 'Kwa Kiingereza, Kiswahili au zote mbili.'],
+        proof: 'Kama Exxonim Consult, LEVO, JOTOFA Group na Drax Raw.',
+        proofLink: '#/work/exxonim-consult',
+        cta: 'Niulize kuhusu tovuti',
+        message: 'Habari Suleiman, ninahitaji tovuti kwa ajili ya biashara yangu.',
+      },
+      {
+        id: 'app',
+        label: 'Programu ya Android',
+        pitch: '**Weka huduma yako mfukoni mwa wateja wako.**',
+        points: ['Imejengwa kwa Flutter na kuwekwa Google Play.', 'Imetengenezwa kufanya kazi vizuri hata kwenye mtandao wa polepole.', 'Kwa Kiingereza na Kiswahili.'],
+        proof: 'Kama LigiPlay na MangiPlus.',
+        proofLink: '#/work/ligiplay',
+        cta: 'Niulize kuhusu programu',
+        message: 'Habari Suleiman, ninahitaji programu ya Android.',
+      },
+      {
+        id: 'system',
+        label: 'Mfumo wa biashara',
+        pitch: '**Kumbukumbu, ripoti na michakato,** mahali pamoja.',
+        points: ['Hifadhidata imara, pamoja na API zake.', 'Ripoti zilizo wazi kwa maamuzi.', 'Umejengwa na mtu anayeshughulikia pia bajeti na uhasibu.'],
+        proof: 'Kama mifumo ya ndani ninayoijenga katika Exxonim Company Limited.',
+        proofLink: '#/about',
+        cta: 'Niulize kuhusu mfumo',
+        message: 'Habari Suleiman, ninahitaji mfumo kwa ajili ya biashara yangu.',
+      },
+      {
+        id: 'numbers',
+        label: 'Msaada wa hesabu',
+        pitch: '**Bajeti, kumbukumbu na ripoti,** kwa mpangilio.',
+        points: ['Bajeti na ufuatiliaji wa matumizi.', 'Kumbukumbu za uhasibu na ripoti.', 'Msaada wa ukaguzi wa ndani.'],
+        proof: 'Kutoka kwa mhitimu wa benki na fedha anayefanya kazi hii Exxonim.',
+        proofLink: '#/about',
+        cta: 'Niulize kuhusu hesabu zako',
+        message: 'Habari Suleiman, ninahitaji msaada wa bajeti na ripoti.',
+      },
+    ],
+    winsTitle: 'Inakufanyia nini',
+    likeThis: 'Unataka kama hii?',
+    demoTitle: 'Jaribu: thibitisha matokeo',
+    demoBadge: 'Mfano',
+    demoRead: 'ametuma picha ya skrini. LigiPlay imesoma matokeo:',
+    demoAsk: 'ni sahihi?',
+    demoConfirm: 'Ndiyo, thibitisha',
+    demoDone: 'Wachezaji wote wawili wamethibitisha. Jedwali limejisasisha lenyewe.',
+    demoNext: 'Mechi inayofuata',
+    demoAgain: 'Anza upya',
+    demoPlayer: 'Mchezaji',
+    demoPlayed: 'Mechi',
+    demoPoints: 'Pointi',
+    ctaTitle: '**Una nafasi ya kazi au mradi?** Tuzungumze.',
+    orEmail: 'Au niandikie barua pepe',
+    periods: { dawn: 'Alfajiri', morning: 'Asubuhi', afternoon: 'Mchana', evening: 'Jioni', night: 'Usiku' },
+    swahiliTime: 'Saa za Kiswahili',
+    skyTitle: 'Sasa hivi Dar es Salaam',
+    wordTitle: 'Neno la Kiswahili',
+    wordFlip: 'Gusa kuona maana kwa Kiingereza',
+    wordNext: 'Gusa kupata neno jingine',
+    wordMeaning: 'Kwa Kiingereza',
+
+    cvTitle: 'CV yangu',
+    cvMeta: 'Ukurasa mmoja, kwa Kiingereza',
+    readCv: 'Soma CV yangu',
+    githubLine: 'Msimbo wangu, pamoja na tovuti hii.',
+    githubButton: 'Tazama GitHub',
+
+    // About
+    aboutPageTitle: '**Suleiman**, kwa ufupi.',
+    story: [
+      {
+        label: 'Nilichosoma',
+        text: '**Benki na Huduma za Fedha** katika **Chuo Kikuu cha Dar es Salaam**, kuanzia 2022 hadi 2025. Katikati ya masomo nilifanya mafunzo kwa vitendo katika **Tanzania Commercial Bank**, kwenye dawati la mbele na kaunta.',
+      },
+      {
+        label: 'Ninachofanya sasa',
+        text: 'Katika **Exxonim Company Limited** ninatengeneza **tovuti, programu za Android na mifumo ya ndani**. Pia ninafanya kazi upande wa biashara: bajeti, kumbukumbu za uhasibu, ripoti na msaada wa ukaguzi.',
+      },
+      {
+        label: 'Ninachojifunza',
+        text: '**Sayansi ya Kompyuta** katika **University of the People**, mtandaoni, hadi 2027.',
+      },
+      {
+        label: 'Ninachotafuta',
+        text: 'Ajira mpya au mradi binafsi katika **teknolojia, fedha au uendeshaji wa biashara**.',
+      },
+      {
+        label: 'Nje ya kazi',
+        text: 'Ninapenda **kazi za hisani na kusaidia watu**.',
+      },
+    ],
+    experience: 'Uzoefu',
+    education: 'Elimu',
+    skills: 'Ujuzi',
+    certificates: 'Vyeti',
+
+    // Work
+    privateWork: 'Tovuti nyingine, mifumo ya biashara na programu za wateja ni za siri au binafsi, kwa hiyo hazijaorodheshwa hapa.',
+    visit: 'Tembelea',
+
+    // CV
+    cvPageTitle: '**CV yangu**, isome hapa au uipakue.',
+    downloadPdf: 'Pakua PDF',
+    print: 'Chapisha',
+    cvLanguageNote: 'CV hii imeandikwa kwa Kiingereza.',
+
+    // Contact
+    contactTitle: '**Nisalimie**, kwa Kiswahili au Kiingereza.',
+    chatChannel: 'kwenye WhatsApp',
+    chatGreeting: 'Una nafasi ya kazi au mradi? Niandikie hapa na ujumbe utafunguka kwenye WhatsApp.',
+    chatLabel: 'Ujumbe wako',
+    chatPlaceholder: 'Andika ujumbe',
+    chatSend: 'Tuma kwa WhatsApp',
+    chatSent: 'Umefunguliwa kwenye WhatsApp',
+    composeTitle: 'Barua pepe',
+    composeTo: 'Kwa',
+    composeSubject: 'Kichwa',
+    composeSubjectPlaceholder: 'Ni kuhusu nini?',
+    composeMessage: 'Ujumbe',
+    composeMessagePlaceholder: 'Andika ujumbe wako',
+    composeSend: 'Fungua kwenye programu ya barua pepe',
+    phoneLabel: 'Simu',
+    copy: 'Nakili',
+    copied: 'Imenakiliwa',
+    github: 'GitHub',
+    linkedin: 'LinkedIn',
   },
 }
+
+// The "word of Kiswahili" card on Home: tap to flip, tap again for the next word.
+export const swahiliWords = [
+  { word: 'Karibu', say: 'kah-REE-boo', meaning: 'Welcome' },
+  { word: 'Habari?', say: 'hah-BAH-ree', meaning: 'Hello, how are you? (literally: any news?)' },
+  { word: 'Asante', say: 'ah-SAHN-teh', meaning: 'Thank you' },
+  { word: 'Kazi', say: 'KAH-zee', meaning: 'Work, a job' },
+  { word: 'Pole pole', say: 'POH-leh POH-leh', meaning: 'Slowly, slowly. Take it easy.' },
+  { word: 'Rafiki', say: 'rah-FEE-kee', meaning: 'Friend' },
+  { word: 'Hakuna matata', say: 'hah-KOO-nah mah-TAH-tah', meaning: 'No worries' },
+]
 
 // Projects, in the order they appear. `layout` decides how the images sit:
 // 'phones' (tall app screens), 'browser' (a website screenshot) or 'banner'.
+// `tint` is the colour behind the images ('' uses the soft card grey).
+// `pitch` and `wins` say what the project does for the people who use it: advantages
+// only, never invented numbers. `ask` is the WhatsApp message behind "Want one like this?".
 export const projects = [
   {
     id: 'ligiplay',
@@ -89,6 +373,20 @@ export const projects = [
     },
     url: '',
     layout: 'phones',
+    tint: '#123d31',
+    pitch: {
+      en: 'Run a whole league from your phone, and end the “who really won?” arguments.',
+      sw: 'Endesha ligi nzima kwa simu yako, na umalize mabishano ya “nani alishinda kweli?”.',
+    },
+    wins: {
+      en: ['Fixtures are made for you.', 'Scores are read from a screenshot. No typing.', 'Both players confirm every result.', 'The table updates itself.', 'Works well on slow networks.', 'In English and Kiswahili.'],
+      sw: ['Ratiba inapangwa kwa ajili yako.', 'Matokeo yanasomwa kutoka kwenye picha ya skrini. Bila kuandika.', 'Wachezaji wote wawili wanathibitisha kila matokeo.', 'Jedwali linajisasisha lenyewe.', 'Inafanya kazi vizuri hata kwenye mtandao wa polepole.', 'Kwa Kiingereza na Kiswahili.'],
+    },
+    demo: true, // shows the small "confirm a result" demo
+    ask: {
+      en: 'Hi Suleiman, I saw LigiPlay. I would like an app like this.',
+      sw: 'Habari Suleiman, nimeona LigiPlay. Ningependa programu kama hii.',
+    },
     images: [
       { src: 'work/ligiplay-1.webp', w: 540, h: 960, alt: { en: 'LigiPlay home screen with tonight’s match and the matchday list', sw: 'Skrini kuu ya LigiPlay yenye mechi ya leo usiku na ratiba ya siku' } },
       { src: 'work/ligiplay-2.webp', w: 540, h: 960, alt: { en: 'LigiPlay screen for discovering open leagues', sw: 'Skrini ya LigiPlay ya kutafuta ligi zilizo wazi' } },
@@ -107,6 +405,19 @@ export const projects = [
     },
     url: 'https://consult.exxonim.tz',
     layout: 'browser',
+    tint: '',
+    pitch: {
+      en: 'From “I want to start a business” to “Start My Registration”, in one visit.',
+      sw: 'Kutoka “nataka kuanzisha biashara” hadi “Start My Registration”, kwa ziara moja.',
+    },
+    wins: {
+      en: ['Every service on one site: company registration, TIN, licences, work permits, NGO registration and annual returns.', 'One clear first step: Start My Registration.', 'Clients can track their consultation.', 'Call or WhatsApp in one tap.'],
+      sw: ['Huduma zote kwenye tovuti moja: usajili wa kampuni, TIN, leseni, vibali vya kazi, usajili wa NGO na taarifa za mwaka.', 'Hatua moja ya kwanza iliyo wazi: Start My Registration.', 'Wateja wanaweza kufuatilia ushauri wao.', 'Piga simu au WhatsApp kwa kubofya mara moja.'],
+    },
+    ask: {
+      en: 'Hi Suleiman, I saw the Exxonim Consult website. I would like a website like this.',
+      sw: 'Habari Suleiman, nimeona tovuti ya Exxonim Consult. Ningependa tovuti kama hii.',
+    },
     images: [
       { src: 'work/exxonim-consult.webp', w: 1200, h: 750, alt: { en: 'Exxonim Consult home page', sw: 'Ukurasa wa mwanzo wa Exxonim Consult' } },
     ],
@@ -122,8 +433,78 @@ export const projects = [
     },
     url: 'https://levo.or.tz',
     layout: 'browser',
+    tint: '#123b62',
+    pitch: {
+      en: 'Help people find legal aid, and help supporters give.',
+      sw: 'Wasaidie watu kupata msaada wa kisheria, na wafadhili kuchangia.',
+    },
+    wins: {
+      en: ['“Need legal support?” is right on the front page.', 'A Donate button for supporters.', 'Its work at a glance: legal aid, environment, water access and education.', 'A language switch, and WhatsApp in one tap.'],
+      sw: ['“Need legal support?” iko kwenye ukurasa wa mbele.', 'Kitufe cha Donate kwa wafadhili.', 'Kazi yake kwa haraka: msaada wa kisheria, mazingira, maji na elimu.', 'Kubadili lugha, na WhatsApp kwa kubofya mara moja.'],
+    },
+    ask: {
+      en: 'Hi Suleiman, I saw the LEVO website. I would like a website for my organisation.',
+      sw: 'Habari Suleiman, nimeona tovuti ya LEVO. Ningependa tovuti kwa ajili ya shirika langu.',
+    },
     images: [
       { src: 'work/levo.webp', w: 1200, h: 750, alt: { en: 'LEVO home page', sw: 'Ukurasa wa mwanzo wa LEVO' } },
+    ],
+  },
+  {
+    id: 'jotofa',
+    name: 'JOTOFA Group',
+    type: { en: 'Website proposal', sw: 'Pendekezo la tovuti' },
+    status: { en: 'Proposal', sw: 'Pendekezo' },
+    summary: {
+      en: 'A website I proposed to JOTOFA Group, a Tanzanian holding company with three businesses: ICT and telecommunications, professional cleaning, and staffing.',
+      sw: 'Tovuti niliyoipendekeza kwa JOTOFA Group, kampuni mama ya Kitanzania yenye biashara tatu: TEHAMA na mawasiliano, usafi wa kitaalamu, na huduma za wafanyakazi.',
+    },
+    url: 'https://frontendjotofa.vercel.app',
+    linkLabel: { en: 'See the proposal', sw: 'Tazama pendekezo' }, // instead of "Visit ..."; this is not JOTOFA's own site
+    layout: 'browser',
+    tint: '#073b60',
+    pitch: {
+      en: 'Three businesses, one clear front door.',
+      sw: 'Biashara tatu, mlango mmoja ulio wazi.',
+    },
+    wins: {
+      en: ['Each business shows its own services: ICT and telecoms, cleaning, and staffing.', 'News, careers and contact, a click away.', 'Call or WhatsApp in one tap.', 'Light and dark mode.'],
+      sw: ['Kila biashara inaonyesha huduma zake: TEHAMA na mawasiliano, usafi, na wafanyakazi.', 'Habari, nafasi za kazi na mawasiliano, kwa kubofya mara moja.', 'Piga simu au WhatsApp kwa kubofya mara moja.', 'Mandhari meupe na meusi.'],
+    },
+    ask: {
+      en: 'Hi Suleiman, I saw your JOTOFA Group proposal. I would like a website for my company.',
+      sw: 'Habari Suleiman, nimeona pendekezo lako la JOTOFA Group. Ningependa tovuti kwa ajili ya kampuni yangu.',
+    },
+    images: [
+      { src: 'work/jotofa.webp', w: 1200, h: 750, alt: { en: 'Home page of the JOTOFA Group website proposal', sw: 'Ukurasa wa mwanzo wa pendekezo la tovuti ya JOTOFA Group' } },
+    ],
+  },
+  {
+    id: 'drax-raw',
+    name: 'Drax Raw',
+    type: { en: 'Portfolio website', sw: 'Tovuti ya kazi' },
+    status: { en: 'Live', sw: 'Iko hewani' },
+    summary: {
+      en: 'Portfolio website for Drax Raw, a filmmaker, video editor and photographer in Dar es Salaam.',
+      sw: 'Tovuti ya kuonyesha kazi za Drax Raw, mtengeneza filamu, mhariri wa video na mpiga picha jijini Dar es Salaam.',
+    },
+    url: 'https://sulemsaba.github.io/draxraw/',
+    layout: 'browser',
+    tint: '#cb2f29',
+    pitch: {
+      en: 'A filmmaker’s work up front, and bookings straight to WhatsApp.',
+      sw: 'Kazi za mtengeneza filamu mbele kabisa, na maombi ya kazi moja kwa moja WhatsApp.',
+    },
+    wins: {
+      en: ['Films play right on the page.', 'Photos and phone wallpapers in their own galleries.', 'Book on WhatsApp from anywhere on the site.', 'A bold look, as loud as the films.'],
+      sw: ['Filamu zinachezwa papo hapo kwenye ukurasa.', 'Picha na wallpapers za simu kwenye maonyesho yake.', 'Weka miadi kwa WhatsApp kutoka popote kwenye tovuti.', 'Muonekano wenye nguvu, kama filamu zenyewe.'],
+    },
+    ask: {
+      en: 'Hi Suleiman, I saw the Drax Raw website. I would like a portfolio website.',
+      sw: 'Habari Suleiman, nimeona tovuti ya Drax Raw. Ningependa tovuti ya kuonyesha kazi zangu.',
+    },
+    images: [
+      { src: 'work/draxraw.webp', w: 1200, h: 750, alt: { en: 'Drax Raw home page', sw: 'Ukurasa wa mwanzo wa Drax Raw' } },
     ],
   },
   {
@@ -137,6 +518,16 @@ export const projects = [
     },
     url: '',
     layout: 'banner',
+    tint: '#f46906',
+    pitch: {
+      en: 'Made for small and medium-sized businesses, in an Android app.',
+      sw: 'Imetengenezwa kwa biashara ndogo na za kati, kama programu ya Android.',
+    },
+    wins: { en: [], sw: [] }, // add what MangiPlus does for a business, one short line each
+    ask: {
+      en: 'Hi Suleiman, I saw MangiPlus. I would like an app for my business.',
+      sw: 'Habari Suleiman, nimeona MangiPlus. Ningependa programu kwa ajili ya biashara yangu.',
+    },
     images: [
       { src: 'work/mangiplus.webp', w: 1024, h: 500, alt: { en: 'MangiPlus logo', sw: 'Nembo ya MangiPlus' } },
     ],
@@ -147,19 +538,11 @@ export const experience = [
   {
     org: 'Exxonim Company Limited',
     role: { en: 'Software development and business operations', sw: 'Uundaji wa programu na uendeshaji wa biashara' },
-    summary: {
-      en: 'Websites, web and Android apps and internal business systems, plus budgets, expenditure tracking, accounting records, reporting and audit support.',
-      sw: 'Tovuti, programu za wavuti na Android na mifumo ya ndani ya biashara, pamoja na bajeti, ufuatiliaji wa matumizi, kumbukumbu za uhasibu, ripoti na ukaguzi.',
-    },
     period: { en: 'Since Jan 2025', sw: 'Tangu Jan 2025' },
   },
   {
     org: 'Tanzania Commercial Bank',
     role: { en: 'Banking intern', sw: 'Mafunzo kwa vitendo, benki' },
-    summary: {
-      en: 'Customer service, front office and teller support, daily transactions, book balancing and banking documentation.',
-      sw: 'Huduma kwa wateja, dawati la mbele na kaunta, miamala ya kila siku, kusawazisha vitabu na nyaraka za kibenki.',
-    },
     period: { en: 'Jul to Sep 2024', sw: 'Jul hadi Sep 2024' },
   },
 ]

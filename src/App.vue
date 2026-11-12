@@ -1,120 +1,36 @@
 <template>
-  <a class="skip" href="#main">{{ t.skip }}</a>
+  <a class="skip" href="#main" @click.prevent="focusMain">{{ t.skip }}</a>
 
   <div class="page" :class="{ 'is-switching': switching }">
-    <header class="masthead">
-      <div class="who reveal" :style="{ '--i': 0 }">
-        <h1 class="name">{{ profile.name }}</h1>
-        <p class="role swap">{{ t.role }}</p>
+    <a class="identity reveal" href="#/">
+      <img :src="profile.photo" width="36" height="36" alt="" decoding="async" />
+      <span>{{ profile.name }}</span>
+    </a>
+
+    <NavPill class="reveal" :pages="pages" :page="route.page" :t="t" />
+
+    <div class="tools reveal">
+      <div class="lang" role="group" :aria-label="t.language">
+        <button
+          v-for="option in languages"
+          :key="option.code"
+          type="button"
+          class="lang-option"
+          :lang="option.code"
+          :aria-label="option.name"
+          :aria-pressed="String(lang === option.code)"
+          @click="setLang(option.code)"
+        >
+          {{ option.short }}
+        </button>
       </div>
+      <ThemeToggle :t="t" />
+    </div>
 
-      <div class="tools reveal" :style="{ '--i': 1 }">
-        <p v-if="time" class="clock">
-          <time :aria-label="`${t.localTime}: ${time}`">{{ time }}</time>
-          <span aria-hidden="true">EAT</span>
-        </p>
-        <div class="lang" role="group" :aria-label="t.language">
-          <button
-            v-for="option in languages"
-            :key="option.code"
-            type="button"
-            class="lang-option"
-            :lang="option.code"
-            :aria-label="option.name"
-            :aria-pressed="String(lang === option.code)"
-            @click="setLang(option.code)"
-          >
-            {{ option.short }}
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <main id="main">
-      <section class="intro">
-        <p class="statement swap reveal" :style="{ '--i': 2 }">{{ t.statement }}</p>
-        <p class="lede swap reveal" :style="{ '--i': 3 }">{{ t.intro }}</p>
-        <p class="now swap reveal" :style="{ '--i': 4 }">{{ t.now }}</p>
-        <p class="actions reveal" :style="{ '--i': 4 }">
-          <a href="#contact" class="swap">{{ t.getInTouch }}</a>
-          <a v-if="profile.links.cv" :href="profile.links.cv" download class="swap">{{ t.downloadCv }}</a>
-        </p>
-      </section>
-
-      <section class="block" aria-labelledby="work-heading">
-        <h2 id="work-heading" class="label swap reveal" :style="{ '--i': 5 }">{{ t.work }}</h2>
-        <div class="reveal" :style="{ '--i': 6 }">
-          <ProjectList :projects="projects" :lang="lang" :t="t" />
-          <p class="note swap">{{ t.privateWork }}</p>
-        </div>
-      </section>
-
-      <section class="block" aria-labelledby="experience-heading">
-        <h2 id="experience-heading" class="label swap">{{ t.experience }}</h2>
-        <ol class="rows">
-          <li v-for="job in experience" :key="job.org" class="row">
-            <span class="row-main">{{ job.org }}</span>
-            <span v-if="job.role[lang]" class="row-sub swap">{{ job.role[lang] }}</span>
-            <span class="row-date swap">{{ job.period[lang] }}</span>
-            <span v-if="job.summary" class="row-note swap">{{ job.summary[lang] }}</span>
-          </li>
-        </ol>
-      </section>
-
-      <section class="block" aria-labelledby="skills-heading">
-        <h2 id="skills-heading" class="label swap">{{ t.skills }}</h2>
-        <ul class="rows">
-          <li v-for="skill in skills" :key="skill.name.en" class="row">
-            <span class="row-main swap">{{ skill.name[lang] }}</span>
-            <span class="row-note swap">{{ skill.items[lang] }}</span>
-          </li>
-        </ul>
-      </section>
-
-      <section class="block" aria-labelledby="education-heading">
-        <h2 id="education-heading" class="label swap">{{ t.education }}</h2>
-        <ul class="rows">
-          <li v-for="school in education" :key="school.org" class="row">
-            <span class="row-main">{{ school.org }}</span>
-            <span class="row-sub swap">{{ school.detail[lang] }}</span>
-            <span class="row-date swap">{{ school.period[lang] }}</span>
-          </li>
-        </ul>
-      </section>
-
-      <section class="block" aria-labelledby="certificates-heading">
-        <h2 id="certificates-heading" class="label swap">{{ t.certificates }}</h2>
-        <ul class="rows">
-          <li v-for="cert in certificates" :key="cert.name.en" class="row">
-            <span class="row-main swap">{{ cert.name[lang] }}</span>
-            <span class="row-date swap">{{ cert.issuer[lang] }}</span>
-          </li>
-        </ul>
-      </section>
-
-      <section id="contact" class="block" aria-labelledby="contact-heading">
-        <h2 id="contact-heading" class="label swap">{{ t.contact }}</h2>
-        <div class="contact">
-          <p class="contact-line swap">{{ t.contactLine }}</p>
-          <a v-if="profile.links.email" class="contact-email" :href="`mailto:${profile.links.email}`">
-            {{ profile.links.email }}
-          </a>
-          <ul class="contact-links">
-            <li v-for="link in contactLinks" :key="link.key">
-              <a
-                :href="link.href"
-                :target="link.external ? '_blank' : null"
-                :rel="link.external ? 'noopener noreferrer' : null"
-                :download="link.download ? '' : null"
-              >
-                <span class="swap">{{ link.label }}</span>
-                <span v-if="link.external" class="visually-hidden">({{ t.opensNewTab }})</span>
-                <ArrowIcon v-if="link.external" />
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+    <main id="main" ref="main" tabindex="-1">
+      <Transition name="page" mode="out-in" @after-leave="onAfterLeave" @after-enter="onAfterEnter">
+        <component :is="views[route.page]" :key="route.page" :lang="lang" :t="t" :focus="route.sub" />
+      </Transition>
     </main>
 
     <footer class="footer">
@@ -125,15 +41,70 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { certificates, copy, education, experience, profile, projects, skills } from './content.js'
-import ProjectList from './components/ProjectList.vue'
-import ArrowIcon from './components/ArrowIcon.vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { copy, profile, projects } from './content.js'
+import NavPill from './components/NavPill.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
+import CvPage from './pages/CvPage.vue'
+import HomePage from './pages/HomePage.vue'
+import AboutPage from './pages/AboutPage.vue'
+import WorkPage from './pages/WorkPage.vue'
+import ContactPage from './pages/ContactPage.vue'
+
+const pages = ['home', 'about', 'work', 'cv', 'contact']
+const views = { home: HomePage, about: AboutPage, work: WorkPage, cv: CvPage, contact: ContactPage }
 
 const languages = [
   { code: 'en', short: 'EN', name: 'English' },
   { code: 'sw', short: 'SW', name: 'Kiswahili' },
 ]
+
+// Pages live in the address after #, so the site works on any static host:
+// #/about, #/work, #/work/ligiplay, #/cv, #/contact. Older links like #ligiplay still land.
+function readRoute() {
+  const hash = decodeURIComponent(window.location.hash.slice(1))
+  if (hash.startsWith('/')) {
+    const [page, sub = ''] = hash.slice(1).split('/')
+    return pages.includes(page) ? { page, sub } : { page: 'home', sub: '' }
+  }
+  if (projects.some((project) => project.id === hash)) return { page: 'work', sub: hash }
+  if (hash === 'contact') return { page: 'contact', sub: '' }
+  return { page: 'home', sub: '' }
+}
+
+const route = ref(readRoute())
+let navigated = false
+
+function onHashChange() {
+  const next = readRoute()
+  if (next.page === route.value.page && next.sub === route.value.sub) return
+  navigated = true
+  if (next.page === route.value.page) {
+    // Same page, new project: scroll to it without a page change.
+    route.value = next
+    document.getElementById(next.sub)?.scrollIntoView({ block: 'start' })
+    return
+  }
+  route.value = next
+}
+
+// Between pages: back to the top, then the new page's title takes focus.
+function onAfterLeave() {
+  window.scrollTo({ top: 0, behavior: 'instant' })
+}
+
+function onAfterEnter() {
+  if (!navigated) return
+  document.querySelector('[data-page-title]')?.focus({ preventScroll: true })
+  // A link to one project lands on it once the page has settled.
+  if (route.value.sub) document.getElementById(route.value.sub)?.scrollIntoView({ block: 'start', behavior: 'instant' })
+}
+
+const main = ref(null)
+function focusMain() {
+  main.value?.focus()
+  main.value?.scrollIntoView({ block: 'start' })
+}
 
 // Language: ?lang=sw in the link wins, then the visitor's last choice, then their browser.
 function initialLanguage() {
@@ -179,49 +150,22 @@ function setLang(next) {
   }, 170)
 }
 
-// Local time in Dar es Salaam, updated on the minute.
-let formatter = null
-try {
-  formatter = new Intl.DateTimeFormat('en-GB', {
-    timeZone: profile.timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  })
-} catch {
-  formatter = null
-}
+const baseTitle = document.title
+watch(
+  [() => route.value.page, t],
+  ([page]) => {
+    document.title = page === 'home' ? baseTitle : `${t.value.nav[page]} · ${profile.name}`
+  },
+  { immediate: true },
+)
 
-const now = ref(new Date())
-const time = computed(() => (formatter ? formatter.format(now.value) : ''))
-let clockTimer = 0
-
-onMounted(() => {
-  const tick = () => {
-    now.value = new Date()
-    clockTimer = setTimeout(tick, 60000 - (Date.now() % 60000) + 50)
-  }
-  tick()
-})
-
+onMounted(() => window.addEventListener('hashchange', onHashChange))
 onBeforeUnmount(() => {
-  clearTimeout(clockTimer)
+  window.removeEventListener('hashchange', onHashChange)
   clearTimeout(switchTimer)
 })
 
 const year = new Date().getFullYear()
-
-const contactLinks = computed(() => {
-  const links = profile.links
-  const list = []
-  if (links.whatsapp) {
-    list.push({ key: 'whatsapp', href: `https://wa.me/${links.whatsapp.replace(/\D/g, '')}`, label: t.value.whatsapp, external: true })
-  }
-  if (links.github) list.push({ key: 'github', href: links.github, label: t.value.github, external: true })
-  if (links.linkedin) list.push({ key: 'linkedin', href: links.linkedin, label: t.value.linkedin, external: true })
-  if (links.cv) list.push({ key: 'cv', href: links.cv, label: t.value.cv, external: false, download: true })
-  return list
-})
 </script>
 
 <style scoped>
@@ -231,7 +175,7 @@ const contactLinks = computed(() => {
   left: 0.75rem;
   z-index: 30;
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--ink);
   color: var(--bg);
   text-decoration: none;
@@ -242,54 +186,83 @@ const contactLinks = computed(() => {
   transform: none;
 }
 
+/* The page always fills the screen, so short pages keep the footer at the bottom. */
 .page {
-  max-width: calc(var(--measure) + var(--gutter) * 2);
-  margin: 0 auto;
-  padding: 1.75rem var(--gutter) 2.5rem;
-}
-
-/* Header */
-.masthead {
+  position: relative;
+  isolation: isolate;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: calc(var(--wide) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: 1.25rem var(--gutter) 2rem;
 }
 
-.name {
-  margin: 0;
-  font-size: 1rem;
+/* Dark theme: light from the portrait's colours, the sky and the palms at the top,
+   the warm shirt near the bottom. */
+:root[data-theme='dark'] .page::before,
+:root[data-theme='dark'] .page::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  z-index: -1;
+  width: 100vw;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .page::before {
+  top: 0;
+  height: min(120rem, 100%); /* never taller than the page itself */
+  background:
+    radial-gradient(46rem 32rem at 20% 8%, rgb(5 161 242 / 0.26), transparent 70%),
+    radial-gradient(40rem 30rem at 85% 20%, rgb(97 140 102 / 0.26), transparent 70%),
+    radial-gradient(30rem 22rem at 55% 42%, rgb(31 180 200 / 0.12), transparent 70%),
+    radial-gradient(44rem 28rem at 8% 70%, rgb(5 161 242 / 0.12), transparent 70%),
+    radial-gradient(36rem 26rem at 92% 88%, rgb(97 140 102 / 0.14), transparent 70%);
+}
+
+:root[data-theme='dark'] .page::after {
+  bottom: 0;
+  height: min(44rem, 100%);
+  background: radial-gradient(46rem 26rem at 50% 100%, rgb(214 116 66 / 0.2), transparent 72%);
+}
+
+main {
+  flex: 1 0 auto;
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  outline: none;
+}
+
+/* Name top left, language and theme top right, level with the menu. */
+.identity,
+.tools {
+  position: absolute;
+  top: 1.5rem;
+  z-index: 21;
+  display: flex;
+  align-items: center;
+}
+
+.identity {
+  left: var(--gutter);
+  gap: 0.625rem;
+  min-height: 2.75rem;
   font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
+  text-decoration: none;
 }
 
-.role {
-  margin: 0;
-  color: var(--muted);
+.identity img {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .tools {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-top: -0.6rem;
-}
-
-.clock {
-  margin: 0;
-  display: flex;
-  gap: 0.35em;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Small phones keep the name and the language switch on one line; the clock steps out. */
-@media (max-width: 30rem) {
-  .clock {
-    display: none;
-  }
+  right: var(--gutter);
+  gap: 0.25rem;
 }
 
 .lang {
@@ -321,181 +294,102 @@ const contactLinks = computed(() => {
   text-underline-offset: 0.35em;
 }
 
-/* Intro */
-.intro {
-  padding-top: clamp(3.5rem, 11vh, 7rem);
-}
+/* Under 66rem the name and tools sit in a row above the menu. */
+@media (max-width: 66rem) {
+  .page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto 1fr auto;
+    align-items: center;
+  }
 
-.statement {
-  max-width: 21em;
-  margin: 0;
-  font-size: clamp(1.625rem, 1.15rem + 1.9vw, 2.375rem);
-  font-weight: 500;
-  line-height: 1.16;
-  letter-spacing: -0.024em;
-  text-wrap: balance;
-}
+  .identity,
+  .tools {
+    position: static;
+    grid-row: 1;
+  }
 
-.lede {
-  max-width: 35rem;
-  margin: 1.5rem 0 0;
-  color: var(--muted);
-  font-size: 1.0625rem;
-}
+  .tools {
+    grid-column: 2;
+    margin-right: -0.5rem;
+  }
 
-.now {
-  max-width: 35rem;
-  margin: 0.75rem 0 0;
-  color: var(--muted);
-  font-size: 1.0625rem;
-}
+  .page > .nav,
+  main,
+  .footer {
+    grid-column: 1 / -1;
+  }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1.5rem;
-  margin: 0.25rem 0 0;
-  font-size: 1.0625rem;
-}
+  .page > .nav {
+    grid-row: 2;
+    margin-top: 0.75rem;
+  }
 
-.actions a {
-  display: inline-block;
-  padding: 0.5rem 0;
-  white-space: nowrap;
-}
+  main {
+    grid-row: 3;
+    align-self: start;
+  }
 
-.note {
-  max-width: 34rem;
-  margin: 1rem 0 0;
-  color: var(--muted);
-  font-size: 0.875rem;
-}
+  .footer {
+    grid-row: 4;
+  }
 
-/* Sections with hanging labels */
-.block {
-  display: grid;
-  gap: 0.5rem;
-  margin-top: clamp(3.5rem, 9vh, 5.5rem);
-}
-
-@media (min-width: 46rem) {
-  .block {
-    grid-template-columns: var(--label) minmax(0, 1fr);
-    gap: 0 var(--gutter);
+  main {
+    margin-top: 1.5rem;
   }
 }
 
-.label {
-  margin: 0;
-  padding-top: 0.75rem;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-@media (max-width: 45.99rem) {
-  .label {
-    padding-top: 0;
+@media (max-width: 40rem) {
+  .page {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
   }
 }
 
-/* Experience */
-.rows {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 1rem;
-  padding: 0.75rem 0;
-  border-top: 1px solid var(--line);
-}
-
-.row:last-child {
-  border-bottom: 1px solid var(--line);
-}
-
-.row-main {
-  font-weight: 500;
-}
-
-.row-sub {
-  grid-column: 1;
-  color: var(--muted);
-}
-
-.row-date {
-  grid-row: 1;
-  grid-column: 2;
-  color: var(--muted);
-  font-size: 0.9375rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.row-note {
-  grid-column: 1 / -1;
-  max-width: 34rem;
-  margin-top: 0.25rem;
-  color: var(--muted);
-  font-size: 0.9375rem;
-}
-
-/* Contact */
-.contact {
-  padding-top: 0.75rem;
-}
-
-@media (max-width: 45.99rem) {
-  .contact {
-    padding-top: 0;
-  }
-}
-
-.contact-line {
-  max-width: 30rem;
-  margin: 0;
-}
-
-.contact-email {
-  display: inline-block;
-  margin-top: 0.75rem;
-  font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-
-.contact-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1.5rem;
-  list-style: none;
-  margin: 0.5rem 0 0;
-  padding: 0;
-}
-
-.contact-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 2.75rem;
-}
-
-/* Footer */
 .footer {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
-  margin-top: clamp(4.5rem, 12vh, 7rem);
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--line);
+  margin-top: clamp(3rem, 7vw, 5rem);
   color: var(--muted);
   font-size: 0.875rem;
+}
+
+/* Between pages: out with a blur, in from just below. */
+.page-enter-active {
+  transition:
+    opacity 0.5s var(--ease-out),
+    transform 0.6s var(--ease-out),
+    filter 0.5s var(--ease-out);
+}
+
+.page-leave-active {
+  transition:
+    opacity 0.18s var(--ease-in),
+    filter 0.18s var(--ease-in);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translate3d(0, 1rem, 0);
+  filter: blur(8px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-from {
+    transform: none;
+    filter: none;
+  }
+
+  .page-leave-to {
+    filter: none;
+  }
 }
 </style>
 

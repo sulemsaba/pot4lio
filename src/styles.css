@@ -1,31 +1,67 @@
-/* Tokens. Light by default; follows the visitor's system setting for dark. */
+/* Tokens. White by default; a dark theme the visitor can switch to. */
 :root {
-  color-scheme: light dark;
-  --bg: #fbfbfa;
-  --ink: #141413;
-  --muted: #6a6a66;
-  --line: #e6e5e1;
-  --soft: #f0efeb;
-  --shadow: 0 18px 40px -18px rgb(20 20 19 / 0.38);
+  color-scheme: light;
+  --bg: #ffffff;
+  --ink: #111111;
+  --muted: #6e6e73; /* body grey, 4.5:1 on cards */
+  --faint: #8e8e93; /* large headline grey only */
+  --line: #e8e8ec;
+  --soft: #f7f7f9; /* cards */
+  --pill: #ececef; /* the active page in the menu */
+  --glass: rgb(255 255 255 / 0.86);
+  --paper: #ffffff;
+  --signal: #f2453d; /* the clock's second hand */
+  --ok: #34c759; /* open to work */
+  --bubble: #ffffff; /* a received chat message */
+  --sent: #d9fdd3; /* a sent chat message, in WhatsApp's own green */
+  --sent-ink: #111b21;
+  --lift: 0 0.625rem 1.75rem -0.75rem rgb(17 17 17 / 0.18);
+
+  /* Colour, taken from the portrait: the sky, the palms, the shirt. */
+  --sky: #05a1f2;
+  --sky-bg: #dff1fc;
+  --sky-ink: #04324c;
+  --palm-bg: #e3ecdc;
+  --palm-ink: #1d3a24;
+  --sand-bg: #efedde;
+  --sand-ink: #38351a;
 
   --font: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
-  --measure: 44rem; /* page column */
-  --label: 8.5rem; /* hanging section labels on wide screens */
-  --gutter: 1.5rem;
+  --wide: 82rem;
+  --gutter: clamp(1rem, 3vw, 2.25rem);
+  --gap: clamp(0.75rem, 1.2vw, 1rem);
+  --radius: clamp(1.25rem, 2.4vw, 2rem);
+  --pad: clamp(1.25rem, 2.4vw, 2rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121211;
-    --ink: #ececea;
-    --muted: #9c9b96;
-    --line: #2a2a28;
-    --soft: #1c1c1a;
-    --shadow: 0 18px 40px -16px rgb(0 0 0 / 0.7);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0e0e10;
+  --ink: #f2f2f4;
+  --muted: #a1a1a9;
+  --faint: #7c7c85;
+  --line: #27272c;
+  --soft: rgb(30 30 36 / 0.62); /* cards let the page's coloured light through */
+  --pill: #2a2a30;
+  --glass: rgb(24 24 27 / 0.82);
+  --paper: #151518;
+  --signal: #ff6157;
+  --ok: #30d158;
+  --bubble: #2a2a31;
+  --sent: #005c4b;
+  --sent-ink: #e9edef;
+  --lift: 0 0.75rem 2rem -0.75rem rgb(0 0 0 / 0.7);
+
+  --sky: #3fb6f7;
+  --sky-bg: #0d2433;
+  --sky-ink: #c6e9fd;
+  --palm-bg: #152219;
+  --palm-ink: #cfe3c8;
+  --sand-bg: #22211a;
+  --sand-ink: #e9e5c4;
 }
 
 *,
@@ -37,12 +73,13 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scrollbar-color: var(--line) transparent;
+  scrollbar-color: #d4d4d8 transparent;
   scrollbar-width: thin;
 }
 
 body {
   margin: 0;
+  overflow-x: clip;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
@@ -62,7 +99,11 @@ body {
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+[data-page-title]:focus {
+  outline: none;
 }
 
 img {
@@ -101,22 +142,256 @@ button {
   border: 0;
 }
 
-/* Motion: one entrance for the first screen, and the language switch. */
+/* Cards: the one container on every page. */
+.card {
+  position: relative;
+  padding: var(--pad);
+  border-radius: var(--radius);
+  background: var(--soft);
+}
+
+/* The big statement on Home. */
+.display {
+  margin: 0;
+  color: var(--faint);
+  font-size: clamp(2.5rem, 1.4rem + 4.4vw, 5.25rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.display strong,
+.headline strong {
+  color: var(--ink);
+  font-weight: inherit;
+}
+
+/* Page headlines: grey, with the words that matter in ink. */
+.headline {
+  margin: 0;
+  color: var(--faint);
+  font-size: clamp(1.625rem, 1.3rem + 1vw, 2rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.headline .ink {
+  color: var(--ink);
+}
+
+.headline a.ink {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+/* Small uppercase labels inside cards. */
+.tag {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* The round arrow button in a card's corner. */
+.corner {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--ink);
+  backdrop-filter: blur(6px);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.4s var(--ease-out);
+}
+
+.corner--light {
+  border-color: rgb(255 255 255 / 0.4);
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+}
+
+a:hover > .corner,
+a:focus-visible > .corner {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  transform: rotate(45deg);
+}
+
+/* Pill buttons. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.875rem;
+  padding: 0 1.25rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.35s var(--ease-out);
+}
+
+.button:hover {
+  border-color: var(--ink);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button--ink {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.button--ink:hover {
+  background: color-mix(in srgb, var(--ink) 86%, var(--bg));
+}
+
+.button svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The theme switch: the new theme spreads out from the button (see ThemeToggle). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Motion: the first screen of each page settles in once. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 
   .reveal {
-    animation: rise 0.85s var(--ease-out) backwards;
-    animation-delay: calc(var(--i, 0) * 70ms + 80ms);
+    animation: rise 0.8s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 60ms + 60ms);
   }
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 0.6rem, 0);
+    transform: translate3d(0, 0.75rem, 0);
     filter: blur(6px);
   }
+}
+
+/* Printing (the CV page): only the page content, in black on white, on A4. */
+@page {
+  size: A4;
+  margin: 11mm 14mm;
+}
+
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --bg: #fff;
+    --ink: #000;
+    --muted: #444;
+    --faint: #666;
+    --line: #ddd;
+    --paper: #fff;
+  }
+
+  .skip,
+  .identity,
+  .tools,
+  .nav,
+  .footer {
+    display: none !important;
+  }
+
+  .reveal {
+    animation: none !important;
+  }
+
+  .page,
+  main {
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Tilting cards (see src/tilt.js). */
+.tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.6s var(--ease-out);
+  will-change: transform;
+}
+
+.tilt.tilting {
+  transition: transform 0.12s linear;
+}
+
+.tilt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.22), transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.tilt.tilting::after {
+  opacity: 1;
+}
+
+/* Dark theme, designed rather than inverted: lit card edges, a fine grain,
+   and soft light from the portrait's colours (see .page in App.vue). */
+:root[data-theme='dark'] .card {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 0 0 1px rgb(255 255 255 / 0.04),
+    0 1.5rem 3rem -1.5rem rgb(0 0 0 / 0.6);
+}
+
+:root[data-theme='dark'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
 }
