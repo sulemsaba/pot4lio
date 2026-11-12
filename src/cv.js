@@ -4,8 +4,8 @@
 
 export const cv = {
   name: 'Suleiman Msaba',
-  headline: 'Software Developer and Business Operations · Banking and Finance Graduate',
-  // Two rows: how to reach him, then where to see the work.
+  headline: ['Software Developer and Business Operations', 'Banking and Finance Graduate'],
+  // Two groups: how to reach him, then where to see the work.
   contact: [
     [
       { text: 'Dar es Salaam, Tanzania' },

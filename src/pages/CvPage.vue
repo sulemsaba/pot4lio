@@ -17,14 +17,20 @@
     <!-- The CV itself, as a sheet of paper. It stays in English, like the PDF. -->
     <article class="sheet reveal" :style="{ '--i': 2 }" lang="en" aria-label="Curriculum vitae">
       <header class="sheet-head">
-        <h2 class="cv-name">{{ cv.name }}</h2>
-        <p class="cv-headline">{{ cv.headline }}</p>
-        <p v-for="(row, r) in cv.contact" :key="r" class="cv-contact">
-          <template v-for="item in row" :key="item.text">
-            <a v-if="item.href" :href="item.href">{{ item.text }}</a>
-            <span v-else>{{ item.text }}</span>
-          </template>
-        </p>
+        <div class="cv-who">
+          <h2 class="cv-name">{{ cv.name }}</h2>
+          <p class="cv-headline">
+            <span v-for="line in cv.headline" :key="line">{{ line }}</span>
+          </p>
+        </div>
+        <div class="cv-reach">
+          <ul v-for="(group, g) in cv.contact" :key="g" class="cv-contact">
+            <li v-for="item in group" :key="item.text">
+              <a v-if="item.href" :href="item.href">{{ item.text }}</a>
+              <span v-else>{{ item.text }}</span>
+            </li>
+          </ul>
+        </div>
       </header>
 
       <section class="cv-section">
@@ -151,9 +157,29 @@ const print = () => window.print()
   line-height: 1.55;
 }
 
+/* Header: name and title, then the contact details in two small groups.
+   Stacked on phones; side by side on wider screens and on paper. */
 .sheet-head {
-  padding-bottom: 1.25rem;
-  border-bottom: 2px solid var(--ink);
+  display: grid;
+  gap: 1.25rem;
+  padding-bottom: 0.5rem;
+}
+
+@media (min-width: 44rem) {
+  .sheet-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .cv-reach {
+    text-align: right;
+  }
+}
+
+.cv-reach {
+  display: grid;
+  gap: 0.625rem;
 }
 
 .cv-name {
@@ -165,25 +191,22 @@ const print = () => window.print()
 }
 
 .cv-headline {
-  margin: 0.375rem 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem 0 0;
   font-size: 1rem;
   font-weight: 500;
+  line-height: 1.4;
 }
 
-/* Contact details in one line, separated by thin dots. */
+/* Contact details: one per line, no separators. */
 .cv-contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.125rem 0;
-  margin: 0.125rem 0 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   color: var(--muted);
-  font-size: 0.8125rem;
-}
-
-.cv-contact > * + *::before {
-  content: '·';
-  margin: 0 0.5rem;
-  color: var(--faint);
+  font-size: 0.875rem;
+  line-height: 1.55;
 }
 
 .cv-contact a {
@@ -362,7 +385,23 @@ const print = () => window.print()
   }
 
   .sheet-head {
-    padding-bottom: 0.75rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .cv-reach {
+    gap: 0.35rem;
+    text-align: right;
+  }
+
+  .cv-contact {
+    font-size: 8.8pt;
+    line-height: 1.4;
+  }
+
+  .cv-headline {
+    margin-top: 0.3rem;
   }
 
   .cv-name {
