@@ -5,7 +5,7 @@
     <header class="masthead">
       <div class="who reveal" :style="{ '--i': 0 }">
         <h1 class="name">{{ profile.name }}</h1>
-        <p class="role"><span class="swap">{{ t.role }}</span>, {{ profile.city }}</p>
+        <p class="role swap">{{ t.role }}</p>
       </div>
 
       <div class="tools reveal" :style="{ '--i': 1 }">
@@ -34,16 +34,19 @@
       <section class="intro">
         <p class="statement swap reveal" :style="{ '--i': 2 }">{{ t.statement }}</p>
         <p class="lede swap reveal" :style="{ '--i': 3 }">{{ t.intro }}</p>
-        <p class="now reveal" :style="{ '--i': 4 }">
-          <span class="swap">{{ t.now }}</span>
-          {{ ' ' }}
+        <p class="now swap reveal" :style="{ '--i': 4 }">{{ t.now }}</p>
+        <p class="actions reveal" :style="{ '--i': 4 }">
           <a href="#contact" class="swap">{{ t.getInTouch }}</a>
+          <a v-if="profile.links.cv" :href="profile.links.cv" download class="swap">{{ t.downloadCv }}</a>
         </p>
       </section>
 
       <section class="block" aria-labelledby="work-heading">
         <h2 id="work-heading" class="label swap reveal" :style="{ '--i': 5 }">{{ t.work }}</h2>
-        <ProjectList class="reveal" :style="{ '--i': 6 }" :projects="projects" :lang="lang" :t="t" />
+        <div class="reveal" :style="{ '--i': 6 }">
+          <ProjectList :projects="projects" :lang="lang" :t="t" />
+          <p class="note swap">{{ t.privateWork }}</p>
+        </div>
       </section>
 
       <section class="block" aria-labelledby="experience-heading">
@@ -53,8 +56,40 @@
             <span class="row-main">{{ job.org }}</span>
             <span v-if="job.role[lang]" class="row-sub swap">{{ job.role[lang] }}</span>
             <span class="row-date swap">{{ job.period[lang] }}</span>
+            <span v-if="job.summary" class="row-note swap">{{ job.summary[lang] }}</span>
           </li>
         </ol>
+      </section>
+
+      <section class="block" aria-labelledby="skills-heading">
+        <h2 id="skills-heading" class="label swap">{{ t.skills }}</h2>
+        <ul class="rows">
+          <li v-for="skill in skills" :key="skill.name.en" class="row">
+            <span class="row-main swap">{{ skill.name[lang] }}</span>
+            <span class="row-note swap">{{ skill.items[lang] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="education-heading">
+        <h2 id="education-heading" class="label swap">{{ t.education }}</h2>
+        <ul class="rows">
+          <li v-for="school in education" :key="school.org" class="row">
+            <span class="row-main">{{ school.org }}</span>
+            <span class="row-sub swap">{{ school.detail[lang] }}</span>
+            <span class="row-date swap">{{ school.period[lang] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="certificates-heading">
+        <h2 id="certificates-heading" class="label swap">{{ t.certificates }}</h2>
+        <ul class="rows">
+          <li v-for="cert in certificates" :key="cert.name.en" class="row">
+            <span class="row-main swap">{{ cert.name[lang] }}</span>
+            <span class="row-date swap">{{ cert.issuer[lang] }}</span>
+          </li>
+        </ul>
       </section>
 
       <section id="contact" class="block" aria-labelledby="contact-heading">
@@ -91,7 +126,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { copy, experience, profile, projects } from './content.js'
+import { certificates, copy, education, experience, profile, projects, skills } from './content.js'
 import ProjectList from './components/ProjectList.vue'
 import ArrowIcon from './components/ArrowIcon.vue'
 
@@ -315,9 +350,25 @@ const contactLinks = computed(() => {
   font-size: 1.0625rem;
 }
 
-.now a {
-  color: var(--ink);
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  margin: 0.25rem 0 0;
+  font-size: 1.0625rem;
+}
+
+.actions a {
+  display: inline-block;
+  padding: 0.5rem 0;
   white-space: nowrap;
+}
+
+.note {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 /* Sections with hanging labels */
@@ -384,6 +435,14 @@ const contactLinks = computed(() => {
   font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
   text-align: right;
+}
+
+.row-note {
+  grid-column: 1 / -1;
+  max-width: 34rem;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
 }
 
 /* Contact */
