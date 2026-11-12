@@ -1,568 +1,523 @@
 <template>
-  <div
-    id="app-shell"
-    :class="{ 
-      'chat-started': chatStarted, 
-      'sidecar-open': sidecarOpen,
-      'is-mobile': isMobile,
-      'sidebar-collapsed': sidebarCollapsed
-    }"
-    :data-theme="theme"
-    :style="appShellStyle"
-  >
-    <!-- ===================== DESKTOP NAVBAR ===================== -->
-    <NavigationBar
-      v-if="!isMobile"
-      class="navbar-header"
-      @research-click="handleResearchClick"
-      @product-click="toggleSidecar"
-      @theme-toggle="toggleTheme"
-      :theme="theme"
-    />
+  <a class="skip" href="#main">{{ t.skip }}</a>
 
-    <!-- ===================== MOBILE HEADER ===================== -->
-    <header v-if="isMobile" class="mobile-header">
-      <button
-        class="mobile-menu-btn"
-        @click="toggleMobileSidebar"
-        aria-label="Toggle menu"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 12h18M3 6h18M3 18h18" />
-        </svg>
-      </button>
-
-      <div class="mobile-title">
-        <span class="logo">PortfolioGPT</span>
+  <div class="page" :class="{ 'is-switching': switching }">
+    <header class="masthead">
+      <div class="who reveal" :style="{ '--i': 0 }">
+        <h1 class="name">{{ profile.name }}</h1>
+        <p class="role swap">{{ t.role }}</p>
       </div>
 
-      <button
-        class="mobile-theme-btn"
-        @click="toggleTheme"
-        aria-label="Toggle theme"
-      >
-        <ThemeToggle :theme="theme" />
-      </button>
+      <div class="tools reveal" :style="{ '--i': 1 }">
+        <p v-if="time" class="clock">
+          <time :aria-label="`${t.localTime}: ${time}`">{{ time }}</time>
+          <span aria-hidden="true">EAT</span>
+        </p>
+        <div class="lang" role="group" :aria-label="t.language">
+          <button
+            v-for="option in languages"
+            :key="option.code"
+            type="button"
+            class="lang-option"
+            :lang="option.code"
+            :aria-label="option.name"
+            :aria-pressed="String(lang === option.code)"
+            @click="setLang(option.code)"
+          >
+            {{ option.short }}
+          </button>
+        </div>
+      </div>
     </header>
 
-    <!-- ===================== LEFT SIDEBAR ===================== -->
-    <ChatSidebar
-      :theme="theme"
-      :class="{ 'mobile-open': isMobile && mobileSidebarOpen }"
-      @nav-select="handleNavSelect"
-      @toggle-theme="toggleTheme"
-      @toggle-collapse="handleSidebarCollapse"
-    />
+    <main id="main">
+      <section class="intro">
+        <p class="statement swap reveal" :style="{ '--i': 2 }">{{ t.statement }}</p>
+        <p class="lede swap reveal" :style="{ '--i': 3 }">{{ t.intro }}</p>
+        <p class="now swap reveal" :style="{ '--i': 4 }">{{ t.now }}</p>
+        <p class="actions reveal" :style="{ '--i': 4 }">
+          <a href="#contact" class="swap">{{ t.getInTouch }}</a>
+          <a v-if="profile.links.cv" :href="profile.links.cv" download class="swap">{{ t.downloadCv }}</a>
+        </p>
+      </section>
 
-    <!-- ===================== MAIN CHAT AREA ===================== -->
-    <main class="main-content">
-      <ChatContainer
-        ref="chatContainer"
-        :messages="messages"
-        :is-typing="isTyping"
-        :is-centered="!chatStarted"
-        @send-message="handleSendMessage"
-      />
+      <section class="block" aria-labelledby="work-heading">
+        <h2 id="work-heading" class="label swap reveal" :style="{ '--i': 5 }">{{ t.work }}</h2>
+        <div class="reveal" :style="{ '--i': 6 }">
+          <ProjectList :projects="projects" :lang="lang" :t="t" />
+          <p class="note swap">{{ t.privateWork }}</p>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="experience-heading">
+        <h2 id="experience-heading" class="label swap">{{ t.experience }}</h2>
+        <ol class="rows">
+          <li v-for="job in experience" :key="job.org" class="row">
+            <span class="row-main">{{ job.org }}</span>
+            <span v-if="job.role[lang]" class="row-sub swap">{{ job.role[lang] }}</span>
+            <span class="row-date swap">{{ job.period[lang] }}</span>
+            <span v-if="job.summary" class="row-note swap">{{ job.summary[lang] }}</span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="block" aria-labelledby="skills-heading">
+        <h2 id="skills-heading" class="label swap">{{ t.skills }}</h2>
+        <ul class="rows">
+          <li v-for="skill in skills" :key="skill.name.en" class="row">
+            <span class="row-main swap">{{ skill.name[lang] }}</span>
+            <span class="row-note swap">{{ skill.items[lang] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="education-heading">
+        <h2 id="education-heading" class="label swap">{{ t.education }}</h2>
+        <ul class="rows">
+          <li v-for="school in education" :key="school.org" class="row">
+            <span class="row-main">{{ school.org }}</span>
+            <span class="row-sub swap">{{ school.detail[lang] }}</span>
+            <span class="row-date swap">{{ school.period[lang] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="certificates-heading">
+        <h2 id="certificates-heading" class="label swap">{{ t.certificates }}</h2>
+        <ul class="rows">
+          <li v-for="cert in certificates" :key="cert.name.en" class="row">
+            <span class="row-main swap">{{ cert.name[lang] }}</span>
+            <span class="row-date swap">{{ cert.issuer[lang] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section id="contact" class="block" aria-labelledby="contact-heading">
+        <h2 id="contact-heading" class="label swap">{{ t.contact }}</h2>
+        <div class="contact">
+          <p class="contact-line swap">{{ t.contactLine }}</p>
+          <a v-if="profile.links.email" class="contact-email" :href="`mailto:${profile.links.email}`">
+            {{ profile.links.email }}
+          </a>
+          <ul class="contact-links">
+            <li v-for="link in contactLinks" :key="link.key">
+              <a
+                :href="link.href"
+                :target="link.external ? '_blank' : null"
+                :rel="link.external ? 'noopener noreferrer' : null"
+                :download="link.download ? '' : null"
+              >
+                <span class="swap">{{ link.label }}</span>
+                <span v-if="link.external" class="visually-hidden">({{ t.opensNewTab }})</span>
+                <ArrowIcon v-if="link.external" />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
     </main>
 
-    <!-- ===================== SIDE PANEL (SIDE CAR) ===================== -->
-    <SidecarPanel
-      v-if="sidecarOpen"
-      :is-open="sidecarOpen"
-      :current-persona="currentPersona"
-      @close="closeSidecar"
-      @project-view="handleProjectView"
-      @contact-sent="handleContactSent"
-      @width-change="handleSidecarWidthChange"
-    />
-
-    <!-- ===================== MOBILE OVERLAY ===================== -->
-    <div
-      v-if="isMobile && mobileSidebarOpen"
-      class="mobile-overlay"
-      @click="closeMobileSidebar"
-    ></div>
+    <footer class="footer">
+      <span>© {{ year }} {{ profile.name }}</span>
+      <span>{{ profile.city }}</span>
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { certificates, copy, education, experience, profile, projects, skills } from './content.js'
+import ProjectList from './components/ProjectList.vue'
+import ArrowIcon from './components/ArrowIcon.vue'
 
-import ChatContainer from './components/ChatContainer.vue'
-import ChatSidebar from './components/ChatSidebar.vue'
-import NavigationBar from './components/NavigationBar.vue'
-import SidecarPanel from './components/SidecarPanel.vue'
-import ThemeToggle from './components/ThemeToggle.vue'
+const languages = [
+  { code: 'en', short: 'EN', name: 'English' },
+  { code: 'sw', short: 'SW', name: 'Kiswahili' },
+]
 
-import portfolioData, {
-  projects,
-  skills,
-  timeline,
-  contactInfo,
-  bio,
-  achievements,
-  faq,
-  cvLink
-} from './data/portfolio-data.js'
-
-/**
- * Layout state
- */
-const theme = ref('dark')
-const sidecarOpen = ref(false)
-const mobileSidebarOpen = ref(false)
-const currentPersona = ref('default')
-
-// Left sidebar (ChatGPT-style)
-const sidebarCollapsed = ref(false)
-const SIDEBAR_WIDTH = 200
-const SIDEBAR_COLLAPSED_WIDTH = 56
-const DESKTOP_NAVBAR_HEIGHT = 64
-
-const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
-const isMobile = computed(() => windowWidth.value < 768)
-
-// Sidecar sizing: keep main content aligned with sidecar width (including resize)
-const sidecarWidth = ref(0)
-const DEFAULT_SIDECAR_WIDTH = 420
-
-const appShellStyle = computed(() => {
-  const widthPx = sidecarOpen.value ? `${Math.max(0, sidecarWidth.value)}px` : '0px'
-  const sidebarPx = isMobile.value
-    ? '0px'
-    : `${sidebarCollapsed.value ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH}px`
-  const desktopTopOffsetPx = isMobile.value ? '0px' : `${DESKTOP_NAVBAR_HEIGHT}px`
-  return {
-    '--sidecar-width': widthPx,
-    '--sidebar-width': sidebarPx,
-    '--desktop-top-offset': desktopTopOffsetPx
-  }
-})
-
-/**
- * Chat state
- */
-const messages = ref([])
-const isTyping = ref(false)
-const chatStarted = computed(() => messages.value.length > 0)
-
-const chatContainer = ref(null)
-
-function createMessage({ isUser, text }) {
-  return {
-    id: crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    isUser,
-    text
-  }
-}
-
-/**
- * Theme
- */
-function loadTheme() {
-  const saved = localStorage.getItem('theme')
-  if (saved === 'light' || saved === 'dark') theme.value = saved
-}
-
-function toggleTheme() {
-  theme.value = theme.value === 'dark' ? 'light' : 'dark'
-  localStorage.setItem('theme', theme.value)
-}
-
-/**
- * Mobile sidebar
- */
-function toggleMobileSidebar() {
-  mobileSidebarOpen.value = !mobileSidebarOpen.value
-}
-
-function closeMobileSidebar() {
-  mobileSidebarOpen.value = false
-}
-
-function handleSidebarCollapse(collapsed) {
-  sidebarCollapsed.value = Boolean(collapsed)
-}
-
-function handleNavSelect(item) {
-  // Supports multiple shapes:
-  // - ChatSidebar emits: { id, section }
-  // - Legacy objects: { label, query, persona }
-  // - Strings (label)
-
-  const id = item && typeof item === 'object' ? item.id : null
-  const label = typeof item === 'string' ? item : item?.label
-  const query = typeof item === 'string' ? null : item?.query
-
-  if (item?.persona) currentPersona.value = item.persona
-
-  if (isMobile.value) closeMobileSidebar()
-
-  // ChatSidebar path
-  if (id) {
-    const mappedById = {
-      projects: 'Tell me about your projects',
-      skills: 'What technologies do you use?',
-      about: 'Tell me about yourself',
-      contact: 'How can I contact you?',
-      resume: 'Where can I download your CV?'
-    }
-    const text = mappedById[id]
-    if (text) handleSendMessage({ text })
-    return
-  }
-
-  // Legacy path
-  if (query) {
-    handleSendMessage({ text: query })
-    return
-  }
-
-  if (!label) return
-
-  const mapped = {
-    Projects: 'Tell me about your projects',
-    Skills: 'What technologies do you use?',
-    Experience: 'Tell me about your experience',
-    About: 'Tell me about yourself',
-    Contact: 'How can I contact you?',
-    CV: 'Where can I download your CV?'
-  }
-
-  handleSendMessage({ text: mapped[label] || `Tell me about ${label}` })
-}
-
-/**
- * Sidecar
- */
-function handleResearchClick() {
-  // In this UI, “Research” functions as a context panel toggle.
-  toggleSidecar()
-}
-
-function toggleSidecar() {
-  sidecarOpen.value = !sidecarOpen.value
-
-  if (sidecarOpen.value) {
-    const savedWidth = parseInt(localStorage.getItem('sidecar-width') || '', 10)
-    sidecarWidth.value = Number.isFinite(savedWidth) ? savedWidth : DEFAULT_SIDECAR_WIDTH
-  } else {
-    sidecarWidth.value = 0
-  }
-}
-
-function closeSidecar() {
-  sidecarOpen.value = false
-  sidecarWidth.value = 0
-}
-
-function handleSidecarWidthChange(newWidth) {
-  const width = Number(newWidth)
-  if (!Number.isFinite(width)) return
-  sidecarWidth.value = Math.max(0, Math.min(800, width))
-}
-
-function handleProjectView(project) {
-  if (!project?.name) return
-  const text = formatProjectDetails(project)
-  messages.value.push(createMessage({ isUser: false, text }))
-}
-
-function handleContactSent(payload) {
-  const name = payload?.name ? `, ${payload.name}` : ''
-  messages.value.push(
-    createMessage({
-      isUser: false,
-      text: `Thanks${name}. Your message has been received. If you prefer email, reach me at **${contactInfo.email}**.`
-    })
-  )
-}
-
-/**
- * Chat send
- */
-async function handleSendMessage(payload) {
-  const text = (payload?.text || '').trim()
-  if (!text) return
-
-  messages.value.push(createMessage({ isUser: true, text }))
-  isTyping.value = true
-
+// Language: ?lang=sw in the link wins, then the visitor's last choice, then their browser.
+function initialLanguage() {
+  const fromUrl = new URLSearchParams(window.location.search).get('lang')
+  if (fromUrl === 'en' || fromUrl === 'sw') return fromUrl
   try {
-    const response = await generateResponse(text)
-    messages.value.push(createMessage({ isUser: false, text: response }))
-  } catch (err) {
-    console.error(err)
-    messages.value.push(
-      createMessage({
-        isUser: false,
-        text: "Sorry — something went wrong while generating a response. Please try again."
-      })
-    )
-  } finally {
-    isTyping.value = false
+    const saved = localStorage.getItem('lang')
+    if (saved === 'en' || saved === 'sw') return saved
+  } catch {
+    // Storage can be blocked; fall through to the browser language.
   }
+  return (navigator.language || '').toLowerCase().startsWith('sw') ? 'sw' : 'en'
 }
 
-/**
- * Portfolio-aware response generator
- */
-async function generateResponse(query) {
-  const q = String(query || '').toLowerCase()
+const lang = ref(initialLanguage())
+document.documentElement.lang = lang.value
+const t = computed(() => copy[lang.value])
 
-  if (q.includes('project') || q.includes('portfolio') || q.includes('work')) return formatProjectsSummary(projects)
-  if (q.includes('skill') || q.includes('technology') || q.includes('stack') || q.includes('tech')) return formatSkillsSummary(skills)
-  if (q.includes('experience') || q.includes('timeline') || q.includes('career') || q.includes('work history')) return formatTimelineSummary(timeline)
-  if (q.includes('about') || q.includes('who are you') || q.includes('yourself') || q.includes('bio')) return formatBio(bio)
-  if (q.includes('cert') || q.includes('achievement') || q.includes('award')) return formatAchievements(achievements)
-  if (q.includes('cv') || q.includes('resume')) return `You can download my CV here: **${cvLink}**.`
-  if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('reach')) return formatContact(contactInfo)
-  if (q.includes('faq') || q.includes('freelance') || q.includes('available') || q.includes('process')) return formatFAQ(faq)
+// The switch: text blurs out, the language changes, text settles back in.
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+const switching = ref(false)
+let switchTimer = 0
 
-  return (
-    "I can help you with:\n\n" +
-    "• **Projects** — portfolio work and case studies\n" +
-    "• **Skills** — technologies and proficiency\n" +
-    "• **Experience** — timeline and highlights\n" +
-    "• **About** — background and focus\n" +
-    "• **Contact** — how to reach me\n\n" +
-    "Try: *Tell me about your projects* or *What technologies do you use?*"
-  )
-}
-
-/**
- * Formatting helpers (Markdown)
- */
-function formatProjectsSummary(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'Projects are not available yet.'
-
-  const lines = list.map((p, idx) => {
-    const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : '—'
-    const status = p.status ? p.status.toUpperCase() : '—'
-    const year = p.year ? `${p.year}` : ''
-
-    return (
-      `${idx + 1}. **${p.name}** ${year ? `(${year})` : ''}\n` +
-      `   - Status: **${status}**\n` +
-      `   - Stack: ${stack}\n` +
-      `   - ${p.description || ''}`
-    )
-  })
-
-  return `Here are a few of my key projects:\n\n${lines.join('\n\n')}\n\nIf you want, tell me which project to open and I will summarize the features and technical decisions.`
-}
-
-function formatProjectDetails(p) {
-  const stack = Array.isArray(p.techStack) ? p.techStack.join(', ') : '—'
-  const features = Array.isArray(p.features) ? p.features.map(f => `- ${f}`).join('\n') : ''
-  const link = p.link && p.link !== '#' ? `\n\nLink: ${p.link}` : ''
-
-  return (
-    `**${p.name}**\n\n` +
-    `${p.description || ''}\n\n` +
-    `**Tech stack:** ${stack}\n` +
-    (features ? `\n**Key features:**\n${features}` : '') +
-    link
-  )
-}
-
-function formatSkillsSummary(categories) {
-  if (!Array.isArray(categories) || categories.length === 0) return 'Skills are not available yet.'
-
-  const lines = categories
-    .map(cat => {
-      const items = Array.isArray(cat.items) ? cat.items : []
-      const skillsLine = items.map(i => `${i.name} (${i.level})`).join(', ')
-      return `**${cat.category}:** ${skillsLine || '—'}`
+function setLang(next) {
+  if (next === lang.value) return
+  const apply = () => {
+    lang.value = next
+    document.documentElement.lang = next
+    try {
+      localStorage.setItem('lang', next)
+    } catch {
+      // Not saved; the choice still applies to this visit.
+    }
+  }
+  if (reducedMotion.matches) return apply()
+  clearTimeout(switchTimer)
+  switching.value = true
+  switchTimer = setTimeout(() => {
+    apply()
+    requestAnimationFrame(() => {
+      switching.value = false
     })
-    .filter(Boolean)
-
-  return `Here is my skills overview:\n\n${lines.join('\n')}\n\nIf you are hiring for a specific role, share the job description and I will map my skills to it.`
+  }, 170)
 }
 
-function formatTimelineSummary(items) {
-  if (!Array.isArray(items) || items.length === 0) return 'Experience information is not available yet.'
-
-  const lines = items.map((e) => {
-    const year = e.year ? `**${e.year}**` : ''
-    const role = e.role ? ` — ${e.role}` : ''
-    const company = e.company ? ` @ ${e.company}` : ''
-    const duration = e.duration ? ` (${e.duration})` : ''
-    const highlights = Array.isArray(e.highlights) ? e.highlights.map(h => `   - ${h}`).join('\n') : ''
-
-    return (
-      `${year}${role}${company}${duration}\n` +
-      `${e.description || ''}` +
-      (highlights ? `\n${highlights}` : '')
-    )
+// Local time in Dar es Salaam, updated on the minute.
+let formatter = null
+try {
+  formatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: profile.timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
   })
-
-  return `Here is my timeline:\n\n${lines.join('\n\n')}`
+} catch {
+  formatter = null
 }
 
-function formatBio(b) {
-  if (!b) return 'Bio is not available yet.'
-  const tagline = b.tagline ? `\n\n_${b.tagline}_` : ''
-  return `${b.long || b.short || ''}${tagline}`
-}
-
-function formatAchievements(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'No certifications/achievements are listed yet.'
-
-  const lines = list.map((a) => {
-    const year = a.year ? ` (${a.year})` : ''
-    const issuer = a.issuer ? ` — ${a.issuer}` : ''
-    return `- **${a.title}**${year}${issuer}\n  - ${a.description || ''}`
-  })
-
-  return `Here are a few certifications/achievements:\n\n${lines.join('\n')}`
-}
-
-function formatContact(c) {
-  if (!c) return 'Contact details are not available yet.'
-
-  const lines = [
-    c.email ? `- Email: **${c.email}**` : null,
-    c.phone ? `- Phone: **${c.phone}**` : null,
-    c.location ? `- Location: ${c.location}` : null,
-    c.availability ? `- Availability: ${c.availability}` : null,
-    c.github ? `- GitHub: ${c.github}` : null,
-    c.linkedin ? `- LinkedIn: ${c.linkedin}` : null
-  ].filter(Boolean)
-
-  return `You can reach me here:\n\n${lines.join('\n')}`
-}
-
-function formatFAQ(list) {
-  if (!Array.isArray(list) || list.length === 0) return 'FAQ is not available yet.'
-
-  const lines = list.map((item) => `**Q:** ${item.question}\n**A:** ${item.answer}`)
-  return `Here are a few quick answers:\n\n${lines.join('\n\n')}`
-}
-
-/**
- * Lifecycle
- */
-function handleWindowResize() {
-  windowWidth.value = window.innerWidth
-  if (!isMobile.value) mobileSidebarOpen.value = false
-}
+const now = ref(new Date())
+const time = computed(() => (formatter ? formatter.format(now.value) : ''))
+let clockTimer = 0
 
 onMounted(() => {
-  loadTheme()
-
-  if (typeof window !== 'undefined') {
-    handleWindowResize()
+  const tick = () => {
+    now.value = new Date()
+    clockTimer = setTimeout(tick, 60000 - (Date.now() % 60000) + 50)
   }
-
-  try {
-    const savedCollapsed = localStorage.getItem('sidebar-collapsed')
-    if (savedCollapsed !== null) sidebarCollapsed.value = JSON.parse(savedCollapsed)
-  } catch {
-    // Ignore malformed localStorage
-  }
-
-  sidecarWidth.value = 0
-
-  messages.value.push(
-    createMessage({
-      isUser: false,
-      text:
-        "Hi — I’m a portfolio assistant. Ask about **projects**, **skills**, **experience**, or **contact**.\n\nTry: *Tell me about your projects*"
-    })
-  )
-
-  window.addEventListener('resize', handleWindowResize, { passive: true })
+  tick()
 })
 
-onUnmounted(() => {
-  window.removeEventListener('resize', handleWindowResize)
+onBeforeUnmount(() => {
+  clearTimeout(clockTimer)
+  clearTimeout(switchTimer)
+})
+
+const year = new Date().getFullYear()
+
+const contactLinks = computed(() => {
+  const links = profile.links
+  const list = []
+  if (links.whatsapp) {
+    list.push({ key: 'whatsapp', href: `https://wa.me/${links.whatsapp.replace(/\D/g, '')}`, label: t.value.whatsapp, external: true })
+  }
+  if (links.github) list.push({ key: 'github', href: links.github, label: t.value.github, external: true })
+  if (links.linkedin) list.push({ key: 'linkedin', href: links.linkedin, label: t.value.linkedin, external: true })
+  if (links.cv) list.push({ key: 'cv', href: links.cv, label: t.value.cv, external: false, download: true })
+  return list
 })
 </script>
 
 <style scoped>
-#app-shell {
-  height: 100vh;
+.skip {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 30;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip:focus {
+  transform: none;
+}
+
+.page {
+  max-width: calc(var(--measure) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: 1.75rem var(--gutter) 2.5rem;
+}
+
+/* Header */
+.masthead {
   display: flex;
-  flex-direction: column;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.main-content {
-  flex: 1;
-  min-height: 0;
-  transition: margin-right 0.3s ease, margin-left 0.2s ease, padding-top 0.2s ease;
+.name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
 }
 
-/* Desktop: reserve space for the fixed left sidebar and top navbar */
-#app-shell:not(.is-mobile) .main-content {
-  margin-left: var(--sidebar-width, 200px);
-  padding-top: var(--desktop-top-offset, 64px);
+.role {
+  margin: 0;
+  color: var(--muted);
 }
 
-/* Desktop: push the sidebar below the fixed navbar */
-#app-shell:not(.is-mobile) :deep(.chat-sidebar) {
-  top: var(--desktop-top-offset, 64px) !important;
-  height: calc(100vh - var(--desktop-top-offset, 64px)) !important;
-}
-
-#app-shell.sidecar-open .main-content {
-  margin-right: var(--sidecar-width, 0px);
-}
-
-/* Mobile header */
-.mobile-header {
-  height: 56px;
+.tools {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-primary);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  gap: 1.25rem;
+  margin-top: -0.6rem;
 }
 
-.mobile-menu-btn,
-.mobile-theme-btn {
-  width: 40px;
-  height: 40px;
+.clock {
+  margin: 0;
+  display: flex;
+  gap: 0.35em;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small phones keep the name and the language switch on one line; the clock steps out. */
+@media (max-width: 30rem) {
+  .clock {
+    display: none;
+  }
+}
+
+.lang {
+  display: flex;
+}
+
+.lang-option {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.lang-option:hover {
+  color: var(--ink);
+}
+
+.lang-option[aria-pressed='true'] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+}
+
+/* Intro */
+.intro {
+  padding-top: clamp(3.5rem, 11vh, 7rem);
+}
+
+.statement {
+  max-width: 21em;
+  margin: 0;
+  font-size: clamp(1.625rem, 1.15rem + 1.9vw, 2.375rem);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 35rem;
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 1.0625rem;
+}
+
+.now {
+  max-width: 35rem;
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 1.0625rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  margin: 0.25rem 0 0;
+  font-size: 1.0625rem;
+}
+
+.actions a {
+  display: inline-block;
+  padding: 0.5rem 0;
+  white-space: nowrap;
+}
+
+.note {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Sections with hanging labels */
+.block {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: clamp(3.5rem, 9vh, 5.5rem);
+}
+
+@media (min-width: 46rem) {
+  .block {
+    grid-template-columns: var(--label) minmax(0, 1fr);
+    gap: 0 var(--gutter);
+  }
+}
+
+.label {
+  margin: 0;
+  padding-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+@media (max-width: 45.99rem) {
+  .label {
+    padding-top: 0;
+  }
+}
+
+/* Experience */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.row-main {
+  font-weight: 500;
+}
+
+.row-sub {
+  grid-column: 1;
+  color: var(--muted);
+}
+
+.row-date {
+  grid-row: 1;
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.row-note {
+  grid-column: 1 / -1;
+  max-width: 34rem;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+/* Contact */
+.contact {
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 45.99rem) {
+  .contact {
+    padding-top: 0;
+  }
+}
+
+.contact-line {
+  max-width: 30rem;
+  margin: 0;
+}
+
+.contact-email {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.contact-links a {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text-primary);
+  gap: 0.375rem;
+  min-height: 2.75rem;
 }
 
-.mobile-menu-btn:hover,
-.mobile-theme-btn:hover {
-  background: var(--surface);
+/* Footer */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: clamp(4.5rem, 12vh, 7rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+</style>
+
+<style>
+/* Language switch: every translatable piece of text blurs out and back in. */
+.swap {
+  transition:
+    opacity 0.4s var(--ease-out),
+    filter 0.4s var(--ease-out);
 }
 
-.mobile-title .logo {
-  font-weight: 600;
-  letter-spacing: 0.2px;
+.is-switching .swap {
+  opacity: 0;
+  filter: blur(6px);
+  transition:
+    opacity 0.16s var(--ease-in),
+    filter 0.16s var(--ease-in);
 }
 
-/* Mobile overlay */
-.mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 45;
+@media (prefers-reduced-motion: reduce) {
+  .is-switching .swap {
+    filter: none;
+  }
 }
 </style>

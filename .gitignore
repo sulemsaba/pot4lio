@@ -50,3 +50,8 @@ dist-ssr/
 .Trashes
 ehthumbs.db
 Thumbs.db
+# Local design and AI tool folders (never published)
+.impeccable/
+PRODUCT.md
+.gemini/
+.codex/
