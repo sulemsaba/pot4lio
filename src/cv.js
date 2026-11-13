@@ -77,4 +77,14 @@ export const cv = {
 
   languages: 'Kiswahili, English, Arabic',
   interests: 'Charity and helping people',
+
+  // Names and roles only. Their phone numbers and emails are private: they live in
+  // private/referees.json (not in git) and only go into the private PDF
+  // (npm run cv:pdf:private), never into the website.
+  referees: [
+    { name: 'Cedric Makoko', role: 'Insurance Relationship Officer', org: 'Tanzania Commercial Bank PLC' },
+    { name: 'Dr. Elinami J. Minja', role: 'Chairperson, Corporate Finance and Financial Markets Group', org: 'University of Dar es Salaam' },
+    { name: 'Tobias A. Swai', role: 'Head of Department of Finance', org: 'University of Dar es Salaam' },
+  ],
+  refereesNote: 'Contact details available on request.',
 }

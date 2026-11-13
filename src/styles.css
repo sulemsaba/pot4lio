@@ -26,6 +26,16 @@
   --sand-bg: #efedde;
   --sand-ink: #38351a;
 
+  /* The footer's changing word, one colour each: sky, palm, sunset. */
+  --say-1: #0477c2;
+  --say-2: #1e8449;
+  --say-3: #d4501c;
+
+  /* The grass along the bottom of every page, far to near. */
+  --grass-back: #c4dcb2;
+  --grass-mid: #86b86a;
+  --grass-front: #4f8c40;
+
   --font: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
@@ -62,6 +72,14 @@
   --palm-ink: #cfe3c8;
   --sand-bg: #22211a;
   --sand-ink: #e9e5c4;
+
+  --say-1: #4cc0ff;
+  --say-2: #5fd38a;
+  --say-3: #ff8a5b;
+
+  --grass-back: #19291d;
+  --grass-mid: #2a4a30;
+  --grass-front: #3f7446;
 }
 
 *,

@@ -7,7 +7,7 @@
       <span>{{ profile.name }}</span>
     </a>
 
-    <NavPill class="reveal" :pages="pages" :page="route.page" :t="t" />
+    <NavPill class="reveal" :pages="menu" :page="route.page" :t="t" />
 
     <div class="tools reveal">
       <div class="lang" role="group" :aria-label="t.language">
@@ -33,10 +33,7 @@
       </Transition>
     </main>
 
-    <footer class="footer">
-      <span>© {{ year }} {{ profile.name }}</span>
-      <span>{{ profile.city }}</span>
-    </footer>
+    <SiteFooter :lang="lang" :t="t" :page="route.page" />
   </div>
 </template>
 
@@ -44,15 +41,19 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { copy, profile, projects } from './content.js'
 import NavPill from './components/NavPill.vue'
+import SiteFooter from './components/SiteFooter.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import CvPage from './pages/CvPage.vue'
+import PlayPage from './pages/PlayPage.vue'
 import HomePage from './pages/HomePage.vue'
 import AboutPage from './pages/AboutPage.vue'
 import WorkPage from './pages/WorkPage.vue'
 import ContactPage from './pages/ContactPage.vue'
 
-const pages = ['home', 'about', 'work', 'cv', 'contact']
-const views = { home: HomePage, about: AboutPage, work: WorkPage, cv: CvPage, contact: ContactPage }
+// The menu shows five pages; the CV has its own button in the footer (and on Home).
+const menu = ['home', 'about', 'work', 'play', 'contact']
+const pages = [...menu, 'cv']
+const views = { home: HomePage, about: AboutPage, work: WorkPage, play: PlayPage, cv: CvPage, contact: ContactPage }
 
 const languages = [
   { code: 'en', short: 'EN', name: 'English' },
@@ -60,7 +61,7 @@ const languages = [
 ]
 
 // Pages live in the address after #, so the site works on any static host:
-// #/about, #/work, #/work/ligiplay, #/cv, #/contact. Older links like #ligiplay still land.
+// #/about, #/work, #/work/ligiplay, #/play, #/cv, #/contact. Older links like #ligiplay still land.
 function readRoute() {
   const hash = decodeURIComponent(window.location.hash.slice(1))
   if (hash.startsWith('/')) {
@@ -164,8 +165,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('hashchange', onHashChange)
   clearTimeout(switchTimer)
 })
-
-const year = new Date().getFullYear()
 </script>
 
 <style scoped>
@@ -196,7 +195,7 @@ const year = new Date().getFullYear()
   min-height: 100dvh;
   max-width: calc(var(--wide) + var(--gutter) * 2);
   margin: 0 auto;
-  padding: 1.25rem var(--gutter) 2rem;
+  padding: 1.25rem var(--gutter) 0; /* the grass sits right on the bottom edge */
 }
 
 /* Dark theme: light from the portrait's colours, the sky and the palms at the top,
@@ -269,6 +268,22 @@ main {
   display: flex;
 }
 
+/* Small phones: a slimmer top bar, so the name stays on one line. */
+@media (max-width: 30rem) {
+  .identity {
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .tools {
+    gap: 0;
+  }
+
+  .lang-option {
+    min-width: 2.375rem;
+  }
+}
+
 .lang-option {
   min-width: 2.75rem;
   min-height: 2.75rem;
@@ -339,22 +354,6 @@ main {
   }
 }
 
-@media (max-width: 40rem) {
-  .page {
-    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
-  }
-}
-
-.footer {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  margin-top: clamp(3rem, 7vw, 5rem);
-  color: var(--muted);
-  font-size: 0.875rem;
-}
 
 /* Between pages: out with a blur, in from just below. */
 .page-enter-active {

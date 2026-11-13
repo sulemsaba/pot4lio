@@ -68,10 +68,9 @@
         <h3 class="cv-heading">Education</h3>
         <div v-for="item in cv.education" :key="item.degree" class="cv-entry cv-entry--tight">
           <p class="cv-line">
-            <strong>{{ item.degree }}</strong>
+            <span><strong>{{ item.degree }}</strong><span class="cv-muted">, {{ item.school }}</span></span>
             <span class="cv-dates">{{ item.dates }}</span>
           </p>
-          <p class="cv-org">{{ item.school }}</p>
         </div>
       </section>
 
@@ -99,6 +98,22 @@
           <p class="cv-text">{{ cv.interests }}</p>
         </section>
       </div>
+
+      <section class="cv-section">
+        <h3 class="cv-heading">Referees</h3>
+        <ul class="cv-referees">
+          <li v-for="person in cv.referees" :key="person.name">
+            <strong>{{ person.name }}</strong>
+            <span>{{ person.role }}</span>
+            <span class="cv-muted">{{ person.org }}</span>
+            <template v-if="contacts[person.name]">
+              <a v-if="contacts[person.name].phone" :href="`tel:${contacts[person.name].phone.replace(/\s/g, '')}`">{{ contacts[person.name].phone }}</a>
+              <a v-if="contacts[person.name].email" :href="`mailto:${contacts[person.name].email}`">{{ contacts[person.name].email }}</a>
+            </template>
+          </li>
+        </ul>
+        <p v-if="!hasContacts" class="cv-note">{{ cv.refereesNote }}</p>
+      </section>
     </article>
   </div>
 </template>
@@ -115,6 +130,23 @@ defineProps({
 })
 
 const print = () => window.print()
+
+// Referees' phone numbers and emails are never part of the site. Only the private PDF
+// passes them in (?referees=..., base64url JSON) when it prints this page.
+function readContacts() {
+  try {
+    const raw = new URLSearchParams(window.location.search).get('referees')
+    if (!raw) return {}
+    const b64 = raw.replace(/-/g, '+').replace(/_/g, '/')
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
+    const list = JSON.parse(new TextDecoder().decode(bytes))
+    return Object.fromEntries(list.filter((p) => p && p.name).map((p) => [p.name, { phone: p.phone || '', email: p.email || '' }]))
+  } catch {
+    return {}
+  }
+}
+const contacts = readContacts()
+const hasContacts = Object.keys(contacts).length > 0
 </script>
 
 <style scoped>
@@ -365,6 +397,42 @@ const print = () => window.print()
   .cv-split {
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   }
+
+  .cv-referees {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem 1.25rem;
+  }
+
+  .cv-referees li {
+    line-height: 1.32;
+  }
+}
+
+/* Referees: three side by side where there is room. */
+.cv-referees {
+  display: grid;
+  gap: 0.875rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 44rem) {
+  .cv-referees {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cv-referees li {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.cv-referees a {
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 /* Printing gives just the sheet: A4, black on white, one page. */
@@ -380,8 +448,8 @@ const print = () => window.print()
     box-shadow: none;
     background: #fff;
     color: #000;
-    font-size: 9.2pt;
-    line-height: 1.36;
+    font-size: 9pt;
+    line-height: 1.33;
   }
 
   .sheet-head {
@@ -436,18 +504,32 @@ const print = () => window.print()
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   }
 
+  .cv-referees {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem 1.25rem;
+  }
+
+  .cv-referees li {
+    line-height: 1.32;
+  }
+
   .cv-section {
-    margin-top: 0.75rem;
+    margin-top: 0.62rem;
   }
 
   .cv-heading {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .cv-entry--tight + .cv-entry--tight {
+    margin-top: 0.15rem;
   }
 
   .cv-entry,
   .cv-pairs dt,
   .cv-pairs dd,
-  .cv-projects li {
+  .cv-projects li,
+  .cv-referees li {
     break-inside: avoid;
   }
 

@@ -20,7 +20,7 @@ export const profile = {
 // In any text below, **words like this** are shown a shade stronger.
 export const copy = {
   en: {
-    nav: { home: 'Home', about: 'About', work: 'Work', cv: 'CV', contact: 'Contact' },
+    nav: { home: 'Home', about: 'About', work: 'Work', play: 'Play', cv: 'CV', contact: 'Contact' },
     navLabel: 'Pages',
     language: 'Language',
     themeToDark: 'Switch to the dark theme',
@@ -30,18 +30,12 @@ export const copy = {
     photoAlt: 'Suleiman Msaba smiling, with palm trees and a blue sky behind him',
 
     // Home
-    headBuilds: 'builds',
+    headBuilds: 'I build',
     builds: ['websites', 'Android apps', 'business systems'],
     buildsAll: 'websites, Android apps and business systems',
     headWin: 'that help your business win.',
     sticker: 'Hi, I’m Suleiman',
-    reasons: [
-      '**Software and money, in one person.** I studied banking and finance, so budgets, books and reports make sense to me.',
-      '**Real work, live today:** three websites, and two Android apps on Google Play.',
-      '**From idea to launch:** the screens, the code, the database and the release.',
-      '**In Kiswahili and English,** for customers who speak either.',
-      '**Open to new roles and freelance projects.**',
-    ],
+    lede: '**Code and finance, in one person.** From idea to launch.',
     heroCta: 'Tell me what you need',
     heroWork: 'See the work',
     heroCv: 'Hiring? Read my CV',
@@ -104,8 +98,17 @@ export const copy = {
     demoPlayer: 'Player',
     demoPlayed: 'Played',
     demoPoints: 'Points',
-    ctaTitle: '**Have a role or a project in mind?** Let’s talk.',
+    ctaTitle: '**Have a role or a project in mind?** Send me a message.',
     orEmail: 'Or email me at',
+
+    // Footer: the sign-off, with its middle word changing, and the grass.
+    sayStart: 'Let’s',
+    sayWords: ['design', 'shape', 'elevate'],
+    sayAll: 'design, shape and elevate',
+    sayEnd: 'incredible work together.',
+    sayButton: 'Say hello',
+    grassHint: 'Go on, touch the grass.',
+    grassLabel: 'Grass. Brush across it, tap it, or press the left and right arrow keys.',
     periods: { dawn: 'Early morning', morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening', night: 'Night' },
     swahiliTime: 'Swahili time',
     skyTitle: 'Now in Dar es Salaam',
@@ -146,11 +149,48 @@ export const copy = {
     experience: 'Experience',
     education: 'Education',
     skills: 'Skills',
+    tools: 'Tools I use',
     certificates: 'Certificates',
 
     // Work
     privateWork: 'Other websites, business systems and client applications are private or confidential, so they are not listed here.',
     visit: 'Visit',
+
+    // Play
+    playTitle: '**Play a little.** Three small games from Dar es Salaam. Easy to learn, hard to put down.',
+    playStart: 'Play',
+    playAgain: 'Play again',
+    playKeys: 'Tap, click or press Space',
+    playScore: 'Score',
+    playBest: 'Best',
+    playNewBest: 'New best!',
+    playOver: 'Game over',
+    playLoading: 'Setting up the game…',
+    playPaused: 'Paused',
+    playResume: 'Carry on',
+    playNo3d: 'This game needs 3D graphics, which this browser has turned off.',
+    daladala: {
+      title: 'Daladala',
+      how: 'Hold to brake, let go to roll on. Stop with the door right at the bus stop: the closer, the more points. Miss three stops and it is over.',
+    },
+    embe: {
+      title: 'Mango drop',
+      how: 'The mango swings on its branch. Tap to let it go and land it in the moving basket. Every catch makes the basket smaller and faster.',
+    },
+    mpira: {
+      title: 'Keep it up',
+      how: 'Tap the ball to kick it. Kick its left side to send it right, and the other way round. Catch a star for +3. Do not let it drop.',
+    },
+    gamePerfect: 'Perfect stop!',
+    gameGood: 'Good stop',
+    gameClose: 'Close enough',
+    gameEarly: 'Too early',
+    gamePassed: 'Missed the stop',
+    gameSwish: 'Right in the middle!',
+    gameNice: 'In!',
+    gameMissed: 'Missed',
+    gameClean: 'Clean kick',
+    gameStar: 'Star!',
 
     // CV
     cvPageTitle: '**My CV**, to read here or download.',
@@ -180,7 +220,7 @@ export const copy = {
     linkedin: 'LinkedIn',
   },
   sw: {
-    nav: { home: 'Mwanzo', about: 'Kunihusu', work: 'Kazi', cv: 'CV', contact: 'Wasiliana' },
+    nav: { home: 'Mwanzo', about: 'Kunihusu', work: 'Kazi', play: 'Cheza', cv: 'CV', contact: 'Wasiliana' },
     navLabel: 'Kurasa',
     language: 'Lugha',
     themeToDark: 'Badili kwenda mandhari meusi',
@@ -190,18 +230,12 @@ export const copy = {
     photoAlt: 'Suleiman Msaba akitabasamu, nyuma yake mitende na anga la buluu',
 
     // Home
-    headBuilds: 'anatengeneza',
+    headBuilds: 'Ninatengeneza',
     builds: ['tovuti', 'programu za Android', 'mifumo ya biashara'],
     buildsAll: 'tovuti, programu za Android na mifumo ya biashara',
     headWin: 'ili biashara yako ishinde.',
     sticker: 'Habari, mimi ni Suleiman',
-    reasons: [
-      '**Teknolojia na fedha, kwa mtu mmoja.** Nilisoma benki na fedha, kwa hiyo bajeti, vitabu vya hesabu na ripoti ninavielewa.',
-      '**Kazi halisi, iliyo hewani leo:** tovuti tatu, na programu mbili za Android zilizo Google Play.',
-      '**Kutoka wazo hadi uzinduzi:** skrini, msimbo, hifadhidata na kuichapisha.',
-      '**Kwa Kiswahili na Kiingereza,** kwa wateja wanaozungumza lugha yoyote kati ya hizo.',
-      '**Niko tayari kwa ajira mpya na miradi binafsi.**',
-    ],
+    lede: '**Teknolojia na fedha, kwa mtu mmoja.** Kuanzia wazo hadi uzinduzi.',
     heroCta: 'Niambie unachohitaji',
     heroWork: 'Tazama kazi',
     heroCv: 'Unaajiri? Soma CV yangu',
@@ -264,8 +298,16 @@ export const copy = {
     demoPlayer: 'Mchezaji',
     demoPlayed: 'Mechi',
     demoPoints: 'Pointi',
-    ctaTitle: '**Una nafasi ya kazi au mradi?** Tuzungumze.',
+    ctaTitle: '**Una nafasi ya kazi au mradi?** Niandikie ujumbe.',
     orEmail: 'Au niandikie barua pepe',
+
+    sayStart: 'Hebu',
+    sayWords: ['tubuni', 'tuunde', 'tujenge'],
+    sayAll: 'tubuni, tuunde na tujenge',
+    sayEnd: 'kazi ya kipekee pamoja.',
+    sayButton: 'Niandikie',
+    grassHint: 'Haya, gusa nyasi.',
+    grassLabel: 'Nyasi. Zipitie kwa kidole au kipanya, zigonge, au bonyeza vitufe vya mshale wa kushoto na kulia.',
     periods: { dawn: 'Alfajiri', morning: 'Asubuhi', afternoon: 'Mchana', evening: 'Jioni', night: 'Usiku' },
     swahiliTime: 'Saa za Kiswahili',
     skyTitle: 'Sasa hivi Dar es Salaam',
@@ -307,11 +349,48 @@ export const copy = {
     experience: 'Uzoefu',
     education: 'Elimu',
     skills: 'Ujuzi',
+    tools: 'Zana ninazotumia',
     certificates: 'Vyeti',
 
     // Work
     privateWork: 'Tovuti nyingine, mifumo ya biashara na programu za wateja ni za siri au binafsi, kwa hiyo hazijaorodheshwa hapa.',
     visit: 'Tembelea',
+
+    // Play
+    playTitle: '**Cheza kidogo.** Michezo mitatu midogo kutoka Dar es Salaam. Rahisi kujifunza, ngumu kuacha.',
+    playStart: 'Cheza',
+    playAgain: 'Cheza tena',
+    playKeys: 'Gusa, bofya au bonyeza Space',
+    playScore: 'Alama',
+    playBest: 'Rekodi',
+    playNewBest: 'Rekodi mpya!',
+    playOver: 'Mchezo umekwisha',
+    playLoading: 'Mchezo unaandaliwa…',
+    playPaused: 'Umesimamishwa',
+    playResume: 'Endelea',
+    playNo3d: 'Mchezo huu unahitaji picha za 3D, ambazo kivinjari hiki kimezizima.',
+    daladala: {
+      title: 'Daladala',
+      how: 'Shikilia kufunga breki, achia iendelee. Simamisha mlango ukiwa kituoni kabisa: ukikaribia zaidi, alama zaidi. Ukikosa vituo vitatu, mchezo umekwisha.',
+    },
+    embe: {
+      title: 'Dondosha embe',
+      how: 'Embe linabembea tawini. Gusa kuliachia litue ndani ya kikapu kinachotembea. Kila ukidaka, kikapu kinakuwa kidogo na chepesi zaidi.',
+    },
+    mpira: {
+      title: 'Mpira juu',
+      how: 'Gusa mpira kuupiga juu. Ukiupiga upande wa kushoto unaenda kulia, na kinyume chake. Pitisha mpira kwenye nyota upate +3. Usiuache uanguke.',
+    },
+    gamePerfect: 'Umesimama sawasawa!',
+    gameGood: 'Vizuri',
+    gameClose: 'Karibu',
+    gameEarly: 'Mapema mno',
+    gamePassed: 'Umepita kituo',
+    gameSwish: 'Katikati kabisa!',
+    gameNice: 'Ndani!',
+    gameMissed: 'Umekosa',
+    gameClean: 'Teke safi',
+    gameStar: 'Nyota!',
 
     // CV
     cvPageTitle: '**CV yangu**, isome hapa au uipakue.',
@@ -344,13 +423,13 @@ export const copy = {
 
 // The "word of Kiswahili" card on Home: tap to flip, tap again for the next word.
 export const swahiliWords = [
-  { word: 'Karibu', say: 'kah-REE-boo', meaning: 'Welcome' },
-  { word: 'Habari?', say: 'hah-BAH-ree', meaning: 'Hello, how are you? (literally: any news?)' },
-  { word: 'Asante', say: 'ah-SAHN-teh', meaning: 'Thank you' },
-  { word: 'Kazi', say: 'KAH-zee', meaning: 'Work, a job' },
-  { word: 'Pole pole', say: 'POH-leh POH-leh', meaning: 'Slowly, slowly. Take it easy.' },
-  { word: 'Rafiki', say: 'rah-FEE-kee', meaning: 'Friend' },
-  { word: 'Hakuna matata', say: 'hah-KOO-nah mah-TAH-tah', meaning: 'No worries' },
+  { word: 'Karibu', say: 'kah-REE-boo', meaning: 'Welcome', short: 'Welcome' },
+  { word: 'Habari?', say: 'hah-BAH-ree', meaning: 'Hello, how are you? (literally: any news?)', short: 'Hello, how are you?' },
+  { word: 'Asante', say: 'ah-SAHN-teh', meaning: 'Thank you', short: 'Thank you' },
+  { word: 'Kazi', say: 'KAH-zee', meaning: 'Work, a job', short: 'Work' },
+  { word: 'Pole pole', say: 'POH-leh POH-leh', meaning: 'Slowly, slowly. Take it easy.', short: 'Slowly' },
+  { word: 'Rafiki', say: 'rah-FEE-kee', meaning: 'Friend', short: 'Friend' },
+  { word: 'Hakuna matata', say: 'hah-KOO-nah mah-TAH-tah', meaning: 'No worries', short: 'No worries' },
 ]
 
 // Projects, in the order they appear. `layout` decides how the images sit:
@@ -567,27 +646,6 @@ export const skills = [
     items: {
       en: 'Websites and web apps, Android apps, business and administration systems, APIs, testing',
       sw: 'Tovuti na programu za wavuti, programu za Android, mifumo ya biashara na utawala, API, majaribio',
-    },
-  },
-  {
-    name: { en: 'Data and reporting', sw: 'Takwimu na ripoti' },
-    items: {
-      en: 'Excel (PivotTables, Power Query), Power BI, Oracle Analytics, SQL, Python (pandas, NumPy, Matplotlib)',
-      sw: 'Excel (PivotTables, Power Query), Power BI, Oracle Analytics, SQL, Python (pandas, NumPy, Matplotlib)',
-    },
-  },
-  {
-    name: { en: 'Programming', sw: 'Lugha za programu' },
-    items: {
-      en: 'Python, JavaScript, TypeScript, SQL, Dart, Flutter, React, HTML, CSS',
-      sw: 'Python, JavaScript, TypeScript, SQL, Dart, Flutter, React, HTML, CSS',
-    },
-  },
-  {
-    name: { en: 'Backend and tools', sw: 'Backend na zana' },
-    items: {
-      en: 'FastAPI, REST APIs, PostgreSQL, MySQL, Git, GitHub, Docker Compose, Linux',
-      sw: 'FastAPI, REST APIs, PostgreSQL, MySQL, Git, GitHub, Docker Compose, Linux',
     },
   },
   {
