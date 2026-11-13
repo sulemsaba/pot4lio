@@ -1,7 +1,7 @@
 <template>
   <nav class="nav" :aria-label="t.navLabel">
     <div ref="pill" class="pill">
-      <span class="indicator" :class="{ ready }" :style="indicator" aria-hidden="true"></span>
+      <span class="indicator" :class="{ ready, hidden: !pages.includes(page) }" :style="indicator" aria-hidden="true"></span>
       <a
         v-for="item in pages"
         :key="item"
@@ -35,7 +35,7 @@ let resizeObserver = null
 
 function place() {
   const link = links[props.page]
-  if (!link) return
+  if (!link) return // a page outside the menu: the highlight stays where it was, hidden
   indicator.transform = `translateX(${link.offsetLeft}px)`
   indicator.width = `${link.offsetWidth}px`
 }
@@ -95,7 +95,12 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
 .indicator.ready {
   transition:
     transform 0.5s var(--ease-out),
-    width 0.5s var(--ease-out);
+    width 0.5s var(--ease-out),
+    opacity 0.3s ease;
+}
+
+.indicator.hidden {
+  opacity: 0;
 }
 
 .item {

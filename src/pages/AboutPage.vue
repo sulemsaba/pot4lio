@@ -52,12 +52,15 @@
         </li>
       </ul>
     </section>
+
+    <ToolBox class="reveal" :style="{ '--i': 6 }" :lang="lang" :t="t" />
   </div>
 </template>
 
 <script setup>
 import { certificates, education, experience, skills } from '../content.js'
 import RichText from '../components/RichText.vue'
+import ToolBox from '../components/ToolBox.vue'
 
 defineProps({
   lang: { type: String, required: true },
@@ -83,7 +86,8 @@ defineProps({
     align-self: stretch;
   }
 
-  .skills {
+  .skills,
+  .toolbox {
     grid-column: 1 / -1;
   }
 }

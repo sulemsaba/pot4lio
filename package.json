@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "serve": "vite preview",
-    "cv:pdf": "vite build && node scripts/cv-pdf.mjs && vite build"
+    "cv:pdf": "vite build && node scripts/cv-pdf.mjs && vite build",
+    "cv:pdf:private": "vite build && node scripts/cv-pdf.mjs --private"
   },
   "dependencies": {
     "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "three": "0.186.1",
     "vue": "^3.4.0"
   },
   "devDependencies": {

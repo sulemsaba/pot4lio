@@ -4,9 +4,9 @@
     <section class="top" aria-labelledby="home-title">
       <div class="card intro reveal" :style="{ '--i': 1 }">
         <h1 id="home-title" class="headline hero-title" tabindex="-1" data-page-title>
-          <span class="visually-hidden">{{ profile.name }} {{ t.headBuilds }} {{ t.buildsAll }} {{ t.headWin }}</span>
+          <span class="visually-hidden">{{ t.headBuilds }} {{ t.buildsAll }} {{ t.headWin }}</span>
           <span aria-hidden="true">
-            <span class="ink">{{ profile.name }}</span>{{ ' ' }}<span class="swap">{{ t.headBuilds }}</span>
+            <span class="ink swap">{{ t.headBuilds }}</span>
             <span class="rotor">
               <span v-if="calm" class="rot-word swap">{{ t.buildsAll }}</span>
               <Transition v-else name="rot" mode="out-in">
@@ -16,10 +16,7 @@
             <span class="win swap">{{ t.headWin }}</span>
           </span>
         </h1>
-        <hr class="rule" />
-        <ul class="reasons">
-          <li v-for="(reason, n) in t.reasons" :key="n" class="swap"><RichText :text="reason" /></li>
-        </ul>
+        <p class="lede swap"><RichText :text="t.lede" /></p>
         <div class="hero-actions">
           <a class="button button--ink" href="#/work" @click.prevent="toNeeds"
             ><span class="swap">{{ t.heroCta }}</span>
@@ -213,8 +210,9 @@ function tone(hex) {
 
 /* The headline: the name, then what he builds, one word at a time. */
 .hero-title {
-  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.25rem);
-  line-height: 1.08;
+  font-size: clamp(2.125rem, 1.2rem + 3.4vw, 4.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
 }
 
 .rotor {
@@ -258,38 +256,35 @@ function tone(hex) {
   filter: blur(8px);
 }
 
-.rule {
-  width: 100%;
-  height: 1px;
-  margin: clamp(1.25rem, 2.5vw, 1.75rem) 0;
-  border: 0;
-  background: var(--line);
-}
-
 .win {
   display: block;
 }
 
-/* Why him: each reason opens with its point in ink. */
-.reasons {
-  display: grid;
-  gap: clamp(0.75rem, 1.5vw, 1rem);
-  max-width: 38rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+/* Two short lines: the point in ink, then the promise in grey. On wide screens they
+   sit with the buttons at the bottom of the card, the headline alone at the top. */
+.lede {
+  margin: clamp(1.5rem, 3vw, 2rem) 0 0;
   color: var(--muted);
-  font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.1875rem);
-  line-height: 1.45;
+  font-size: clamp(1.125rem, 0.95rem + 0.7vw, 1.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.012em;
 }
 
-.reasons li {
-  text-wrap: pretty;
-}
-
-.reasons :deep(strong) {
+.lede :deep(strong) {
+  display: block;
   color: var(--ink);
   font-weight: 500;
+}
+
+@media (min-width: 48rem) {
+  .lede {
+    margin-top: auto;
+    padding-top: 2rem;
+  }
+
+  .lede + .hero-actions {
+    margin-top: 0;
+  }
 }
 
 .hero-actions {
@@ -519,9 +514,13 @@ function tone(hex) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+}
+
+/* The 5:4 shape only where a column is wide enough for it: below that, the minimum
+   height would carry through the ratio and push each card wider than its column. */
+@media (min-width: 64rem) {
   .widgets > * {
     aspect-ratio: 5 / 4;
-    min-height: 15rem;
   }
 }
 
