@@ -29,7 +29,7 @@
 
     <main id="main" ref="main" tabindex="-1">
       <Transition name="page" mode="out-in" @after-leave="onAfterLeave" @after-enter="onAfterEnter">
-        <component :is="views[route.page]" :key="route.page" :lang="lang" :t="t" :focus="route.sub" />
+        <component :is="views[route.page]" :key="route.page === 'writing' ? `writing/${route.sub}` : route.page" :lang="lang" :t="t" :focus="route.sub" />
       </Transition>
     </main>
 
@@ -40,20 +40,21 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { copy, profile, projects } from './content.js'
+import { essays } from './writing.js'
 import NavPill from './components/NavPill.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import CvPage from './pages/CvPage.vue'
-import PlayPage from './pages/PlayPage.vue'
+import WritingPage from './pages/WritingPage.vue'
 import HomePage from './pages/HomePage.vue'
 import AboutPage from './pages/AboutPage.vue'
 import WorkPage from './pages/WorkPage.vue'
 import ContactPage from './pages/ContactPage.vue'
 
 // The menu shows five pages; the CV has its own button in the footer (and on Home).
-const menu = ['home', 'about', 'work', 'play', 'contact']
+const menu = ['home', 'about', 'work', 'writing', 'contact']
 const pages = [...menu, 'cv']
-const views = { home: HomePage, about: AboutPage, work: WorkPage, play: PlayPage, cv: CvPage, contact: ContactPage }
+const views = { home: HomePage, about: AboutPage, work: WorkPage, writing: WritingPage, cv: CvPage, contact: ContactPage }
 
 const languages = [
   { code: 'en', short: 'EN', name: 'English' },
@@ -61,11 +62,13 @@ const languages = [
 ]
 
 // Pages live in the address after #, so the site works on any static host:
-// #/about, #/work, #/work/ligiplay, #/play, #/cv, #/contact. Older links like #ligiplay still land.
+// #/about, #/work, #/work/ligiplay, #/writing, #/writing/<essay>, #/cv, #/contact. Older links
+// like #ligiplay still land, and the old #/play opens Writing.
 function readRoute() {
   const hash = decodeURIComponent(window.location.hash.slice(1))
   if (hash.startsWith('/')) {
     const [page, sub = ''] = hash.slice(1).split('/')
+    if (page === 'play') return { page: 'writing', sub: '' }
     return pages.includes(page) ? { page, sub } : { page: 'home', sub: '' }
   }
   if (projects.some((project) => project.id === hash)) return { page: 'work', sub: hash }
@@ -80,8 +83,8 @@ function onHashChange() {
   const next = readRoute()
   if (next.page === route.value.page && next.sub === route.value.sub) return
   navigated = true
-  if (next.page === route.value.page) {
-    // Same page, new project: scroll to it without a page change.
+  if (next.page === route.value.page && next.page !== 'writing') {
+    // Same page, new project: scroll to it without a page change. (Each essay is a page.)
     route.value = next
     document.getElementById(next.sub)?.scrollIntoView({ block: 'start' })
     return
@@ -153,9 +156,11 @@ function setLang(next) {
 
 const baseTitle = document.title
 watch(
-  [() => route.value.page, t],
-  ([page]) => {
-    document.title = page === 'home' ? baseTitle : `${t.value.nav[page]} · ${profile.name}`
+  [() => route.value.page, () => route.value.sub, t],
+  ([page, sub]) => {
+    const essay = page === 'writing' && essays.find((item) => item.slug === sub)
+    const name = essay ? essay.title : t.value.nav[page]
+    document.title = page === 'home' ? baseTitle : `${name} · ${profile.name}`
   },
   { immediate: true },
 )

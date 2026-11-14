@@ -20,7 +20,7 @@ export const profile = {
 // In any text below, **words like this** are shown a shade stronger.
 export const copy = {
   en: {
-    nav: { home: 'Home', about: 'About', work: 'Work', play: 'Play', cv: 'CV', contact: 'Contact' },
+    nav: { home: 'Home', about: 'About', work: 'Work', writing: 'Writing', cv: 'CV', contact: 'Contact' },
     navLabel: 'Pages',
     language: 'Language',
     themeToDark: 'Switch to the dark theme',
@@ -156,41 +156,17 @@ export const copy = {
     privateWork: 'Other websites, business systems and client applications are private or confidential, so they are not listed here.',
     visit: 'Visit',
 
-    // Play
-    playTitle: '**Play a little.** Three small games from Dar es Salaam. Easy to learn, hard to put down.',
-    playStart: 'Play',
-    playAgain: 'Play again',
-    playKeys: 'Tap, click or press Space',
-    playScore: 'Score',
-    playBest: 'Best',
-    playNewBest: 'New best!',
-    playOver: 'Game over',
-    playLoading: 'Setting up the game…',
-    playPaused: 'Paused',
-    playResume: 'Carry on',
-    playNo3d: 'This game needs 3D graphics, which this browser has turned off.',
-    daladala: {
-      title: 'Daladala',
-      how: 'Hold to brake, let go to roll on. Stop with the door right at the bus stop: the closer, the more points. Miss three stops and it is over.',
-    },
-    embe: {
-      title: 'Mango drop',
-      how: 'The mango swings on its branch. Tap to let it go and land it in the moving basket. Every catch makes the basket smaller and faster.',
-    },
-    mpira: {
-      title: 'Keep it up',
-      how: 'Tap the ball to kick it. Kick its left side to send it right, and the other way round. Catch a star for +3. Do not let it drop.',
-    },
-    gamePerfect: 'Perfect stop!',
-    gameGood: 'Good stop',
-    gameClose: 'Close enough',
-    gameEarly: 'Too early',
-    gamePassed: 'Missed the stop',
-    gameSwish: 'Right in the middle!',
-    gameNice: 'In!',
-    gameMissed: 'Missed',
-    gameClean: 'Clean kick',
-    gameStar: 'Star!',
+    // Writing
+    writingTitle: '**Writing.** Essays on how we think, learn and live, and where it is all going.',
+    writingNote: '',
+    writingAll: 'All writing',
+    writingNext: 'Next essay',
+    writingBy: 'By',
+    writingMinutes: '{n} min read',
+    writingTopics: { career: 'Career', business: 'Business', philosophy: 'Philosophy', education: 'Education', future: 'The future', technology: 'Technology', life: 'Life' },
+    writingPhoto: 'Photo',
+    writingPhotos: 'Photos from Wikimedia Commons. Each essay credits its photo and its licence.',
+    writingPainting: 'Painting',
 
     // CV
     cvPageTitle: '**My CV**, to read here or download.',
@@ -220,7 +196,7 @@ export const copy = {
     linkedin: 'LinkedIn',
   },
   sw: {
-    nav: { home: 'Mwanzo', about: 'Kunihusu', work: 'Kazi', play: 'Cheza', cv: 'CV', contact: 'Wasiliana' },
+    nav: { home: 'Mwanzo', about: 'Kunihusu', work: 'Kazi', writing: 'Makala', cv: 'CV', contact: 'Wasiliana' },
     navLabel: 'Kurasa',
     language: 'Lugha',
     themeToDark: 'Badili kwenda mandhari meusi',
@@ -356,41 +332,17 @@ export const copy = {
     privateWork: 'Tovuti nyingine, mifumo ya biashara na programu za wateja ni za siri au binafsi, kwa hiyo hazijaorodheshwa hapa.',
     visit: 'Tembelea',
 
-    // Play
-    playTitle: '**Cheza kidogo.** Michezo mitatu midogo kutoka Dar es Salaam. Rahisi kujifunza, ngumu kuacha.',
-    playStart: 'Cheza',
-    playAgain: 'Cheza tena',
-    playKeys: 'Gusa, bofya au bonyeza Space',
-    playScore: 'Alama',
-    playBest: 'Rekodi',
-    playNewBest: 'Rekodi mpya!',
-    playOver: 'Mchezo umekwisha',
-    playLoading: 'Mchezo unaandaliwa…',
-    playPaused: 'Umesimamishwa',
-    playResume: 'Endelea',
-    playNo3d: 'Mchezo huu unahitaji picha za 3D, ambazo kivinjari hiki kimezizima.',
-    daladala: {
-      title: 'Daladala',
-      how: 'Shikilia kufunga breki, achia iendelee. Simamisha mlango ukiwa kituoni kabisa: ukikaribia zaidi, alama zaidi. Ukikosa vituo vitatu, mchezo umekwisha.',
-    },
-    embe: {
-      title: 'Dondosha embe',
-      how: 'Embe linabembea tawini. Gusa kuliachia litue ndani ya kikapu kinachotembea. Kila ukidaka, kikapu kinakuwa kidogo na chepesi zaidi.',
-    },
-    mpira: {
-      title: 'Mpira juu',
-      how: 'Gusa mpira kuupiga juu. Ukiupiga upande wa kushoto unaenda kulia, na kinyume chake. Pitisha mpira kwenye nyota upate +3. Usiuache uanguke.',
-    },
-    gamePerfect: 'Umesimama sawasawa!',
-    gameGood: 'Vizuri',
-    gameClose: 'Karibu',
-    gameEarly: 'Mapema mno',
-    gamePassed: 'Umepita kituo',
-    gameSwish: 'Katikati kabisa!',
-    gameNice: 'Ndani!',
-    gameMissed: 'Umekosa',
-    gameClean: 'Teke safi',
-    gameStar: 'Nyota!',
+    // Writing
+    writingTitle: '**Makala.** Insha kuhusu jinsi tunavyofikiri, tunavyojifunza na tunavyoishi, na tunakoelekea.',
+    writingNote: 'Insha hizi ziko kwa Kiingereza kwa sasa.',
+    writingAll: 'Makala zote',
+    writingNext: 'Insha inayofuata',
+    writingBy: 'Na',
+    writingMinutes: 'Dakika {n} za kusoma',
+    writingTopics: { career: 'Kazi', business: 'Biashara', philosophy: 'Falsafa', education: 'Elimu', future: 'Wakati ujao', technology: 'Teknolojia', life: 'Maisha' },
+    writingPhoto: 'Picha',
+    writingPhotos: 'Picha kutoka Wikimedia Commons. Kila insha inataja mpiga picha na leseni yake.',
+    writingPainting: 'Mchoro',
 
     // CV
     cvPageTitle: '**CV yangu**, isome hapa au uipakue.',

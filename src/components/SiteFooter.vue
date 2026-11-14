@@ -6,7 +6,7 @@
         <span aria-hidden="true">
           <span class="say-line"
             ><span class="swap">{{ t.sayStart }}</span>{{ ' ' }}<span class="say-slot"
-              ><Transition name="say" mode="out-in" :duration="{ enter: 1000, leave: 460 }"
+              ><Transition name="say" :duration="{ enter: 1700, leave: 1000 }"
                 ><span :key="`${lang}-${index}`" class="say-word swap" :style="{ '--say': `var(--say-${(index % 3) + 1})` }"
                   ><span v-for="(letter, n) in letters" :key="n" class="ch" :style="{ '--n': n }">{{ letter }}</span></span
                 ></Transition
@@ -51,7 +51,8 @@ const props = defineProps({
 const year = new Date().getFullYear()
 const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// The middle word changes every few seconds, letter by letter, each word in its own colour.
+// The middle word changes every five seconds, each word in its own colour: the old word
+// drifts up and fades while the new one settles in letter by letter, in the same place.
 // It only runs while the footer is on screen.
 const root = ref(null)
 const index = ref(0)
@@ -63,7 +64,7 @@ let observer = null
 function loop() {
   clearInterval(timer)
   if (calm || !onScreen || document.hidden) return
-  timer = setInterval(() => (index.value += 1), 2600)
+  timer = setInterval(() => (index.value += 1), 5000)
 }
 
 onMounted(() => {
@@ -108,6 +109,7 @@ onBeforeUnmount(() => {
 }
 
 .say-slot {
+  position: relative;
   display: inline-block;
 }
 
@@ -121,33 +123,40 @@ onBeforeUnmount(() => {
   white-space: pre;
 }
 
-/* In: letters rise one after another. Out: they lift away, quicker. */
+/* The two words cross: the old one lifts away softly while the new one, a moment
+   later, settles in letter by letter. Slow on purpose, so the line reads calmly. */
+.say-leave-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .say-enter-active .ch {
   transition:
-    transform 0.7s var(--ease-out),
-    opacity 0.5s var(--ease-out),
-    filter 0.5s var(--ease-out);
-  transition-delay: calc(var(--n) * 38ms);
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(0.25s + var(--n) * 45ms);
 }
 
 .say-leave-active .ch {
   transition:
-    transform 0.28s var(--ease-in),
-    opacity 0.28s var(--ease-in),
-    filter 0.28s var(--ease-in);
-  transition-delay: calc(var(--n) * 22ms);
+    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: calc(var(--n) * 25ms);
 }
 
 .say-enter-from .ch {
   opacity: 0;
-  transform: translate3d(0, 0.45em, 0) rotate(6deg);
-  filter: blur(6px);
+  transform: translate3d(0, 0.28em, 0);
+  filter: blur(8px);
 }
 
 .say-leave-to .ch {
   opacity: 0;
-  transform: translate3d(0, -0.3em, 0);
-  filter: blur(6px);
+  transform: translate3d(0, -0.2em, 0);
+  filter: blur(8px);
 }
 
 .say-actions {
