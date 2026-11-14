@@ -3,6 +3,29 @@
   <article v-if="essay" class="essay">
     <div class="progress" aria-hidden="true"><span :style="{ transform: `scaleX(${progress})` }"></span></div>
 
+    <!-- On wide screens: the contents stay at the left, halfway down, while you read. -->
+    <nav class="toc" :class="{ shown: tocShown }" :aria-label="t.writingContents">
+      <p class="toc-title swap" aria-hidden="true">{{ t.writingContents }}</p>
+      <div class="toc-rail">
+        <span class="toc-marker" :style="marker" aria-hidden="true"></span>
+        <ol>
+          <li v-for="(item, i) in contents" :key="item.id">
+            <button
+              :ref="(el) => (tocButtons[i] = el)"
+              type="button"
+              class="toc-link"
+              :class="{ active: i === active, swap: !i }"
+              :aria-current="i === active ? 'location' : null"
+              :lang="i ? 'en' : null"
+              @click="jump(item)"
+            >
+              {{ i ? item.text : t.writingIntro }}
+            </button>
+          </li>
+        </ol>
+      </div>
+    </nav>
+
     <a class="back swap reveal" :style="{ '--i': 0 }" href="#/writing"><span class="back-arrow"><ArrowIcon /></span>{{ t.writingAll }}</a>
 
     <header class="card head reveal" :class="toneClass(essay)" :style="{ '--i': 1 }">
@@ -36,10 +59,22 @@
       </figcaption>
     </figure>
 
-    <div ref="prose" class="prose reveal" :style="{ '--i': 3 }" lang="en">
+    <!-- Smaller screens: the same contents, folded, before the text. -->
+    <details ref="foldedToc" class="toc-folded reveal" :style="{ '--i': 3 }">
+      <summary class="swap">{{ t.writingContents }}</summary>
+      <ol>
+        <li v-for="(item, i) in contents" :key="item.id">
+          <button type="button" :class="{ swap: !i }" :lang="i ? 'en' : null" @click="jump(item, true)">
+            {{ i ? item.text : t.writingIntro }}
+          </button>
+        </li>
+      </ol>
+    </details>
+
+    <div ref="prose" class="prose reveal" :style="{ '--i': 4 }" lang="en">
       <template v-for="(block, n) in essay.body" :key="n">
         <p v-if="typeof block === 'string'" :class="{ lede: n === 0 }"><Inline :text="block" /></p>
-        <h2 v-else-if="block.h">{{ block.h }}</h2>
+        <h2 v-else-if="block.h" :id="anchor(block.h)" tabindex="-1">{{ block.h }}</h2>
         <figure v-else-if="block.q" class="quote">
           <blockquote><p>{{ block.q }}</p></blockquote>
           <figcaption><Inline :text="block.by" /></figcaption>
@@ -68,8 +103,46 @@
       <RichText :text="t.writingTitle" />
     </h1>
     <p v-if="t.writingNote" class="note swap reveal" :style="{ '--i': 1 }">{{ t.writingNote }}</p>
-    <ul class="shelf">
-      <li v-for="(item, n) in essays" :key="item.slug" class="reveal" :class="{ lead: n === 0 || (n === essays.length - 1 && n % 2 === 1) }" :style="{ '--i': n + 2 }">
+
+    <div class="filters reveal" :style="{ '--i': 2 }">
+      <label class="search">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <circle cx="8.5" cy="8.5" r="5.75" fill="none" stroke="currentColor" stroke-width="1.6" />
+          <path d="m13 13 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <span class="visually-hidden swap">{{ t.writingSearch }}</span>
+        <input v-model="state.q" type="search" :placeholder="t.writingSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" />
+        <button v-if="state.q" type="button" class="clear" :aria-label="t.writingClear" @click="state.q = ''">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="m6 6 8 8m0-8-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </button>
+      </label>
+      <div class="topics" role="group" :aria-label="t.writingTopicsLabel">
+        <button type="button" class="topic" :aria-pressed="String(!state.topic)" @click="state.topic = ''">
+          <span class="swap">{{ t.writingAllTopics }}</span><span class="count">{{ essays.length }}</span>
+        </button>
+        <button
+          v-for="topic in topics"
+          :key="topic"
+          type="button"
+          class="topic"
+          :aria-pressed="String(state.topic === topic)"
+          @click="state.topic = state.topic === topic ? '' : topic"
+        >
+          <span class="swap">{{ t.writingTopics[topic] }}</span><span class="count">{{ counts[topic] }}</span>
+        </button>
+      </div>
+    </div>
+    <p class="visually-hidden" aria-live="polite">{{ found }}</p>
+
+    <div v-if="!shown.length" class="card empty">
+      <p class="swap">{{ t.writingNone.replace('{q}', state.q.trim()) }}</p>
+      <button type="button" class="show-all swap" @click="reset">{{ t.writingShowAll }}</button>
+    </div>
+
+    <ul v-else class="shelf">
+      <li v-for="(item, n) in shown" :key="item.slug" class="reveal" :class="{ lead: n === 0 || (n === shown.length - 1 && n % 2 === 1) }" :style="{ '--i': n + 3 }">
         <a class="card entry" :class="toneClass(item)" :href="`#/writing/${item.slug}`">
           <div class="shot" aria-hidden="true">
             <img
@@ -96,9 +169,17 @@
   </div>
 </template>
 
+<script>
+import { reactive } from 'vue'
+
+// What the reader searched for and picked stays put while they read an essay and come
+// back to the list.
+const filters = reactive({ q: '', topic: '' })
+</script>
+
 <script setup>
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { profile } from '../content.js'
+import { computed, defineComponent, h, nextTick, onBeforeUnmount, onMounted, reactive as react, ref, watch } from 'vue'
+import { copy, profile } from '../content.js'
 import { essays } from '../writing.js'
 import ArrowIcon from '../components/ArrowIcon.vue'
 import RichText from '../components/RichText.vue'
@@ -113,6 +194,45 @@ const props = defineProps({
 // (and the last, when it would otherwise sit alone in its row).
 const essay = computed(() => essays.find((item) => item.slug === props.focus) || null)
 const nextEssay = computed(() => essays[(essays.indexOf(essay.value) + 1) % essays.length])
+
+// ---------- Search and topics ----------
+const state = filters
+const topics = [...new Set(essays.map((item) => item.topic))]
+const counts = Object.fromEntries(topics.map((topic) => [topic, essays.filter((item) => item.topic === topic).length]))
+
+// Lower case, no accents, one kind of apostrophe: so "konigsberg" finds Königsberg.
+const fold = (text) =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/’/g, "'")
+const searchable = essays.map((item) =>
+  fold(
+    [
+      item.title,
+      item.dek,
+      copy.en.writingTopics[item.topic],
+      copy.sw.writingTopics[item.topic],
+      ...item.body.map((block) => (typeof block === 'string' ? block : [block.h, block.q, block.by, ...(block.list || [])].join(' '))),
+    ]
+      .join(' ')
+      .replace(/\*/g, ''),
+  ),
+)
+
+const shown = computed(() => {
+  const terms = fold(state.q).split(/\s+/).filter(Boolean)
+  return essays.filter(
+    (item, i) => (!state.topic || item.topic === state.topic) && terms.every((term) => searchable[i].includes(term)),
+  )
+})
+const found = computed(() => (shown.value.length === 1 ? props.t.writingOne : props.t.writingMany.replace('{n}', shown.value.length)))
+
+function reset() {
+  state.q = ''
+  state.topic = ''
+}
 
 // The small picture for cards, the large one where there is room.
 const srcset = (image) => `${image.small} 800w, ${image.src} ${Math.min(image.w, 1600)}w`
@@ -146,17 +266,64 @@ const Inline = defineComponent({
   },
 })
 
-// A thin line along the top shows how far through the essay you are.
+// ---------- Reading ----------
+// Each heading gets an id from its words, so the contents can jump to it.
+const anchor = (text) =>
+  `s-${fold(text)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')}`
+
+// The contents: the start of the essay, then each heading.
+const contents = computed(() =>
+  essay.value ? [{ id: 'top', text: '' }, ...essay.value.body.filter((block) => block.h).map((block) => ({ id: anchor(block.h), text: block.h }))] : [],
+)
+
 const prose = ref(null)
+const foldedToc = ref(null)
 const progress = ref(0)
+const active = ref(0)
+const tocShown = ref(false)
+const tocButtons = []
+const marker = react({ transform: 'translateY(0)', height: '0px' })
+const calm = window.matchMedia('(prefers-reduced-motion: reduce)')
 let frame = 0
 
+// The line along the top shows how far you are; the contents mark the section you are in
+// (the last heading above the upper third of the screen) and show only beside the text.
 function measure() {
   frame = 0
   const box = prose.value?.getBoundingClientRect()
   if (!box) return
-  const read = (window.innerHeight * 0.6 - box.top) / box.height
-  progress.value = Math.min(1, Math.max(0, read))
+  const view = window.innerHeight
+  progress.value = Math.min(1, Math.max(0, (view * 0.6 - box.top) / box.height))
+  tocShown.value = box.top < view * 0.55 && box.bottom > view * 0.4
+  let current = 0
+  prose.value.querySelectorAll('h2[id]').forEach((heading, i) => {
+    if (heading.getBoundingClientRect().top < view * 0.3) current = i + 1
+  })
+  active.value = current
+}
+
+// The marker slides to the section you are in.
+function placeMarker() {
+  const button = tocButtons[active.value]
+  if (!button) return
+  marker.transform = `translateY(${button.offsetTop}px)`
+  marker.height = `${button.offsetHeight}px`
+}
+
+watch([active, () => props.lang], () => nextTick(placeMarker))
+
+// Jump to a section: the heading lands a little below the top, clear of the menu.
+function jump(item, folded = false) {
+  if (folded && foldedToc.value) foldedToc.value.open = false
+  requestAnimationFrame(() => {
+    const target = item.id === 'top' ? prose.value : document.getElementById(item.id)
+    if (!target) return
+    const offset = window.matchMedia('(min-width: 40rem)').matches ? 104 : 24
+    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: calm.matches ? 'auto' : 'smooth' })
+    if (item.id !== 'top') target.focus({ preventScroll: true })
+  })
 }
 
 function onScroll() {
@@ -168,12 +335,15 @@ watch(essay, () => requestAnimationFrame(measure))
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', onScroll, { passive: true })
+  window.addEventListener('resize', placeMarker, { passive: true })
   measure()
+  nextTick(placeMarker)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', onScroll)
+  window.removeEventListener('resize', placeMarker)
   cancelAnimationFrame(frame)
 })
 </script>
@@ -195,10 +365,171 @@ onBeforeUnmount(() => {
   font-size: 0.9375rem;
 }
 
+/* Search, then the topics. */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin: clamp(1.5rem, 3.5vw, 2.25rem) 0 0;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: min(100%, 18rem);
+}
+
+.search > svg {
+  position: absolute;
+  left: 0.9rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 2.75rem 0 2.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: var(--bg);
+}
+
+.clear {
+  position: absolute;
+  right: 0.4rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.clear svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.clear:hover {
+  background: var(--pill);
+  color: var(--ink);
+}
+
+.clear:focus-visible,
+.topic:focus-visible,
+.show-all:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.topic:hover {
+  border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+  color: var(--ink);
+}
+
+.topic[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.count {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
+}
+
+@media (max-width: 40rem) {
+  .search {
+    width: 100%;
+  }
+}
+
+.empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: clamp(1.75rem, 4vw, 2.75rem) 0 0;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.show-all {
+  height: 2.5rem;
+  padding: 0 1.125rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .shelf {
   display: grid;
   gap: var(--gap);
-  margin: clamp(1.75rem, 4vw, 2.75rem) 0 0;
+  margin: clamp(1.5rem, 3.5vw, 2.25rem) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -490,6 +821,156 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 
+/* ---------- Contents ---------- */
+/* Wide screens: fixed at the left of the text, halfway down the screen. It appears once
+   the text reaches the middle of the screen and leaves when the text does. */
+.toc {
+  display: none;
+}
+
+@media (min-width: 82rem) {
+  .toc {
+    position: fixed;
+    top: 50%;
+    left: max(var(--gutter), calc(50% - 23rem - 16rem));
+    z-index: 20;
+    display: block;
+    width: 13rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-0.5rem, -50%, 0);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.5s var(--ease-out);
+  }
+
+  .toc.shown,
+  .toc:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(0, -50%, 0);
+  }
+
+  .toc-folded {
+    display: none;
+  }
+}
+
+.toc-title {
+  margin: 0 0 0.875rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.toc-rail {
+  position: relative;
+  padding-left: 1rem;
+  border-left: 1px solid var(--line);
+}
+
+/* The marker on the rail slides to the section you are reading. */
+.toc-marker {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition:
+    transform 0.45s var(--ease-out),
+    height 0.45s var(--ease-out);
+}
+
+.toc ol,
+.toc-folded ol {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc-link,
+.toc-folded button {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.toc-link:hover,
+.toc-folded button:hover,
+.toc-link.active {
+  color: var(--ink);
+}
+
+.toc-link.active {
+  font-weight: 500;
+}
+
+.toc-link:focus-visible,
+.toc-folded button:focus-visible,
+.toc-folded summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Smaller screens: folded into a box before the text. */
+.toc-folded {
+  margin: clamp(1.75rem, 4vw, 2.25rem) clamp(1.5rem, 4vw, 2.75rem) 0;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+
+.toc-folded summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  list-style: none;
+  cursor: pointer;
+}
+
+.toc-folded summary::-webkit-details-marker {
+  display: none;
+}
+
+.toc-folded summary::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.25s ease;
+}
+
+.toc-folded[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.toc-folded ol {
+  padding: 0 1rem 0.75rem;
+}
+
+.toc-folded button {
+  font-size: 0.9375rem;
+}
+
 /* The text: a calm reading column, lined up with the card's text above. */
 .prose {
   padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2.75rem) 0;
@@ -508,6 +989,7 @@ onBeforeUnmount(() => {
 }
 
 .prose h2 {
+  scroll-margin-top: 6.5rem;
   margin: 2.2em 0 0.6em;
   font-size: 1.375rem;
   font-weight: 600;
@@ -608,9 +1090,15 @@ onBeforeUnmount(() => {
 }
 
 
+.prose h2:focus {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .entry,
-  .next {
+  .next,
+  .toc,
+  .toc-marker {
     transition: none;
   }
 

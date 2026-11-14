@@ -166,6 +166,16 @@ export const copy = {
     writingTopics: { career: 'Career', business: 'Business', philosophy: 'Philosophy', education: 'Education', future: 'The future', technology: 'Technology', life: 'Life' },
     writingPhoto: 'Photo',
     writingPhotos: 'Photos from Wikimedia Commons. Each essay credits its photo and its licence.',
+    writingSearch: 'Search essays',
+    writingClear: 'Clear search',
+    writingTopicsLabel: 'Topics',
+    writingAllTopics: 'All',
+    writingOne: '1 essay',
+    writingMany: '{n} essays',
+    writingNone: 'Nothing matches “{q}”.',
+    writingShowAll: 'Show all essays',
+    writingContents: 'In this essay',
+    writingIntro: 'Introduction',
     writingPainting: 'Painting',
 
     // CV
@@ -342,6 +352,16 @@ export const copy = {
     writingTopics: { career: 'Kazi', business: 'Biashara', philosophy: 'Falsafa', education: 'Elimu', future: 'Wakati ujao', technology: 'Teknolojia', life: 'Maisha' },
     writingPhoto: 'Picha',
     writingPhotos: 'Picha kutoka Wikimedia Commons. Kila insha inataja mpiga picha na leseni yake.',
+    writingSearch: 'Tafuta insha',
+    writingClear: 'Futa utafutaji',
+    writingTopicsLabel: 'Mada',
+    writingAllTopics: 'Zote',
+    writingOne: 'Insha 1',
+    writingMany: 'Insha {n}',
+    writingNone: 'Hakuna insha inayolingana na “{q}”.',
+    writingShowAll: 'Onyesha insha zote',
+    writingContents: 'Ndani ya insha hii',
+    writingIntro: 'Utangulizi',
     writingPainting: 'Mchoro',
 
     // CV
