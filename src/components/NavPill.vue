@@ -178,6 +178,14 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   }
 }
 
+/* The narrowest phones: a little less room around each name, so the five still fit
+   with space at the edges (Kiswahili's names are the longest). */
+@media (max-width: 24rem) {
+  .item {
+    padding: 0 0.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .indicator.ready {
     transition: none;
