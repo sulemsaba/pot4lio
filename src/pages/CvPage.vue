@@ -33,12 +33,13 @@
         </div>
       </header>
 
-      <section class="cv-section">
+      <!-- The sections, in the CV's own order (a tailored version can change it). -->
+      <template v-for="part in order" :key="part">
+      <section v-if="part === 'profile'" class="cv-section">
         <h3 class="cv-heading">Profile</h3>
         <p class="cv-text">{{ cv.profile }}</p>
       </section>
-
-      <section class="cv-section">
+      <section v-if="part === 'experience'" class="cv-section">
         <h3 class="cv-heading">Experience</h3>
         <div v-for="job in cv.experience" :key="job.role" class="cv-entry">
           <p class="cv-line">
@@ -51,8 +52,7 @@
           </ul>
         </div>
       </section>
-
-      <section class="cv-section">
+      <section v-if="part === 'projects'" class="cv-section">
         <h3 class="cv-heading">Projects</h3>
         <ul class="cv-projects">
           <li v-for="project in cv.projects" :key="project.name">
@@ -63,8 +63,7 @@
         </ul>
         <p class="cv-note">{{ cv.projectsNote }}</p>
       </section>
-
-      <section class="cv-section">
+      <section v-if="part === 'education'" class="cv-section">
         <h3 class="cv-heading">Education</h3>
         <div v-for="item in cv.education" :key="item.degree" class="cv-entry cv-entry--tight">
           <p class="cv-line">
@@ -73,8 +72,7 @@
           </p>
         </div>
       </section>
-
-      <section class="cv-section">
+      <section v-if="part === 'skills'" class="cv-section">
         <h3 class="cv-heading">Skills</h3>
         <dl class="cv-pairs">
           <template v-for="[label, items] in cv.skills" :key="label">
@@ -83,8 +81,7 @@
           </template>
         </dl>
       </section>
-
-      <div class="cv-split">
+      <div v-if="part === 'more'" class="cv-split">
         <section class="cv-section">
           <h3 class="cv-heading">Certifications</h3>
           <ul class="cv-bullets">
@@ -98,8 +95,7 @@
           <p class="cv-text">{{ cv.interests }}</p>
         </section>
       </div>
-
-      <section class="cv-section">
+      <section v-if="part === 'referees'" class="cv-section">
         <h3 class="cv-heading">Referees</h3>
         <ul class="cv-referees">
           <li v-for="person in cv.referees" :key="person.name">
@@ -114,6 +110,7 @@
         </ul>
         <p v-if="!hasContacts" class="cv-note">{{ cv.refereesNote }}</p>
       </section>
+      </template>
     </article>
   </div>
 </template>
@@ -130,6 +127,8 @@ defineProps({
 })
 
 const print = () => window.print()
+
+const order = cv.order || ['profile', 'experience', 'projects', 'education', 'skills', 'more', 'referees']
 
 // Referees' phone numbers and emails are never part of the site. Only the private PDF
 // passes them in (?referees=..., base64url JSON) when it prints this page.
