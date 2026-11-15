@@ -2,7 +2,7 @@
 // (run `npm run cv:pdf`), so the two always match. Keep it short and scannable:
 // one line per point, facts only.
 
-export const cv = {
+const base = {
   name: 'Suleiman Msaba',
   headline: ['Software Developer and Business Operations', 'Banking and Finance Graduate'],
   // Two groups: how to reach him, then where to see the work.
@@ -88,3 +88,10 @@ export const cv = {
   ],
   refereesNote: 'Contact details available on request.',
 }
+
+// A tailored version for one application (a different headline, profile, order of
+// sections...) can replace parts of the CV. It comes from a file in private/ and only
+// the PDF script passes it in, at build time (VITE_CV_VARIANT); the website never has it.
+const variant = import.meta.env.VITE_CV_VARIANT ? JSON.parse(import.meta.env.VITE_CV_VARIANT) : null
+
+export const cv = variant ? { ...base, ...variant } : base
