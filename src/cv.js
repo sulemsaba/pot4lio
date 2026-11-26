@@ -29,9 +29,16 @@ const base = {
       bullets: [
         'Build and maintain websites, web apps, Android apps and internal business systems.',
         'Develop database-backed features and APIs; test, troubleshoot and improve them.',
-        'Support budgets, expenditure tracking, accounting records and internal reporting.',
-        'Assist with audit-related processes and financial and operational analysis.',
+        'Support budgets, expenditure tracking, accounting records, internal reporting and audit-related analysis.',
         'Work with stakeholders to turn requirements into tools that improve accuracy and efficiency.',
+      ],
+    },
+    {
+      role: 'Data Cleaning and Migration (contract)',
+      org: 'Tanzania Red Cross Society',
+      dates: '2026',
+      bullets: [
+        'Cleaned and organised the organisation’s data and fed it into their new database and system.',
       ],
     },
     {
@@ -47,7 +54,7 @@ const base = {
   ],
 
   projects: [
-    { name: 'LigiPlay', what: 'Android app for eFootball leagues: fixtures, results read from screenshots, player confirmation and live tables.', tech: 'Flutter, FastAPI, PostgreSQL · Google Play' },
+    { name: 'LigiPlay', what: 'Android app for eFootball leagues: fixtures, results from screenshots, live tables.', tech: 'Flutter, FastAPI · Google Play' },
     { name: 'MangiPlus', what: 'Android app for small and medium-sized businesses.', tech: 'Google Play' },
     { name: 'consult.exxonim.tz', what: 'Website for company registration, licences, permits and compliance services.', tech: '' },
     { name: 'levo.or.tz', what: 'Website for Legal Vision Organization (LEVO), a legal aid and advocacy organisation.', tech: '' },
@@ -58,14 +65,13 @@ const base = {
 
   education: [
     { degree: 'Bachelor of Commerce, Banking and Financial Services', school: 'University of Dar es Salaam', dates: 'Sep 2022 to Oct 2025' },
-    { degree: 'BSc Computer Science (in progress)', school: 'University of the People, online', dates: 'Sep 2025 to Aug 2027' },
   ],
 
   skills: [
     ['Development', 'Python, JavaScript, TypeScript, Dart, Flutter, React, HTML, CSS'],
     ['Backend and data', 'FastAPI, REST APIs, PostgreSQL, MySQL, SQL'],
     ['Tools', 'Git, GitHub, Docker Compose, Linux'],
-    ['Finance and analysis', 'Budgeting, accounting records, financial reporting, audit support, Excel (PivotTables, Power Query), Power BI, Oracle Analytics, pandas'],
+    ['Finance and analysis', 'Budgeting, accounting records, reporting, audit support, Excel, Power BI, Oracle Analytics'],
     ['Banking', 'Customer service, teller operations, transaction processing, compliance documentation'],
   ],
 
@@ -76,7 +82,7 @@ const base = {
   ],
 
   languages: 'Kiswahili, English, Arabic',
-  interests: 'Charity and helping people',
+  interests: 'Reading on technology and business, learning new technologies, writing essays, charity',
 
   // Names and roles only. Their phone numbers and emails are private: they live in
   // private/referees.json (not in git) and only go into the private PDF

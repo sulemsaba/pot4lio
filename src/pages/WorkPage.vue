@@ -5,12 +5,14 @@
     </h1>
     <WorkGallery :class="{ reveal: !focus }" :style="{ '--i': 2 }" :projects="projects" :lang="lang" :t="t" :focus="focus" />
     <p class="note swap">{{ t.privateWork }}</p>
+    <MotionShowcase class="showcase" :t="t" />
     <NeedsPicker class="closing" :lang="lang" :t="t" id="work-needs" />
   </div>
 </template>
 
 <script setup>
 import { projects } from '../content.js'
+import MotionShowcase from '../components/MotionShowcase.vue'
 import NeedsPicker from '../components/NeedsPicker.vue'
 import RichText from '../components/RichText.vue'
 import WorkGallery from '../components/WorkGallery.vue'
@@ -32,7 +34,8 @@ defineProps({
   margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
 }
 
-.closing {
+.closing,
+.showcase {
   margin-top: clamp(4.5rem, 9vw, 7rem);
 }
 

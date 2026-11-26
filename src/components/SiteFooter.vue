@@ -1,18 +1,12 @@
 <template>
-  <footer ref="root" class="footer">
+  <footer class="footer">
     <div class="sign-off">
       <p class="say">
         <span class="visually-hidden">{{ t.sayStart }} {{ t.sayAll }} {{ t.sayEnd }}</span>
         <span aria-hidden="true">
           <span class="say-line"
-            ><span class="swap">{{ t.sayStart }}</span>{{ ' ' }}<span class="say-slot"
-              ><Transition name="say" :duration="{ enter: 1700, leave: 1000 }"
-                ><span :key="`${lang}-${index}`" class="say-word swap" :style="{ '--say': `var(--say-${(index % 3) + 1})` }"
-                  ><span v-for="(letter, n) in letters" :key="n" class="ch" :style="{ '--n': n }">{{ letter }}</span></span
-                ></Transition
-              ></span
-            ></span
-          >
+            ><span class="swap">{{ t.sayStart }}</span>{{ ' ' }}<WordRoll class="swap" :words="t.sayWords" :every="6000"
+          /></span>
           <span class="say-line swap">{{ t.sayEnd }}</span>
         </span>
       </p>
@@ -33,16 +27,20 @@
       <span v-if="!calm" id="grass-hint" class="hint swap">{{ t.grassHint }}</span>
     </div>
 
-    <GrassField :t="t" :caption-id="calm ? '' : 'grass-hint'" />
+    <div class="ground">
+      <GrassField :t="t" :caption-id="calm ? '' : 'grass-hint'" />
+      <StreetLight />
+    </div>
   </footer>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { profile } from '../content.js'
 import GrassField from './GrassField.vue'
+import StreetLight from './StreetLight.vue'
+import WordRoll from './WordRoll.vue'
 
-const props = defineProps({
+defineProps({
   lang: { type: String, required: true },
   t: { type: Object, required: true },
   page: { type: String, required: true },
@@ -50,38 +48,6 @@ const props = defineProps({
 
 const year = new Date().getFullYear()
 const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-// The middle word changes every five seconds, each word in its own colour: the old word
-// drifts up and fades while the new one settles in letter by letter, in the same place.
-// It only runs while the footer is on screen.
-const root = ref(null)
-const index = ref(0)
-const letters = computed(() => Array.from(props.t.sayWords[index.value % props.t.sayWords.length]))
-let timer = 0
-let onScreen = false
-let observer = null
-
-function loop() {
-  clearInterval(timer)
-  if (calm || !onScreen || document.hidden) return
-  timer = setInterval(() => (index.value += 1), 5000)
-}
-
-onMounted(() => {
-  if (calm || !('IntersectionObserver' in window)) return
-  observer = new IntersectionObserver(([entry]) => {
-    onScreen = entry.isIntersecting
-    loop()
-  })
-  observer.observe(root.value)
-  document.addEventListener('visibilitychange', loop)
-})
-
-onBeforeUnmount(() => {
-  clearInterval(timer)
-  observer?.disconnect()
-  document.removeEventListener('visibilitychange', loop)
-})
 </script>
 
 <style scoped>
@@ -108,57 +74,6 @@ onBeforeUnmount(() => {
   display: block;
 }
 
-.say-slot {
-  position: relative;
-  display: inline-block;
-}
-
-.say-word {
-  display: inline-block;
-  color: var(--say);
-}
-
-.ch {
-  display: inline-block;
-  white-space: pre;
-}
-
-/* The two words cross: the old one lifts away softly while the new one, a moment
-   later, settles in letter by letter. Slow on purpose, so the line reads calmly. */
-.say-leave-active {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.say-enter-active .ch {
-  transition:
-    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(0.25s + var(--n) * 45ms);
-}
-
-.say-leave-active .ch {
-  transition:
-    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-    filter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: calc(var(--n) * 25ms);
-}
-
-.say-enter-from .ch {
-  opacity: 0;
-  transform: translate3d(0, 0.28em, 0);
-  filter: blur(8px);
-}
-
-.say-leave-to .ch {
-  opacity: 0;
-  transform: translate3d(0, -0.2em, 0);
-  filter: blur(8px);
-}
-
 .say-actions {
   display: flex;
   flex-wrap: wrap;
@@ -167,11 +82,11 @@ onBeforeUnmount(() => {
   margin-bottom: 0.4rem;
 }
 
+/* Both lines on the left: the road light stands on the right. */
 .meta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
+  gap: 0.5rem 2rem;
   margin-top: clamp(2.5rem, 5vw, 4rem);
   color: var(--muted);
   font-size: 0.875rem;
@@ -182,7 +97,15 @@ onBeforeUnmount(() => {
   font-weight: 500;
 }
 
-.footer :deep(.grass) {
+/* The grass and the street light standing in it. */
+.ground {
+  position: relative;
+  isolation: isolate;
   margin-top: 0.75rem;
+}
+
+.ground :deep(.grass) {
+  position: relative;
+  z-index: 1;
 }
 </style>

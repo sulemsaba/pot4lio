@@ -17,11 +17,24 @@
         <img
           v-for="(image, n) in project.images"
           :key="image.src"
+          class="shot"
           :src="image.src"
           :width="image.w"
           :height="image.h"
           :alt="image.alt[lang]"
           :style="{ '--j': n }"
+          loading="lazy"
+          decoding="async"
+        />
+        <!-- The same website on a phone, standing in front of the desktop one. -->
+        <img
+          v-if="project.phone"
+          class="phone"
+          :src="project.phone.src"
+          :width="project.phone.w"
+          :height="project.phone.h"
+          :alt="project.phone.alt[lang]"
+          :style="{ '--j': project.images.length }"
           loading="lazy"
           decoding="async"
         />
@@ -36,13 +49,29 @@
           <p class="summary swap">{{ project.summary[lang] }}</p>
 
           <template v-if="project.wins?.[lang]?.length">
-            <h3 class="tag wins-title swap">{{ t.winsTitle }}</h3>
-            <ul class="wins">
-              <li v-for="win in project.wins[lang]" :key="win" class="swap">
-                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8.25" /><path d="M5.5 9.25 7.75 11.5 12.5 6.5" /></svg>
-                <span>{{ win }}</span>
-              </li>
-            </ul>
+            <!-- On phones the list folds away behind its title, so the page stays short. -->
+            <h3 class="tag wins-title swap">
+              <button
+                v-if="narrow"
+                type="button"
+                class="wins-toggle"
+                :aria-expanded="String(open.has(project.id))"
+                :aria-controls="`${project.id}-wins`"
+                @click="toggle(project.id)"
+              >
+                {{ t.winsTitle }}<span class="wins-count">{{ project.wins[lang].length }}</span
+                ><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" /></svg>
+              </button>
+              <template v-else>{{ t.winsTitle }}</template>
+            </h3>
+            <div :id="`${project.id}-wins`" class="wins-fold" :class="{ open: !narrow || open.has(project.id) }">
+              <ul class="wins">
+                <li v-for="win in project.wins[lang]" :key="win" class="swap">
+                  <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8.25" /><path d="M5.5 9.25 7.75 11.5 12.5 6.5" /></svg>
+                  <span>{{ win }}</span>
+                </li>
+              </ul>
+            </div>
           </template>
 
           <LeagueDemo v-if="project.demo" :t="t" />
@@ -66,7 +95,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, reactive } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { profile } from '../content.js'
 import ArrowIcon from './ArrowIcon.vue'
 import LeagueDemo from './LeagueDemo.vue'
@@ -84,6 +113,13 @@ const hostOf = (url) => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 const whatsapp = profile.links.whatsapp.replace(/\D/g, '')
 const ask = (project) => `https://wa.me/${whatsapp}?text=${encodeURIComponent(project.ask[props.lang])}`
 
+// Phones fold each project's list of advantages; a tap opens it.
+const phoneQuery = window.matchMedia('(max-width: 40rem)')
+const narrow = ref(phoneQuery.matches)
+const onQuery = (event) => (narrow.value = event.matches)
+const open = reactive(new Set())
+const toggle = (id) => (open.has(id) ? open.delete(id) : open.add(id))
+
 // Each piece below the fold develops into view once, as it scrolls in.
 // Pieces start fully visible; only JavaScript with motion allowed arms them.
 const elements = new Map()
@@ -97,6 +133,7 @@ function register(el, id) {
 }
 
 onMounted(() => {
+  phoneQuery.addEventListener('change', onQuery)
   const target = props.focus
   const linked = props.projects.some((project) => project.id === target)
 
@@ -123,7 +160,10 @@ onMounted(() => {
   if (linked) elements.get(target)?.scrollIntoView({ block: 'start', behavior: 'instant' })
 })
 
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  phoneQuery.removeEventListener('change', onQuery)
+})
 </script>
 
 <style scoped>
@@ -186,12 +226,45 @@ onBeforeUnmount(() => observer?.disconnect())
   padding: clamp(1.25rem, 5.5vw, 4rem) clamp(1.25rem, 5.5vw, 4rem) 0;
 }
 
-.frame--browser img {
+.frame--browser .shot {
   width: 100%;
   border-radius: 0.625rem 0.625rem 0 0;
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 0.07),
     0 1.5rem 3rem -1.25rem rgb(0 0 0 / 0.4);
+}
+
+/* The phone: in front, on the right, rising from the bottom edge like the browser. */
+.phone {
+  position: absolute;
+  right: 5%;
+  bottom: -14%;
+  z-index: 1;
+  width: 21%;
+  border: clamp(0.25rem, 0.5vw, 0.4rem) solid #111;
+  border-radius: clamp(1rem, 2.2vw, 1.75rem);
+  background: #111;
+  box-shadow: 0 1.75rem 3rem -1rem rgb(0 0 0 / 0.5);
+}
+
+/* Phones: a taller frame, the desktop page larger and cropped on the right, and
+   the phone big enough to read. */
+@media (max-width: 40rem) {
+  .frame--browser {
+    aspect-ratio: 1 / 1.02;
+    padding: 1.25rem 0 0 1.25rem;
+  }
+
+  .frame--browser .shot {
+    width: 150%;
+    max-width: none;
+  }
+
+  .phone {
+    right: 6%;
+    bottom: -12%;
+    width: 44%;
+  }
 }
 
 /* A logo banner sits in its own colour. */
@@ -254,6 +327,77 @@ onBeforeUnmount(() => observer?.disconnect())
 
 .wins-title {
   margin: 1.5rem 0 0.75rem;
+}
+
+.wins-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  margin: -0.75rem 0 -0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wins-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.wins-toggle svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.wins-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+/* Folding: the list's row grows from nothing to its full height. */
+.wins-fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease-out);
+}
+
+.wins-fold.open {
+  grid-template-rows: 1fr;
+}
+
+.wins-fold > .wins {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Folded away, it is hidden from screen readers too (after the fold has closed). */
+.wins-fold:not(.open) > .wins {
+  visibility: hidden;
+  transition: visibility 0s 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wins-fold {
+    transition: none;
+  }
 }
 
 /* What it does for you: ticks, two columns where there is room. */
