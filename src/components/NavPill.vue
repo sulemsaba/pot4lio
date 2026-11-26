@@ -1,7 +1,7 @@
 <template>
   <nav class="nav" :aria-label="t.navLabel">
     <div ref="pill" class="pill">
-      <span class="indicator" :class="{ ready, hidden: !pages.includes(page) }" :style="indicator" aria-hidden="true"></span>
+      <span ref="indicator" class="indicator" :class="{ hidden: !pages.includes(page) }" aria-hidden="true"></span>
       <a
         v-for="item in pages"
         :key="item"
@@ -18,7 +18,8 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { motion, snap, spring, step, still, tune } from '../motion.js'
 
 const props = defineProps({
   pages: { type: Array, required: true },
@@ -26,36 +27,71 @@ const props = defineProps({
   t: { type: Object, required: true },
 })
 
-// A grey pill slides behind the current page's name.
+// A solid pill slides under the current page's name. Each edge is its own spring: the
+// edge in the direction of travel is stiff and the other is soft, so the pill
+// stretches toward the new page and then pulls its tail in.
+// Adapted from DesignBookmark's Tab pill, with its spring values.
 const pill = ref(null)
+const indicator = ref(null)
 const links = {}
-const indicator = reactive({ transform: 'translateX(0)', width: '0px' })
-const ready = ref(false)
+const left = spring(0)
+const right = spring(0)
 let resizeObserver = null
 
-function place() {
+const engine = motion({
+  frame(dt) {
+    step(left, dt)
+    step(right, dt)
+    return !still(left, 0.05) || !still(right, 0.05)
+  },
+  render() {
+    indicator.value.style.transform = `translateX(${left.x.toFixed(2)}px)`
+    indicator.value.style.width = `${Math.max(0, right.x - left.x).toFixed(2)}px`
+  },
+})
+
+function place(jump) {
   const link = links[props.page]
-  if (!link) return // a page outside the menu: the highlight stays where it was, hidden
-  indicator.transform = `translateX(${link.offsetLeft}px)`
-  indicator.width = `${link.offsetWidth}px`
+  if (!link) return // a page outside the menu: the pill stays where it was, hidden
+  const from = left.t
+  left.t = link.offsetLeft
+  right.t = link.offsetLeft + link.offsetWidth
+  if (left.t >= from) {
+    tune(right, 620, 40)
+    tune(left, 170, 19)
+  } else {
+    tune(left, 620, 40)
+    tune(right, 170, 19)
+  }
+  if (jump) {
+    snap(left)
+    snap(right)
+  }
+  engine.wake()
 }
 
 watch(
-  () => [props.page, props.t],
-  () => nextTick(place),
+  () => props.page,
+  () => nextTick(() => place(false)),
+)
+watch(
+  () => props.t,
+  () => nextTick(() => place(true)),
 )
 
 onMounted(() => {
-  place()
-  requestAnimationFrame(() => (ready.value = true))
+  place(true)
   if ('ResizeObserver' in window) {
-    resizeObserver = new ResizeObserver(place)
+    resizeObserver = new ResizeObserver(() => place(true))
     resizeObserver.observe(pill.value)
   }
-  document.fonts?.ready.then(place)
+  document.fonts?.ready.then(() => place(true))
 })
 
-onBeforeUnmount(() => resizeObserver?.disconnect())
+onBeforeUnmount(() => {
+  engine.stop()
+  resizeObserver?.disconnect()
+})
 </script>
 
 <style scoped>
@@ -89,14 +125,9 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   bottom: 0.3125rem;
   left: 0;
   border-radius: 999px;
-  background: var(--pill);
-}
-
-.indicator.ready {
-  transition:
-    transform 0.5s var(--ease-out),
-    width 0.5s var(--ease-out),
-    opacity 0.3s ease;
+  background: var(--ink);
+  transition: opacity 0.3s ease;
+  will-change: transform, width;
 }
 
 .indicator.hidden {
@@ -118,11 +149,16 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   font-weight: 500;
   text-decoration: none;
   transition: color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.item:hover,
-.item[aria-current='page'] {
+.item:hover {
   color: var(--ink);
+}
+
+/* The current page reads light on the dark pill (dark on the light one at night). */
+.item[aria-current='page'] {
+  color: var(--bg);
 }
 
 .dot {
@@ -145,20 +181,16 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   -webkit-backdrop-filter: saturate(1.05) blur(22px) brightness(0.8);
 }
 
-:root[data-theme='dark'] .indicator {
-  background: rgb(255 255 255 / 0.13);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    0 1px 2px rgb(0 0 0 / 0.4);
-}
-
 :root[data-theme='dark'] .item {
   color: rgb(255 255 255 / 0.68);
 }
 
-:root[data-theme='dark'] .item:hover,
-:root[data-theme='dark'] .item[aria-current='page'] {
+:root[data-theme='dark'] .item:hover {
   color: #fff;
+}
+
+:root[data-theme='dark'] .item[aria-current='page'] {
+  color: var(--bg);
 }
 
 /* On phones the menu sits at the bottom, under the thumb. */
@@ -186,9 +218,4 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .indicator.ready {
-    transition: none;
-  }
-}
 </style>

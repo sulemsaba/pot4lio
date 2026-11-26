@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <!-- First screen: who, a face, the time in Dar es Salaam. -->
+    <!-- First screen: who, a website that changes with the screen, the time in Dar es Salaam. -->
     <section class="top" aria-labelledby="home-title">
       <div class="card intro reveal" :style="{ '--i': 1 }">
         <h1 id="home-title" class="headline hero-title" tabindex="-1" data-page-title>
@@ -9,9 +9,7 @@
             <span class="ink swap">{{ t.headBuilds }}</span>
             <span class="rotor">
               <span v-if="calm" class="rot-word swap">{{ t.buildsAll }}</span>
-              <Transition v-else name="rot" mode="out-in">
-                <span :key="`${lang}-${wordIndex}`" class="rot-word">{{ t.builds[wordIndex % t.builds.length] }}</span>
-              </Transition>
+              <WordRoll v-else class="rot-roll" :words="t.builds" :every="4200" :tint="false" />
             </span>
             <span class="win swap">{{ t.headWin }}</span>
           </span>
@@ -27,10 +25,7 @@
         </div>
       </div>
 
-      <figure v-tilt="5" class="card photo reveal" :style="{ '--i': 2 }">
-        <img :src="profile.photo" width="460" height="460" :alt="t.photoAlt" fetchpriority="high" decoding="async" />
-        <figcaption class="sticker swap">{{ t.sticker }}</figcaption>
-      </figure>
+      <ResponsivePlay class="reveal" :style="{ '--i': 2 }" :t="t" />
 
       <SkyCard class="reveal" :style="{ '--i': 3 }" :time-zone="profile.timeZone" :t="t" />
     </section>
@@ -108,9 +103,11 @@ import ChatContact from '../components/ChatContact.vue'
 import CvCard from '../components/CvCard.vue'
 import GithubCard from '../components/GithubCard.vue'
 import NeedsPicker from '../components/NeedsPicker.vue'
+import ResponsivePlay from '../components/ResponsivePlay.vue'
 import RichText from '../components/RichText.vue'
 import SkyCard from '../components/SkyCard.vue'
 import WordCard from '../components/WordCard.vue'
+import WordRoll from '../components/WordRoll.vue'
 
 defineProps({
   lang: { type: String, required: true },
@@ -128,21 +125,17 @@ function toNeeds() {
   title.closest('section')?.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true })
 }
 
-// Two slow loops, each running only while on screen: the headline's word,
-// and the LigiPlay tile turning through its screens.
-const wordIndex = ref(0)
+// The LigiPlay tile turns through its screens while it is on screen.
+// (The headline's word rolls on its own: see WordRoll.)
 const screen = ref(0)
 const tilesEl = ref(null)
-let wordTimer = 0
 let screenTimer = 0
 let tilesVisible = false
 let observer = null
 
 function loop() {
-  clearInterval(wordTimer)
   clearInterval(screenTimer)
   if (calm || document.hidden) return
-  wordTimer = setInterval(() => (wordIndex.value += 1), 2600)
   if (tilesVisible) screenTimer = setInterval(() => (screen.value += 1), 2800)
 }
 
@@ -160,7 +153,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  clearInterval(wordTimer)
   clearInterval(screenTimer)
   observer?.disconnect()
   document.removeEventListener('visibilitychange', loop)
@@ -184,8 +176,8 @@ function tone(hex) {
   margin-top: clamp(4.5rem, 9vw, 7rem);
 }
 
-/* First screen. Phones: intro, photo, clock, one under another.
-   Wide: the intro on the left, photo and clock stacked on the right. */
+/* First screen. Phones: intro, playground, clock, one under another.
+   Wide: the intro on the left, playground and clock stacked on the right. */
 .top {
   display: grid;
   gap: var(--gap);
@@ -218,6 +210,19 @@ function tone(hex) {
 .rotor {
   display: block;
   min-height: 1.08em;
+  color: var(--ink);
+}
+
+/* The rolling word keeps its sky-blue underline, which stretches with the word. */
+.rot-roll::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.04em;
+  height: 0.09em;
+  border-radius: 0.045em;
+  background: var(--sky);
 }
 
 .rot-word {
@@ -228,32 +233,6 @@ function tone(hex) {
   text-decoration-thickness: 0.09em;
   text-underline-offset: 0.14em;
   text-decoration-skip-ink: none;
-}
-
-.rot-enter-active {
-  transition:
-    opacity 0.55s var(--ease-out),
-    transform 0.6s var(--ease-out),
-    filter 0.55s var(--ease-out);
-}
-
-.rot-leave-active {
-  transition:
-    opacity 0.22s var(--ease-in),
-    transform 0.22s var(--ease-in),
-    filter 0.22s var(--ease-in);
-}
-
-.rot-enter-from {
-  opacity: 0;
-  transform: translate3d(0, 0.35em, 0);
-  filter: blur(8px);
-}
-
-.rot-leave-to {
-  opacity: 0;
-  transform: translate3d(0, -0.25em, 0);
-  filter: blur(8px);
 }
 
 .win {
@@ -298,40 +277,6 @@ function tone(hex) {
 
 .text-link {
   font-weight: 500;
-}
-
-.photo {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  aspect-ratio: 1;
-}
-
-/* A sticker on the photo, slightly crooked, as if pressed on by hand. */
-.sticker {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  z-index: 3;
-  padding: 0.5rem 0.875rem;
-  border-radius: 0.75rem;
-  background: #fff;
-  color: #111;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  box-shadow: 0 0.75rem 1.5rem -0.5rem rgb(0 0 0 / 0.35);
-  transform: rotate(-4deg);
-  transition: transform 0.5s var(--ease-out);
-}
-
-.photo:hover .sticker {
-  transform: rotate(-1deg) translate3d(0, -0.2rem, 0);
-}
-
-.photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 /* The work: four tiles, two by two on phones. */

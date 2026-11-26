@@ -301,7 +301,7 @@ a:focus-visible > .corner {
   stroke-linejoin: round;
 }
 
-/* The theme switch: the new theme spreads out from the button (see ThemeToggle). */
+/* The theme switch: the new theme spreads out from the pull cord (see theme.js). */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

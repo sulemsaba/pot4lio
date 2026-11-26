@@ -9,8 +9,8 @@
 
     <NavPill class="reveal" :pages="menu" :page="route.page" :t="t" />
 
-    <div class="tools reveal">
-      <div class="lang" role="group" :aria-label="t.language">
+    <div class="tools">
+      <div class="lang reveal" role="group" :aria-label="t.language">
         <button
           v-for="option in languages"
           :key="option.code"
@@ -24,7 +24,7 @@
           {{ option.short }}
         </button>
       </div>
-      <ThemeToggle :t="t" />
+      <PullCord :t="t" />
     </div>
 
     <main id="main" ref="main" tabindex="-1">
@@ -43,7 +43,7 @@ import { copy, profile, projects } from './content.js'
 import { essays } from './writing.js'
 import NavPill from './components/NavPill.vue'
 import SiteFooter from './components/SiteFooter.vue'
-import ThemeToggle from './components/ThemeToggle.vue'
+import PullCord from './components/PullCord.vue'
 import CvPage from './pages/CvPage.vue'
 import WritingPage from './pages/WritingPage.vue'
 import HomePage from './pages/HomePage.vue'
