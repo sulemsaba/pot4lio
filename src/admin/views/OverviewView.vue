@@ -69,6 +69,7 @@
       <a class="job" href="#/essays"><Icon name="pen" /><span><strong>Writing</strong><span class="muted">{{ state.draft.essays.length }} essays</span></span></a>
       <a class="job" href="#/cv"><Icon name="file" /><span><strong>CV</strong><span class="muted">The page and the PDF</span></span></a>
       <a class="job" href="#/copy"><Icon name="type" /><span><strong>Site text</strong><span class="muted">Headings, buttons, messages</span></span></a>
+      <a v-if="state.draft.profile.stats?.umami" class="job" href="https://cloud.umami.is" target="_blank" rel="noopener"><Icon name="eye" /><span><strong>Visitors</strong><span class="muted">Countries, devices, pages</span></span></a>
     </div>
   </section>
 </template>

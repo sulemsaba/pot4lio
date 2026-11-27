@@ -45,6 +45,15 @@ Before publishing, the admin page lists what will change, and its Overview flags
 a look: missing Kiswahili, pictures with no description, long dashes, two projects with the
 same address, and referee contact details (which must stay private).
 
+### Visitor statistics
+
+The site can count its visitors with Umami (free at cloud.umami.is): countries and cities,
+devices, browsers, pages, where visitors came from and when, plus clicks on the CV,
+WhatsApp, email and phone links (`src/analytics.js`). It sets no cookies and identifies
+nobody. It stays off until you paste your Umami website ID in the admin page (Profile and
+links, Visitor statistics) and publish, and it never counts visits from your own computer
+(localhost) or from the draft preview.
+
 ## Your own server (later)
 
 `server/` holds a small API (FastAPI, SQLite or PostgreSQL) for when you own a server; its

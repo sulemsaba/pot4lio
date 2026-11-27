@@ -34,6 +34,7 @@
         </li>
       </ul>
       <p class="side-foot">
+        <a v-if="state.draft.profile.stats?.umami" href="https://cloud.umami.is" target="_blank" rel="noopener"><Icon name="eye" :size="14" /> Visitor statistics</a>
         <a href="../" target="_blank" rel="noopener"><Icon name="external" :size="14" /> The live site</a>
       </p>
     </nav>
@@ -185,7 +186,8 @@ async function go({ key, path }) {
   pendingFocus = false
   // The deepest part of the path that is on the page.
   for (let n = path.length; n >= 0; n--) {
-    const el = document.getElementById(fieldId(key, path.slice(0, n)))
+    const target = fieldId(key, path.slice(0, n))
+    const el = document.getElementById(target) || document.getElementById(`${target}-input`)
     if (!el) continue
     el.scrollIntoView({ block: 'center', behavior: 'smooth' })
     const input = el.matches('input, textarea, select') ? el : el.querySelector('input, textarea, select, button')

@@ -134,6 +134,7 @@ export function runChecks(draft) {
   })
 
   if (!draft.profile?.links?.linkedin) add('info', 'LinkedIn is hidden until you add a link.', 'profile', ['links', 'linkedin'])
+  if (!draft.profile?.stats?.umami) add('info', 'Visitor statistics are off. Add your free Umami website ID to see who visits.', 'profile', ['stats', 'umami'])
 
   const order = { error: 0, warn: 1, info: 2 }
   return found.sort((a, b) => order[a.level] - order[b.level])
