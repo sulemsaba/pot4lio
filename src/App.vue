@@ -46,6 +46,7 @@ import NavPill from './components/NavPill.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import PullCord from './components/PullCord.vue'
 import PreviewBar from './components/PreviewBar.vue'
+import { startAnalytics, trackPage } from './analytics.js'
 import CvPage from './pages/CvPage.vue'
 import WritingPage from './pages/WritingPage.vue'
 import HomePage from './pages/HomePage.vue'
@@ -168,6 +169,10 @@ watch(
 )
 
 onMounted(() => window.addEventListener('hashchange', onHashChange))
+
+// Visitor statistics (off until set up in the admin page): one page view per page opened.
+startAnalytics()
+watch(route, ({ page, sub }) => trackPage(`/${page === 'home' ? '' : page}${sub ? `/${sub}` : ''}`), { immediate: true })
 onBeforeUnmount(() => {
   window.removeEventListener('hashchange', onHashChange)
   clearTimeout(switchTimer)

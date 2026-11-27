@@ -63,6 +63,19 @@ export const schema = {
           cvPreview: { type: 'image', label: 'CV picture', pathOnly: true, dir: '', max: 1200, help: 'A picture of the first page of the CV, for the CV card on Home.' },
         },
       },
+      stats: {
+        type: 'object',
+        label: 'Visitor statistics',
+        optional: true,
+        help: 'See who visits: country and city, device, browser, which pages, where they came from and when. No cookies, and nobody is identified by name.',
+        fields: {
+          umami: t('Umami website ID', {
+            placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            help: 'Make a free account at cloud.umami.is, add a website with the domain sulemsaba.github.io, open its settings and copy the Website ID here. Then publish. Leave it empty to switch the statistics off.',
+          }),
+          script: { type: 'url', label: 'Tracker address', optional: true, help: 'Only if you run Umami on your own server later: https://your-server/script.js.' },
+        },
+      },
     },
   },
 
