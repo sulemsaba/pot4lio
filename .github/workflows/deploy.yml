@@ -24,7 +24,18 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # VITE_API_URL is a repository variable (Settings, Secrets and variables, Actions,
+      # Variables). Leave it unset while there is no server: the site uses src/data.
       - run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+      # Print the CV PDF again from the CV page, so an edit made in the admin page reaches
+      # the PDF too. If this fails, the PDF already in public/ is the one that ships.
+      - name: Print the CV PDF
+        continue-on-error: true
+        env:
+          CHROME: google-chrome
+        run: node scripts/cv-pdf.mjs && cp public/suleiman-msaba-cv.pdf dist/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

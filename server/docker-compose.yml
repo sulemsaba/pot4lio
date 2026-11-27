@@ -1,0 +1,40 @@
+# The server and its PostgreSQL database, for a VPS:
+#   cp .env.example .env   (then fill it in, with ENV=production)
+#   docker compose up -d --build
+# The API listens on 127.0.0.1:8000 only; put Caddy (or nginx) in front for HTTPS.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql+psycopg://portfolio:${POSTGRES_PASSWORD}@db:5432/portfolio
+      # Only the proxy on this machine can reach the port, so trust its X-Forwarded-For
+      # (the rate limits then see each visitor's real address).
+      FORWARDED_ALLOW_IPS: "*"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - media:/app/data
+
+volumes:
+  db:
+  media:

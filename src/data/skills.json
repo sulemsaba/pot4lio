@@ -1,0 +1,42 @@
+[
+  {
+    "name": {
+      "en": "Banking and financial services",
+      "sw": "Benki na huduma za fedha"
+    },
+    "items": {
+      "en": "Customer service, front office and teller support, transaction processing, banking documentation, compliance procedures",
+      "sw": "Huduma kwa wateja, dawati la mbele na kaunta, uchakataji wa miamala, nyaraka za kibenki, taratibu za uzingatiaji"
+    }
+  },
+  {
+    "name": {
+      "en": "Finance and business operations",
+      "sw": "Fedha na uendeshaji wa biashara"
+    },
+    "items": {
+      "en": "Budgets and expenditure tracking, accounting operations, financial records and reporting, internal audit support, process improvement",
+      "sw": "Bajeti na ufuatiliaji wa matumizi, shughuli za uhasibu, kumbukumbu na ripoti za fedha, msaada wa ukaguzi wa ndani, uboreshaji wa michakato"
+    }
+  },
+  {
+    "name": {
+      "en": "Digital business solutions",
+      "sw": "Suluhisho za kidijitali kwa biashara"
+    },
+    "items": {
+      "en": "Websites and web apps, Android apps, business and administration systems, APIs, testing",
+      "sw": "Tovuti na programu za wavuti, programu za Android, mifumo ya biashara na utawala, API, majaribio"
+    }
+  },
+  {
+    "name": {
+      "en": "Languages",
+      "sw": "Lugha"
+    },
+    "items": {
+      "en": "Kiswahili, English, Arabic",
+      "sw": "Kiswahili, Kiingereza, Kiarabu"
+    }
+  }
+]

@@ -15,22 +15,58 @@ npm run preview  # check the production build
 
 ## Edit the content
 
-Everything the site says is in `src/content.js`, in English (`en`) and Kiswahili (`sw`):
+Open the admin page: `http://localhost:3000/admin/` while `npm run dev` runs, or
+`https://sulemsaba.github.io/pot4lio/admin/` on the live site. It edits everything the
+site says, in English and Kiswahili side by side: profile and links, projects (with their
+pictures), essays, the About page, the CV, the Kiswahili words and every other line of
+site text. A preview beside the editor shows the real site with your changes as you type.
 
-- `profile`: name, city, photo and links (email, WhatsApp, GitHub, LinkedIn, CV). Empty links are hidden. The photo is `public/suleiman.webp`; replace that file to change it.
-- `copy`: every sentence on the site, page by page, including the story on the About page. In the story, `**words like this**` show a little stronger.
-- `projects`: name, type, status, summary, link, images and `tint` (the colour behind the images). Images live in `public/work/`. Each project also has a `pitch` (one line on what it does for people), `wins` (its advantages, shown as ticks) and `ask` (the WhatsApp message behind "Want one like this?"). Keep these to real advantages; never invent numbers.
-- `copy.needs`: the "What does your business need?" picker on Home and Work: one entry per choice, with its points, an example and a ready-made WhatsApp message.
-- `greetings`: the words the greeting card cycles through, one per language spoken.
-- `experience`, `education`, `skills`, `certificates`: the lists under About.
-- `src/writing.js`: the essays on the Writing page, newest first. Each has a `slug` (its link), `topic`, `tone` (`sand`, `palm`, `sky` or empty), `date`, `title`, `dek` and `body`. In the body a string is a paragraph, `{ h }` a heading, `{ q, by }` a quotation and `{ list }` a list; `**bold**` and `*italic*` work inside. The essays are in English; the page around them follows the language switch. Each essay has a photo in `public/writing/` (`<slug>.webp`, up to 1600px wide, and `<slug>-sm.webp`, 800px wide) with its credit in `image`; the photos come from Wikimedia Commons and every one is credited under its essay with its licence.
-- `src/tools.js`: the "Tools I use" card on About, in three groups. Logos come from Simple Icons (CC0); Excel, Power BI, Matplotlib, SQL and VS Code get plain line drawings. Add or remove a tool there.
+The content itself is a set of JSON files in `src/data/`, one per part of the site;
+`src/data/README.md` explains each one. The admin page and the site both read them, so
+you can also edit them by hand.
+
+### Where the admin page saves
+
+Your edits are saved in your browser as you type (a draft). Publishing sends them on, to
+one of three places you choose in the admin page's Settings:
+
+- **This browser only.** Nothing leaves the browser. Save a copy of the content file and
+  run `npm run content -- import <file>` here, then deploy.
+- **GitHub (no server needed).** With a fine-grained GitHub token that can only write to
+  this repository (Settings in the admin page shows how to make one), Publish writes the
+  changed files and new pictures to `main` as one commit. The deploy workflow then rebuilds
+  the site in about a minute. Every publish is a commit, so the history is on GitHub.
+- **Your own server.** For when you have one: see below.
+
+Anyone can open the admin page, but without your token or your server password their edits
+stay in their own browser. The page is marked `noindex`, so search engines skip it.
+
+Before publishing, the admin page lists what will change, and its Overview flags what needs
+a look: missing Kiswahili, pictures with no description, long dashes, two projects with the
+same address, and referee contact details (which must stay private).
+
+## Your own server (later)
+
+`server/` holds a small API (FastAPI, SQLite or PostgreSQL) for when you own a server; its
+`README.md` explains how to run and deploy it, and `server/API.md` is the contract between
+it and the site. With it connected:
+
+- the site loads its content from the server, so a publish shows at once, with no rebuild;
+- pictures upload straight to the server;
+- the contact form sends messages to the admin page's Inbox, instead of opening the
+  visitor's email app;
+- every publish is kept, and any earlier version can be restored.
+
+To switch it on, set the repository variable `VITE_API_URL` (GitHub, *Settings, Secrets
+and variables, Actions, Variables*) to the server's address and run the deploy again, then
+sign in under Settings in the admin page. Until then the site works exactly as now, from
+`src/data/`.
 
 The contact box sends visitors to WhatsApp with their message already typed, using the number in `profile.links.whatsapp`.
 
-The menu has five pages: Home, About, Work, Writing and Contact (`#/`, `#/about`, `#/work`, `#/writing`, `#/contact`). The CV (`#/cv`) is linked from the footer of every page and from Home. The footer ends with a sign-off whose middle word rolls to the next one letter by letter (`sayWords` in `src/content.js`, `src/components/WordRoll.vue`) and a strip of grass that grows up the first time it comes into view, which visitors can brush, tap, or push with the arrow keys (`src/components/GrassField.vue`). A road light stands at the right end of the grass (`src/components/StreetLight.vue`): off by day, and at night it flickers on and lights the grass below its arm. `#/work/ligiplay` (or any project id) opens the Work page at that project. Writing lists the essays, with a search (titles, summaries and full text, accents ignored) and topic buttons; the search and topic stay set while a reader opens an essay and comes back. `#/writing/<slug>` opens one essay; on wide screens its contents sit fixed at the left, halfway down the screen, mark the section being read and jump to any section, and on smaller screens they fold into a box before the text. The old `#/play` link opens Writing.
+The menu has five pages: Home, About, Work, Writing and Contact (`#/`, `#/about`, `#/work`, `#/writing`, `#/contact`). The CV (`#/cv`) is linked from the footer of every page and from Home. The footer ends with a sign-off whose middle word rolls to the next one letter by letter (`sayWords` in `src/data/copy.json`, `src/components/WordRoll.vue`) and a strip of grass that grows up the first time it comes into view, which visitors can brush, tap, or push with the arrow keys (`src/components/GrassField.vue`). A road light stands at the right end of the grass (`src/components/StreetLight.vue`): off by day, and at night it flickers on and lights the grass below its arm. `#/work/ligiplay` (or any project id) opens the Work page at that project. Writing lists the essays, with a search (titles, summaries and full text, accents ignored) and topic buttons; the search and topic stay set while a reader opens an essay and comes back. `#/writing/<slug>` opens one essay; on wide screens its contents sit fixed at the left, halfway down the screen, mark the section being read and jump to any section, and on smaller screens they fold into a box before the text. The old `#/play` link opens Writing.
 
-The CV page shows the CV from `src/cv.js`, with buttons to download the PDF or print. The PDF (`public/suleiman-msaba-cv.pdf`) is printed from that same page, so after editing `src/cv.js` run `npm run cv:pdf` (it needs Chrome or Chromium installed) and the download matches again. For one application, a tailored CV (its own headline, profile, skills or order of sections) can be written as `private/<name>.json` and printed with `node scripts/cv-pdf.mjs --private --variant private/<name>.json`; it is built separately inside `private/`, so it never reaches git or the website.
+The CV page shows the CV from `src/data/cv.json`, with buttons to download the PDF or print. The PDF (`public/suleiman-msaba-cv.pdf`) is printed from that same page on every deploy, so the download always matches; `npm run cv:pdf` prints it on your computer too (it needs Chrome or Chromium installed). For one application, a tailored CV (its own headline, profile, skills or order of sections) can be written as `private/<name>.json` and printed with `node scripts/cv-pdf.mjs --private --variant private/<name>.json`; it is built separately inside `private/`, so it never reaches git or the website.
 
 Referees appear on the public CV by name and role only. Their phone numbers and emails live in `private/referees.json`, which is not in git. `npm run cv:pdf:private` prints `private/Suleiman-Msaba-CV-with-referees.pdf`, the full CV to send with job applications.
 

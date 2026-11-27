@@ -1,0 +1,32 @@
+[
+  {
+    "name": {
+      "en": "CS50’s Introduction to Programming with Python (CS50P)",
+      "sw": "CS50’s Introduction to Programming with Python (CS50P)"
+    },
+    "issuer": {
+      "en": "HarvardX",
+      "sw": "HarvardX"
+    }
+  },
+  {
+    "name": {
+      "en": "Software Architecture",
+      "sw": "Software Architecture"
+    },
+    "issuer": {
+      "en": "Udemy",
+      "sw": "Udemy"
+    }
+  },
+  {
+    "name": {
+      "en": "NDG Hackathon 2025, Copenhagen",
+      "sw": "NDG Hackathon 2025, Copenhagen"
+    },
+    "issuer": {
+      "en": "Certificate",
+      "sw": "Cheti"
+    }
+  }
+]

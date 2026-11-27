@@ -66,8 +66,7 @@ const active = ref(0)
 const tabs = []
 const current = computed(() => props.t.needs[active.value])
 
-const number = profile.links.whatsapp.replace(/\D/g, '')
-const whatsapp = (text) => `https://wa.me/${number}?text=${encodeURIComponent(text)}`
+const whatsapp = (text) => `https://wa.me/${profile.links.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`
 const mailto = (need) => `mailto:${profile.links.email}?subject=${encodeURIComponent(need.label)}&body=${encodeURIComponent(need.message)}`
 
 // Arrow keys move between the choices, as in any set of tabs.

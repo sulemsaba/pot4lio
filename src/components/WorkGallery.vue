@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { profile } from '../content.js'
 import ArrowIcon from './ArrowIcon.vue'
 import LeagueDemo from './LeagueDemo.vue'
@@ -110,8 +110,8 @@ const props = defineProps({
 const hostOf = (url) => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
 // "Want one like this?" opens WhatsApp with a message about this project, ready to send.
-const whatsapp = profile.links.whatsapp.replace(/\D/g, '')
-const ask = (project) => `https://wa.me/${whatsapp}?text=${encodeURIComponent(project.ask[props.lang])}`
+const whatsapp = computed(() => profile.links.whatsapp.replace(/\D/g, ''))
+const ask = (project) => `https://wa.me/${whatsapp.value}?text=${encodeURIComponent(project.ask[props.lang])}`
 
 // Phones fold each project's list of advantages; a tap opens it.
 const phoneQuery = window.matchMedia('(max-width: 40rem)')

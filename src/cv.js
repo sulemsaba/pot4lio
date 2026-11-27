@@ -1,99 +1,13 @@
 // The CV: shown on the CV page, and printed from that page to the PDF in /public
 // (run `npm run cv:pdf`), so the two always match. Keep it short and scannable:
 // one line per point, facts only.
+import { site } from './site.js'
 
-const base = {
-  name: 'Suleiman Msaba',
-  headline: ['Software Developer and Business Operations', 'Banking and Finance Graduate'],
-  // Two groups: how to reach him, then where to see the work.
-  contact: [
-    [
-      { text: 'Dar es Salaam, Tanzania' },
-      { text: '+255 768 944 291', href: 'tel:+255768944291' },
-      { text: 'suleimanmsaba1@gmail.com', href: 'mailto:suleimanmsaba1@gmail.com' },
-    ],
-    [
-      { text: 'Portfolio: sulemsaba.github.io/pot4lio', href: 'https://sulemsaba.github.io/pot4lio/' },
-      { text: 'github.com/sulemsaba', href: 'https://github.com/sulemsaba' },
-    ],
-  ],
-
-  profile:
-    'Banking and finance graduate who builds websites, Android apps and business systems. At Exxonim Company Limited I combine software development with finance and operations: budgets, accounting records, reporting and audit support.',
-
-  experience: [
-    {
-      role: 'Software Development and Business Operations',
-      org: 'Exxonim Company Limited, Dar es Salaam',
-      dates: 'Jan 2025 to present',
-      bullets: [
-        'Build and maintain websites, web apps, Android apps and internal business systems.',
-        'Develop database-backed features and APIs; test, troubleshoot and improve them.',
-        'Support budgets, expenditure tracking, accounting records, internal reporting and audit-related analysis.',
-        'Work with stakeholders to turn requirements into tools that improve accuracy and efficiency.',
-      ],
-    },
-    {
-      role: 'Data Cleaning and Migration (contract)',
-      org: 'Tanzania Red Cross Society',
-      dates: '2026',
-      bullets: [
-        'Cleaned and organised the organisation’s data and fed it into their new database and system.',
-      ],
-    },
-    {
-      role: 'Banking Intern',
-      org: 'Tanzania Commercial Bank, Dar es Salaam',
-      dates: 'Jul 2024 to Sep 2024',
-      bullets: [
-        'Served customers at the front office and teller desk, including account-related enquiries.',
-        'Assisted with daily transaction processing and back-office book balancing.',
-        'Supported accurate records and compliance documentation.',
-      ],
-    },
-  ],
-
-  projects: [
-    { name: 'LigiPlay', what: 'Android app for eFootball leagues: fixtures, results from screenshots, live tables.', tech: 'Flutter, FastAPI · Google Play' },
-    { name: 'MangiPlus', what: 'Android app for small and medium-sized businesses.', tech: 'Google Play' },
-    { name: 'consult.exxonim.tz', what: 'Website for company registration, licences, permits and compliance services.', tech: '' },
-    { name: 'levo.or.tz', what: 'Website for Legal Vision Organization (LEVO), a legal aid and advocacy organisation.', tech: '' },
-    { name: 'JOTOFA Group', what: 'Website proposal for a Tanzanian holding company in ICT, cleaning and staffing.', tech: 'frontendjotofa.vercel.app' },
-    { name: 'Drax Raw', what: 'Portfolio website for a filmmaker: films, galleries and WhatsApp booking.', tech: 'sulemsaba.github.io/draxraw' },
-  ],
-  projectsNote: 'Other client and internal systems are private.',
-
-  education: [
-    { degree: 'Bachelor of Commerce, Banking and Financial Services', school: 'University of Dar es Salaam', dates: 'Sep 2022 to Oct 2025' },
-  ],
-
-  skills: [
-    ['Development', 'Python, JavaScript, TypeScript, Dart, Flutter, React, HTML, CSS'],
-    ['Backend and data', 'FastAPI, REST APIs, PostgreSQL, MySQL, SQL'],
-    ['Tools', 'Git, GitHub, Docker Compose, Linux'],
-    ['Finance and analysis', 'Budgeting, accounting records, reporting, audit support, Excel, Power BI, Oracle Analytics'],
-    ['Banking', 'Customer service, teller operations, transaction processing, compliance documentation'],
-  ],
-
-  certifications: [
-    'CS50’s Introduction to Programming with Python (CS50P), HarvardX',
-    'Software Architecture, Udemy',
-    'NDG Hackathon 2025, Copenhagen',
-  ],
-
-  languages: 'Kiswahili, English, Arabic',
-  interests: 'Reading on technology and business, learning new technologies, writing essays, charity',
-
-  // Names and roles only. Their phone numbers and emails are private: they live in
-  // private/referees.json (not in git) and only go into the private PDF
-  // (npm run cv:pdf:private), never into the website.
-  referees: [
-    { name: 'Cedric Makoko', role: 'Insurance Relationship Officer', org: 'Tanzania Commercial Bank PLC' },
-    { name: 'Dr. Elinami J. Minja', role: 'Chairperson, Corporate Finance and Financial Markets Group', org: 'University of Dar es Salaam' },
-    { name: 'Tobias A. Swai', role: 'Head of Department of Finance', org: 'University of Dar es Salaam' },
-  ],
-  refereesNote: 'Contact details available on request.',
-}
+// The CV itself is src/data/cv.json, edited from the admin page. Referees there are names
+// and roles only. Their phone numbers and emails are private: they live in
+// private/referees.json (not in git) and only go into the private PDF
+// (npm run cv:pdf:private), never into the website.
+const base = site.cv
 
 // A tailored version for one application (a different headline, profile, order of
 // sections...) can replace parts of the CV. It comes from a file in private/ and only

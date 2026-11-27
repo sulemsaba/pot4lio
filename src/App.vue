@@ -35,6 +35,7 @@
 
     <SiteFooter :lang="lang" :t="t" :page="route.page" />
   </div>
+  <PreviewBar />
 </template>
 
 <script setup>
@@ -44,6 +45,7 @@ import { essays } from './writing.js'
 import NavPill from './components/NavPill.vue'
 import SiteFooter from './components/SiteFooter.vue'
 import PullCord from './components/PullCord.vue'
+import PreviewBar from './components/PreviewBar.vue'
 import CvPage from './pages/CvPage.vue'
 import WritingPage from './pages/WritingPage.vue'
 import HomePage from './pages/HomePage.vue'
