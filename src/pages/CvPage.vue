@@ -116,6 +116,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { cv } from '../cv.js'
 import { profile } from '../content.js'
 import RichText from '../components/RichText.vue'
@@ -128,7 +129,7 @@ defineProps({
 
 const print = () => window.print()
 
-const order = cv.order || ['profile', 'experience', 'projects', 'education', 'skills', 'more', 'referees']
+const order = computed(() => cv.order || ['profile', 'experience', 'projects', 'education', 'skills', 'more', 'referees'])
 
 // Referees' phone numbers and emails are never part of the site. Only the private PDF
 // passes them in (?referees=..., base64url JSON) when it prints this page.

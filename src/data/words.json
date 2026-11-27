@@ -1,0 +1,44 @@
+[
+  {
+    "word": "Karibu",
+    "say": "kah-REE-boo",
+    "meaning": "Welcome",
+    "short": "Welcome"
+  },
+  {
+    "word": "Habari?",
+    "say": "hah-BAH-ree",
+    "meaning": "Hello, how are you? (literally: any news?)",
+    "short": "Hello, how are you?"
+  },
+  {
+    "word": "Asante",
+    "say": "ah-SAHN-teh",
+    "meaning": "Thank you",
+    "short": "Thank you"
+  },
+  {
+    "word": "Kazi",
+    "say": "KAH-zee",
+    "meaning": "Work, a job",
+    "short": "Work"
+  },
+  {
+    "word": "Pole pole",
+    "say": "POH-leh POH-leh",
+    "meaning": "Slowly, slowly. Take it easy.",
+    "short": "Slowly"
+  },
+  {
+    "word": "Rafiki",
+    "say": "rah-FEE-kee",
+    "meaning": "Friend",
+    "short": "Friend"
+  },
+  {
+    "word": "Hakuna matata",
+    "say": "hah-KOO-nah mah-TAH-tah",
+    "meaning": "No worries",
+    "short": "No worries"
+  }
+]

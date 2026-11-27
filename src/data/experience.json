@@ -1,0 +1,35 @@
+[
+  {
+    "org": "Exxonim Company Limited",
+    "role": {
+      "en": "Software development and business operations",
+      "sw": "Uundaji wa programu na uendeshaji wa biashara"
+    },
+    "period": {
+      "en": "Since Jan 2025",
+      "sw": "Tangu Jan 2025"
+    }
+  },
+  {
+    "org": "Tanzania Red Cross Society",
+    "role": {
+      "en": "Data cleaning and migration (contract)",
+      "sw": "Usafishaji na uhamishaji wa data (mkataba)"
+    },
+    "period": {
+      "en": "2026",
+      "sw": "2026"
+    }
+  },
+  {
+    "org": "Tanzania Commercial Bank",
+    "role": {
+      "en": "Banking intern",
+      "sw": "Mafunzo kwa vitendo, benki"
+    },
+    "period": {
+      "en": "Jul to Sep 2024",
+      "sw": "Jul hadi Sep 2024"
+    }
+  }
+]

@@ -11,6 +11,11 @@
       <span class="visually-hidden" aria-live="polite">{{ copied ? t.copied : '' }}</span>
     </div>
 
+    <!-- With a server connected, the message goes straight to it, so it needs a way to reply. -->
+    <label v-if="direct" class="row">
+      <span class="label swap">{{ t.composeFrom }}</span>
+      <input v-model="from" type="text" maxlength="160" autocomplete="email" :placeholder="t.composeFromPlaceholder" />
+    </label>
     <label class="row">
       <span class="label swap">{{ t.composeSubject }}</span>
       <input v-model="subject" type="text" maxlength="160" :placeholder="t.composeSubjectPlaceholder" />
@@ -21,14 +26,18 @@
       <textarea v-model="body" rows="5" maxlength="4000" :placeholder="t.composeMessagePlaceholder"></textarea>
     </label>
 
+    <!-- A trap for spam bots: people never see it, bots fill it in. -->
+    <input v-if="direct" v-model="trap" class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <div class="send-row">
-      <button type="submit" class="button button--ink" :disabled="!body.trim()"><span class="swap">{{ t.composeSend }}</span></button>
+      <p v-if="direct && state !== 'idle'" class="state" role="status">{{ stateText }}</p>
+      <button type="submit" class="button button--ink" :disabled="!ready"><span class="swap">{{ direct ? (state === 'sending' ? t.composeSending : t.composeSendDirect) : t.composeSend }}</span></button>
     </div>
   </form>
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { API, sendMessage } from '../site.js'
 
 const props = defineProps({
   email: { type: String, required: true },
@@ -38,9 +47,38 @@ const props = defineProps({
 const subject = ref('')
 const body = ref('')
 
-// The message opens in the visitor's own email app, ready to send.
-function send() {
+// With a server (VITE_API_URL), the message is sent from here and lands in the admin page's
+// inbox. Without one, it opens in the visitor's own email app, ready to send.
+const direct = Boolean(API)
+const from = ref('')
+const trap = ref('')
+const state = ref('idle') // idle, sending, done, failed
+const ready = computed(() => body.value.trim() && (!direct || (from.value.trim() && state.value !== 'sending')))
+const stateText = computed(() => ({ sending: props.t.composeSending, done: props.t.composeDone, failed: props.t.composeFailed })[state.value] || '')
+
+async function send() {
   if (!body.value.trim()) return
+  if (direct) {
+    if (!from.value.trim()) return
+    state.value = 'sending'
+    const contact = from.value.trim()
+    try {
+      await sendMessage({
+        email: contact.includes('@') ? contact : '',
+        phone: contact.includes('@') ? '' : contact,
+        subject: subject.value.trim(),
+        message: body.value.trim(),
+        page: 'contact',
+        website: trap.value,
+      })
+      state.value = 'done'
+      subject.value = ''
+      body.value = ''
+    } catch {
+      state.value = 'failed'
+    }
+    return
+  }
   const query = new URLSearchParams({ subject: subject.value.trim(), body: body.value.trim() }).toString().replace(/\+/g, '%20')
   window.location.href = `mailto:${props.email}?${query}`
 }
@@ -167,11 +205,27 @@ textarea::placeholder {
 
 .send-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 0.75rem 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--line);
 }
 
+.trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.state {
+  margin: 0 auto 0 0;
+  align-self: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
 /* Until there is a message, the button waits quietly as an outline. */
 .send-row .button:disabled {
   border-color: var(--line);

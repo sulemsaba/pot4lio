@@ -1,0 +1,21 @@
+[
+  {
+    "id": "ligiplay",
+    "name": "LigiPlay",
+    "type": {
+      "en": "Android app",
+      "sw": "Programu ya Android"
+    },
+    "wins": {
+      "en": [
+        "Both players confirm every result."
+      ],
+      "sw": []
+    },
+    "summary": {
+      "en": "Ends the “who really won?” arguments.",
+      "sw": "Habari’za"
+    },
+    "images": []
+  }
+]

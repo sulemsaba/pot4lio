@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { toolGroups } from '../tools.js'
 
 defineProps({
@@ -45,8 +45,10 @@ defineProps({
 // The logos sit in plain ink. The first time the card comes into view, a wave of
 // colour runs through them, one after another, so phones (with no hover) see it too.
 // After that a tile lights up in its own colour when the pointer is on it.
-let count = 0
-const numbered = toolGroups.map((group) => ({ ...group, tools: group.tools.map((tool) => ({ ...tool, n: count++ })) }))
+const numbered = computed(() => {
+  let count = 0
+  return toolGroups.map((group) => ({ ...group, tools: group.tools.map((tool) => ({ ...tool, n: count++ })) }))
+})
 
 const box = ref(null)
 const lit = ref(false)

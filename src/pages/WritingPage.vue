@@ -197,8 +197,8 @@ const nextEssay = computed(() => essays[(essays.indexOf(essay.value) + 1) % essa
 
 // ---------- Search and topics ----------
 const state = filters
-const topics = [...new Set(essays.map((item) => item.topic))]
-const counts = Object.fromEntries(topics.map((topic) => [topic, essays.filter((item) => item.topic === topic).length]))
+const topics = computed(() => [...new Set(essays.map((item) => item.topic))])
+const counts = computed(() => Object.fromEntries(topics.value.map((topic) => [topic, essays.filter((item) => item.topic === topic).length])))
 
 // Lower case, no accents, one kind of apostrophe: so "konigsberg" finds Königsberg.
 const fold = (text) =>
@@ -207,7 +207,7 @@ const fold = (text) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/’/g, "'")
-const searchable = essays.map((item) =>
+const searchable = computed(() => essays.map((item) =>
   fold(
     [
       item.title,
@@ -219,12 +219,12 @@ const searchable = essays.map((item) =>
       .join(' ')
       .replace(/\*/g, ''),
   ),
-)
+))
 
 const shown = computed(() => {
   const terms = fold(state.q).split(/\s+/).filter(Boolean)
   return essays.filter(
-    (item, i) => (!state.topic || item.topic === state.topic) && terms.every((term) => searchable[i].includes(term)),
+    (item, i) => (!state.topic || item.topic === state.topic) && terms.every((term) => searchable.value[i].includes(term)),
   )
 })
 const found = computed(() => (shown.value.length === 1 ? props.t.writingOne : props.t.writingMany.replace('{n}', shown.value.length)))

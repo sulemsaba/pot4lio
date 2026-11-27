@@ -1,0 +1,376 @@
+[
+  {
+    "id": "ligiplay",
+    "name": "LigiPlay",
+    "type": {
+      "en": "Android app",
+      "sw": "Programu ya Android"
+    },
+    "status": {
+      "en": "On Google Play · Flutter, Dart, FastAPI, PostgreSQL · English and Kiswahili",
+      "sw": "Iko Google Play · Flutter, Dart, FastAPI, PostgreSQL · Kiingereza na Kiswahili"
+    },
+    "summary": {
+      "en": "Leagues and cups for eFootball players. LigiPlay makes the fixtures, reads the final score from a screenshot, asks both players to confirm it, and keeps the table up to date. It is built to work well on slow networks.",
+      "sw": "Ligi na makombe kwa wachezaji wa eFootball. LigiPlay inapanga ratiba, inasoma matokeo ya mwisho kutoka kwenye picha ya skrini, inawaomba wachezaji wote wawili kuyathibitisha, na inasasisha jedwali la msimamo. Imejengwa kufanya kazi vizuri hata kwenye mtandao wa polepole."
+    },
+    "url": "",
+    "layout": "phones",
+    "tint": "#123d31",
+    "pitch": {
+      "en": "Run a whole league from your phone, and end the “who really won?” arguments.",
+      "sw": "Endesha ligi nzima kwa simu yako, na umalize mabishano ya “nani alishinda kweli?”."
+    },
+    "wins": {
+      "en": [
+        "Fixtures are made for you.",
+        "Scores are read from a screenshot. No typing.",
+        "Both players confirm every result.",
+        "The table updates itself.",
+        "Works well on slow networks.",
+        "In English and Kiswahili."
+      ],
+      "sw": [
+        "Ratiba inapangwa kwa ajili yako.",
+        "Matokeo yanasomwa kutoka kwenye picha ya skrini. Bila kuandika.",
+        "Wachezaji wote wawili wanathibitisha kila matokeo.",
+        "Jedwali linajisasisha lenyewe.",
+        "Inafanya kazi vizuri hata kwenye mtandao wa polepole.",
+        "Kwa Kiingereza na Kiswahili."
+      ]
+    },
+    "demo": true,
+    "ask": {
+      "en": "Hi Suleiman, I saw LigiPlay. I would like an app like this.",
+      "sw": "Habari Suleiman, nimeona LigiPlay. Ningependa programu kama hii."
+    },
+    "images": [
+      {
+        "src": "work/ligiplay-1.webp",
+        "w": 540,
+        "h": 960,
+        "alt": {
+          "en": "LigiPlay home screen with tonight’s match and the matchday list",
+          "sw": "Skrini kuu ya LigiPlay yenye mechi ya leo usiku na ratiba ya siku"
+        }
+      },
+      {
+        "src": "work/ligiplay-2.webp",
+        "w": 540,
+        "h": 960,
+        "alt": {
+          "en": "LigiPlay screen for discovering open leagues",
+          "sw": "Skrini ya LigiPlay ya kutafuta ligi zilizo wazi"
+        }
+      },
+      {
+        "src": "work/ligiplay-3.webp",
+        "w": 540,
+        "h": 960,
+        "alt": {
+          "en": "LigiPlay league table",
+          "sw": "Jedwali la msimamo wa ligi kwenye LigiPlay"
+        }
+      },
+      {
+        "src": "work/ligiplay-4.webp",
+        "w": 540,
+        "h": 960,
+        "alt": {
+          "en": "LigiPlay statistics screen",
+          "sw": "Skrini ya takwimu kwenye LigiPlay"
+        }
+      }
+    ]
+  },
+  {
+    "id": "exxonim-consult",
+    "name": "Exxonim Consult",
+    "type": {
+      "en": "Website",
+      "sw": "Tovuti"
+    },
+    "status": {
+      "en": "Live",
+      "sw": "Iko hewani"
+    },
+    "summary": {
+      "en": "Website for Exxonim Consult, which handles company registration, TIN, licences, work permits, NGO registration and annual returns in Tanzania.",
+      "sw": "Tovuti ya Exxonim Consult, inayoshughulikia usajili wa kampuni, TIN, leseni, vibali vya kazi, usajili wa NGO na taarifa za mwaka nchini Tanzania."
+    },
+    "url": "https://consult.exxonim.tz",
+    "layout": "browser",
+    "tint": "",
+    "pitch": {
+      "en": "From “I want to start a business” to “Start My Registration”, in one visit.",
+      "sw": "Kutoka “nataka kuanzisha biashara” hadi “Start My Registration”, kwa ziara moja."
+    },
+    "wins": {
+      "en": [
+        "Every service on one site: company registration, TIN, licences, work permits, NGO registration and annual returns.",
+        "One clear first step: Start My Registration.",
+        "Clients can track their consultation.",
+        "Call or WhatsApp in one tap."
+      ],
+      "sw": [
+        "Huduma zote kwenye tovuti moja: usajili wa kampuni, TIN, leseni, vibali vya kazi, usajili wa NGO na taarifa za mwaka.",
+        "Hatua moja ya kwanza iliyo wazi: Start My Registration.",
+        "Wateja wanaweza kufuatilia ushauri wao.",
+        "Piga simu au WhatsApp kwa kubofya mara moja."
+      ]
+    },
+    "ask": {
+      "en": "Hi Suleiman, I saw the Exxonim Consult website. I would like a website like this.",
+      "sw": "Habari Suleiman, nimeona tovuti ya Exxonim Consult. Ningependa tovuti kama hii."
+    },
+    "phone": {
+      "src": "work/exxonim-consult-phone.webp",
+      "w": 600,
+      "h": 1298,
+      "alt": {
+        "en": "The Exxonim Consult website on a phone",
+        "sw": "Tovuti ya Exxonim Consult kwenye simu"
+      }
+    },
+    "images": [
+      {
+        "src": "work/exxonim-consult.webp",
+        "w": 1200,
+        "h": 750,
+        "alt": {
+          "en": "Exxonim Consult home page",
+          "sw": "Ukurasa wa mwanzo wa Exxonim Consult"
+        }
+      }
+    ]
+  },
+  {
+    "id": "levo",
+    "name": "LEVO",
+    "type": {
+      "en": "Website",
+      "sw": "Tovuti"
+    },
+    "status": {
+      "en": "Live",
+      "sw": "Iko hewani"
+    },
+    "summary": {
+      "en": "Website for Legal Vision Organization (LEVO), a Tanzanian organization working on legal aid, legal education and advocacy.",
+      "sw": "Tovuti ya Legal Vision Organization (LEVO), shirika la Kitanzania linalofanya kazi ya msaada wa kisheria, elimu ya sheria na utetezi."
+    },
+    "url": "https://levo.or.tz",
+    "layout": "browser",
+    "tint": "#123b62",
+    "pitch": {
+      "en": "Help people find legal aid, and help supporters give.",
+      "sw": "Wasaidie watu kupata msaada wa kisheria, na wafadhili kuchangia."
+    },
+    "wins": {
+      "en": [
+        "“Need legal support?” is right on the front page.",
+        "A Donate button for supporters.",
+        "Its work at a glance: legal aid, environment, water access and education.",
+        "A language switch, and WhatsApp in one tap."
+      ],
+      "sw": [
+        "“Need legal support?” iko kwenye ukurasa wa mbele.",
+        "Kitufe cha Donate kwa wafadhili.",
+        "Kazi yake kwa haraka: msaada wa kisheria, mazingira, maji na elimu.",
+        "Kubadili lugha, na WhatsApp kwa kubofya mara moja."
+      ]
+    },
+    "ask": {
+      "en": "Hi Suleiman, I saw the LEVO website. I would like a website for my organisation.",
+      "sw": "Habari Suleiman, nimeona tovuti ya LEVO. Ningependa tovuti kwa ajili ya shirika langu."
+    },
+    "phone": {
+      "src": "work/levo-phone.webp",
+      "w": 600,
+      "h": 1298,
+      "alt": {
+        "en": "The LEVO website on a phone",
+        "sw": "Tovuti ya LEVO kwenye simu"
+      }
+    },
+    "images": [
+      {
+        "src": "work/levo.webp",
+        "w": 1200,
+        "h": 750,
+        "alt": {
+          "en": "LEVO home page",
+          "sw": "Ukurasa wa mwanzo wa LEVO"
+        }
+      }
+    ]
+  },
+  {
+    "id": "jotofa",
+    "name": "JOTOFA Group",
+    "type": {
+      "en": "Website proposal",
+      "sw": "Pendekezo la tovuti"
+    },
+    "status": {
+      "en": "Proposal",
+      "sw": "Pendekezo"
+    },
+    "summary": {
+      "en": "A website I proposed to JOTOFA Group, a Tanzanian holding company with three businesses: ICT and telecommunications, professional cleaning, and staffing.",
+      "sw": "Tovuti niliyoipendekeza kwa JOTOFA Group, kampuni mama ya Kitanzania yenye biashara tatu: TEHAMA na mawasiliano, usafi wa kitaalamu, na huduma za wafanyakazi."
+    },
+    "url": "https://frontendjotofa.vercel.app",
+    "linkLabel": {
+      "en": "See the proposal",
+      "sw": "Tazama pendekezo"
+    },
+    "layout": "browser",
+    "tint": "#073b60",
+    "pitch": {
+      "en": "Three businesses, one clear front door.",
+      "sw": "Biashara tatu, mlango mmoja ulio wazi."
+    },
+    "wins": {
+      "en": [
+        "Each business shows its own services: ICT and telecoms, cleaning, and staffing.",
+        "News, careers and contact, a click away.",
+        "Call or WhatsApp in one tap.",
+        "Light and dark mode."
+      ],
+      "sw": [
+        "Kila biashara inaonyesha huduma zake: TEHAMA na mawasiliano, usafi, na wafanyakazi.",
+        "Habari, nafasi za kazi na mawasiliano, kwa kubofya mara moja.",
+        "Piga simu au WhatsApp kwa kubofya mara moja.",
+        "Mandhari meupe na meusi."
+      ]
+    },
+    "ask": {
+      "en": "Hi Suleiman, I saw your JOTOFA Group proposal. I would like a website for my company.",
+      "sw": "Habari Suleiman, nimeona pendekezo lako la JOTOFA Group. Ningependa tovuti kwa ajili ya kampuni yangu."
+    },
+    "phone": {
+      "src": "work/jotofa-phone.webp",
+      "w": 600,
+      "h": 1298,
+      "alt": {
+        "en": "The JOTOFA Group website on a phone",
+        "sw": "Tovuti ya JOTOFA Group kwenye simu"
+      }
+    },
+    "images": [
+      {
+        "src": "work/jotofa.webp",
+        "w": 1200,
+        "h": 750,
+        "alt": {
+          "en": "Home page of the JOTOFA Group website proposal",
+          "sw": "Ukurasa wa mwanzo wa pendekezo la tovuti ya JOTOFA Group"
+        }
+      }
+    ]
+  },
+  {
+    "id": "drax-raw",
+    "name": "Drax Raw",
+    "type": {
+      "en": "Portfolio website",
+      "sw": "Tovuti ya kazi"
+    },
+    "status": {
+      "en": "Live",
+      "sw": "Iko hewani"
+    },
+    "summary": {
+      "en": "Portfolio website for Drax Raw, a filmmaker, video editor and photographer in Dar es Salaam.",
+      "sw": "Tovuti ya kuonyesha kazi za Drax Raw, mtengeneza filamu, mhariri wa video na mpiga picha jijini Dar es Salaam."
+    },
+    "url": "https://sulemsaba.github.io/draxraw/",
+    "layout": "browser",
+    "tint": "#cb2f29",
+    "pitch": {
+      "en": "A filmmaker’s work up front, and bookings straight to WhatsApp.",
+      "sw": "Kazi za mtengeneza filamu mbele kabisa, na maombi ya kazi moja kwa moja WhatsApp."
+    },
+    "wins": {
+      "en": [
+        "Films play right on the page.",
+        "Photos and phone wallpapers in their own galleries.",
+        "Book on WhatsApp from anywhere on the site.",
+        "A bold look, as loud as the films."
+      ],
+      "sw": [
+        "Filamu zinachezwa papo hapo kwenye ukurasa.",
+        "Picha na wallpapers za simu kwenye maonyesho yake.",
+        "Weka miadi kwa WhatsApp kutoka popote kwenye tovuti.",
+        "Muonekano wenye nguvu, kama filamu zenyewe."
+      ]
+    },
+    "ask": {
+      "en": "Hi Suleiman, I saw the Drax Raw website. I would like a portfolio website.",
+      "sw": "Habari Suleiman, nimeona tovuti ya Drax Raw. Ningependa tovuti ya kuonyesha kazi zangu."
+    },
+    "phone": {
+      "src": "work/draxraw-phone.webp",
+      "w": 600,
+      "h": 1298,
+      "alt": {
+        "en": "The Drax Raw website on a phone",
+        "sw": "Tovuti ya Drax Raw kwenye simu"
+      }
+    },
+    "images": [
+      {
+        "src": "work/draxraw.webp",
+        "w": 1200,
+        "h": 750,
+        "alt": {
+          "en": "Drax Raw home page",
+          "sw": "Ukurasa wa mwanzo wa Drax Raw"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mangiplus",
+    "name": "MangiPlus",
+    "type": {
+      "en": "Android app",
+      "sw": "Programu ya Android"
+    },
+    "status": {
+      "en": "On Google Play",
+      "sw": "Iko Google Play"
+    },
+    "summary": {
+      "en": "An Android app for small and medium-sized businesses (SMEs).",
+      "sw": "Programu ya Android kwa biashara ndogo na za kati."
+    },
+    "url": "",
+    "layout": "banner",
+    "tint": "#f46906",
+    "pitch": {
+      "en": "Made for small and medium-sized businesses, in an Android app.",
+      "sw": "Imetengenezwa kwa biashara ndogo na za kati, kama programu ya Android."
+    },
+    "wins": {
+      "en": [],
+      "sw": []
+    },
+    "ask": {
+      "en": "Hi Suleiman, I saw MangiPlus. I would like an app for my business.",
+      "sw": "Habari Suleiman, nimeona MangiPlus. Ningependa programu kwa ajili ya biashara yangu."
+    },
+    "images": [
+      {
+        "src": "work/mangiplus.webp",
+        "w": 1024,
+        "h": 500,
+        "alt": {
+          "en": "MangiPlus logo",
+          "sw": "Nembo ya MangiPlus"
+        }
+      }
+    ]
+  }
+]
